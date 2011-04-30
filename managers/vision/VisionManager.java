@@ -23,10 +23,10 @@ public class VisionManager {
 		return point;
 	}
 	
-	private double distance(Point a, Point b){
+	private static double distance(Point a, Point b){
 		return Math.sqrt( (a.x-b.x)*(a.x-b.x) + (a.y-b.y)*(a.y-b.y) );
 	}
-	private Corners idealizedReprojection(Corners corners){
+	private static Corners idealizedReprojection(Corners corners){
 		double averageWidth = distance(corners.upleft(), corners.upright()) + distance(corners.downright(), corners.downleft());
 		averageWidth /= 2;
 		double averageHeight = distance(corners.upleft(), corners.downleft()) + distance(corners.upright(), corners.downright());
@@ -143,7 +143,10 @@ public class VisionManager {
             */
         	
             Corners corners = new Corners(new Point(961, 531), new Point(2338, 182), new Point(1411, 2393), new Point(2874, 1986));
+        	System.out.println(corners);
         	
+        	Corners reprojected = idealizedReprojection(corners);
+        	System.out.println(reprojected);
             
             
         }else{
