@@ -96,7 +96,7 @@ public class EditPanel extends JPanel implements MouseMotionListener {
 		super();
 
 		this.addMouseMotionListener(this);
-		this.setBackground(Color.WHITE);
+		this.setBackground(Color.LIGHT_GRAY);
 
 		this.cornerUL = new Ellipse2D.Double();
 		this.cornerUR = new Ellipse2D.Double();
