@@ -1,9 +1,13 @@
 package vision;
 
 import java.awt.image.BufferedImage;
+import java.awt.Graphics;
 import java.awt.Point;
 import core.Corners;
 import javax.imageio.ImageIO;
+
+import com.googlecode.javacv.cpp.opencv_core.CvMat;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -13,13 +17,11 @@ import static com.googlecode.javacv.cpp.opencv_highgui.*;
 import static com.googlecode.javacv.cpp.opencv_calib3d.*;
 
 public class VisionManager {
-	public VisionManager(){}
-	
-	public ConfigurationDictionary estimateConfigurationValues(BufferedImage img){
+	public static ConfigurationDictionary estimateConfigurationValues(BufferedImage img){
 		return new ConfigurationDictionary();
 	}
 	
-	public Point snapCorner(BufferedImage img, Point point){
+	public static Point snapCorner(BufferedImage img, Point point){
 		return point;
 	}
 	
@@ -46,42 +48,49 @@ public class VisionManager {
 		
 		return new Corners(new Point(0,0), new Point(width,0), new Point(0,height), new Point(width,height));
 	}
-	public BufferedImage rerenderImage(BufferedImage img, Corners points, ConfigurationDictionary config){
-		img = this.imageGlobalTransforms(img, config);
+	public static BufferedImage rerenderImage(BufferedImage img, Corners corners, ConfigurationDictionary config){
+		img = imageGlobalTransforms(img, config);
 		
-		Corners targets = this.idealizedReprojection(points);
+		IplImage image = BufferedImageToIplImage(img);
 		
-		//solve for the homography between points and targets
+    	Corners reprojected = idealizedReprojection(corners);
+        
+    	IplImage transformed = cvCreateImage(cvSize(reprojected.width(), reprojected.height()), IPL_DEPTH_8U, 3);
+    	
+    	CvMat homography = cvCreateMat(3,3,CV_64F);
+    	CvMat source_points = cornersToMat(corners);
+    	CvMat dest_points = cornersToMat(reprojected);
+
+    	cvFindHomography(source_points, dest_points, homography);
+    	cvWarpPerspective(image, transformed, homography, CV_INTER_LINEAR+CV_WARP_FILL_OUTLIERS, cvScalarAll(0));
 		
-		
-		//backproject the target area
-		
-		
-		return img;
+		return IplImageToBufferedImage(transformed);
 	}
 	
-	private BufferedImage applyTemperatureCorrection(BufferedImage img, ConfigurationValue temp){
+	private static BufferedImage applyTemperatureCorrection(BufferedImage img, ConfigurationValue temp){
 		return img;
 	}
-	private BufferedImage applyFlipCorrection(BufferedImage img, ConfigurationValue flip){
+	private static BufferedImage applyFlipCorrection(BufferedImage img, ConfigurationValue flip){
 		return img;
 	}
-	private BufferedImage applyContrastBoost(BufferedImage img, ConfigurationValue boost){
+	private static BufferedImage applyContrastBoost(BufferedImage img, ConfigurationValue boost){
 		return img;
 	}
-	public BufferedImage imageGlobalTransforms(BufferedImage img, ConfigurationDictionary config){
+	public static BufferedImage imageGlobalTransforms(BufferedImage img, ConfigurationDictionary config){
+		if (config == null){return img;}
+		
 		for(Object _name: config.getAllKeys()){
 			String name = (String)_name;
 			ConfigurationValue currentValue = config.getKey(name);
 			
 			if (currentValue.type == ConfigurationValue.ValueType.ColorTemperature){
-				img = this.applyTemperatureCorrection(img, currentValue);
+				img = applyTemperatureCorrection(img, currentValue);
 			}
 			else if (currentValue.type == ConfigurationValue.ValueType.FlipHorizontal ||
 					currentValue.type == ConfigurationValue.ValueType.FlipVertical){
-				img = this.applyFlipCorrection(img, currentValue);
+				img = applyFlipCorrection(img, currentValue);
 			}else if (currentValue.type == ConfigurationValue.ValueType.ContrastBoost){
-				img = this.applyContrastBoost(img, currentValue);
+				img = applyContrastBoost(img, currentValue);
 			}else{
 				System.err.println("A type in a ConfigurationDictionary given to recolorImage() is invalid and non-processable.");
 			}
@@ -89,7 +98,7 @@ public class VisionManager {
 		return img;
 	}
 	
-	public Corners findCorners(BufferedImage img){
+	public static Corners findCorners(BufferedImage img){
 		
 		//take the magnitude of the differential
 		
@@ -106,22 +115,51 @@ public class VisionManager {
 		return new Corners(new Point(0,0), new Point(img.getWidth(),0), new Point(0,img.getHeight()), new Point(img.getWidth(),img.getHeight()));
 	}
 	
-	private void writeImageToFile(BufferedImage img, String path) throws IOException{
+	private static void writeImageToFile(BufferedImage img, String path) throws IOException{
+		//ImageIO is slow and clunky, switch to cvSave?
 		File output = new File(path);;
-		ImageIO.write(img, "TIFF", output);
+		ImageIO.write(img, "png", output);
 	}
-	public void outputToFile(BufferedImage img, String path, Corners points, ConfigurationDictionary config) throws IOException{
-		this.writeImageToFile(this.rerenderImage(img, points, config), path);
-	}
-	
-	private BufferedImage IplImageToBufferedImage(IplImage img){
-		return null;
-	}
-	private IplImage BufferedImageToIplImage(BufferedImage img){
-		return null;
+	public static void outputToFile(BufferedImage img, String path, Corners points, ConfigurationDictionary config) throws IOException{
+		writeImageToFile(rerenderImage(img, points, config), path);
 	}
 	
-	public static void main(String[] args){
+	private static BufferedImage IplImageToBufferedImage(IplImage image){
+		return image.getBufferedImage();
+	}
+	
+	/*
+	 * Convert a BufferedImage to an IplImage
+	 * 
+	 * This is inefficient, but it seems to be the best possible (according to the author of javacv)
+	 * http://code.google.com/p/javacv/issues/detail?id=2
+	 */
+	private static IplImage BufferedImageToIplImage(BufferedImage image){
+		BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_3BYTE_BGR);
+		Graphics g = bufferedImage.getGraphics();
+		g.drawImage(image, 0, 0, null);
+		g.dispose();
+		return IplImage.createFrom(bufferedImage);
+	}
+	
+	private static CvMat cornersToMat(Corners c){
+		CvMat points = cvCreateMat(4, 2, CV_64F);
+		points.put(0,0,c.upleft().x);
+		points.put(0,1,c.upleft().y);
+		
+		points.put(1,0,c.upright().x);
+		points.put(1,1,c.upright().y);
+		
+		points.put(2,0,c.downleft().x);
+		points.put(2,1,c.downleft().y);
+		
+		points.put(3,0,c.downright().x);
+		points.put(3,1,c.downright().y);
+		
+		return points;
+	}
+	
+	public static void main(String[] args) throws IOException{
 		System.out.println("Vision library stub launcher");
 		IplImage image = cvLoadImage("tests/images/DSC_7384.JPG");
 		System.out.println("Loaded");
@@ -142,15 +180,10 @@ public class VisionManager {
             cvSaveImage("output.png", output);
             */
         	
-            Corners corners = new Corners(new Point(961, 531), new Point(2338, 182), new Point(1411, 2393), new Point(2874, 1986));
-        	System.out.println(corners);
-        	Corners reprojected = idealizedReprojection(corners);
-        	System.out.println(reprojected);
-            
-        	IplImage transformed = cvCreateImage(cvSize(reprojected.width(), reprojected.height()), IPL_DEPTH_8U, 3);
         	
-        	//cvWarpPerspective(const CvArr* src, CvArr* dst, const CvMat* mapMatrix, int flags=CV_INTER_LINEAR+CV_WARP_FILL_OUTLIERS, CvScalar fillval=cvScalarAll(0))
-            
+        	Corners corners = new Corners(new Point(961, 531), new Point(2338, 182), new Point(1411, 2393), new Point(2874, 1986));        	
+        	outputToFile(IplImageToBufferedImage(image), "output.png", corners, null);
+        	
         }else{
         	System.out.println("Error loading image");
         }
