@@ -35,24 +35,24 @@ public class MainPanel extends JPanel {
 		super();
 		this.setLayout(new BorderLayout());
 		
-		// Setup and display the file chooser
-		JFileChooser fileChooser = new JFileChooser();
-		fileChooser.setDialogTitle("Select Workspace");
-		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		fileChooser.setAcceptAllFileFilterUsed(false);
-		int returnVal = fileChooser.showOpenDialog(this);
-
-		// Handle the case where the user closes the file chooser
-		// without choosing the workspace
-		while (returnVal != JFileChooser.APPROVE_OPTION) {
-			JOptionPane.showMessageDialog(this, "Please select a workspace.", "No Workspace Selected", JOptionPane.WARNING_MESSAGE);
-			returnVal = fileChooser.showOpenDialog(this);
-		}
-		
-		// Once the user selects the workspace, its absolute
-		// path is stored
-		File file = fileChooser.getSelectedFile();
-		ParamHolder.setWorkspace(file.getAbsolutePath());
+//		// Setup and display the file chooser
+//		JFileChooser fileChooser = new JFileChooser();
+//		fileChooser.setDialogTitle("Select Workspace");
+//		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+//		fileChooser.setAcceptAllFileFilterUsed(false);
+//		int returnVal = fileChooser.showOpenDialog(this);
+//
+//		// Handle the case where the user closes the file chooser
+//		// without choosing the workspace
+//		while (returnVal != JFileChooser.APPROVE_OPTION) {
+//			JOptionPane.showMessageDialog(this, "Please select a workspace.", "No Workspace Selected", JOptionPane.WARNING_MESSAGE);
+//			returnVal = fileChooser.showOpenDialog(this);
+//		}
+//		
+//		// Once the user selects the workspace, its absolute
+//		// path is stored
+//		File file = fileChooser.getSelectedFile();
+//		ParamHolder.setWorkspace(file.getAbsolutePath());
 
 		// Setup the central panel
 		CentralPanel centralPanel = new CentralPanel();
