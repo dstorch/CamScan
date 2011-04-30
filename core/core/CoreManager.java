@@ -53,8 +53,8 @@ public class CoreManager {
 		
 		for (Iterator i = root.elementIterator("DOCLIST"); i.hasNext();) {
 			Element docList = (Element) i.next();
-			for (Iterator j = root.elementIterator("DOC"); j.hasNext();) {
-				Element singleDoc = (Element) i.next();
+			for (Iterator j = docList.elementIterator("DOC"); j.hasNext();) {
+				Element singleDoc = (Element) j.next();
 				String docStr = singleDoc.attribute("value").getStringValue();
 				_allDocuments.add(_xmlReader.parseDocument(docStr));
 			}
