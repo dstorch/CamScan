@@ -2,6 +2,12 @@ package core;
 
 public class Parameters {
 
+	/****************************************
+	 * 
+	 * Immutable Parameters
+	 * 
+	 ****************************************/
+	
 	/**
 	 * name of the startup file
 	 */
@@ -36,4 +42,46 @@ public class Parameters {
 	 * path of the document data
 	 */
 	public static final String DOC_DIRECTORY = "workspace/docs";
+	
+	/****************************************
+	 * 
+	 * Mutable Parameters
+	 * 
+	 ****************************************/
+	
+	/**
+	 * Reference to the Core Manager instance.
+	 */
+	private static CoreManager coreManager;
+	
+	/****************************************
+	 * 
+	 * Getters for the Immutable Parameters
+	 * 
+	 ****************************************/
+	
+	/**
+	 * Returns the Core Manager instance.
+	 * 
+	 * @return The Core Manager instance
+	 */
+	public CoreManager getCoreManager() {
+		return coreManager;
+	}
+	
+	/****************************************
+	 * 
+	 * Setters for the Immutable Parameters
+	 * 
+	 ****************************************/
+	
+	/**
+	 * Sets the Core Manager instance.
+	 * 
+	 * @param cm The Core Manager instance to set
+	 */
+	public void setCoreManager(CoreManager cm) {
+		if (coreManager == null)
+			coreManager = cm;
+	}
 }
