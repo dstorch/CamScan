@@ -10,7 +10,7 @@ public class ConfigurationValue {
 	public ValueType type;
 	
 	public static enum ValueType{
-		FlipHorizontal, FlipVertical, ColorTemperature, ContrastBoost;
+		FlipHorizontal, FlipVertical, ColorTemperature, ContrastBoost, BilateralFilter;
 	}
 	
 	public ConfigurationValue(ValueType type, int value) throws InvalidTypingException{
@@ -28,7 +28,7 @@ public class ConfigurationValue {
 		this.type = type;
 	}
 	public ConfigurationValue(ValueType type, boolean value) throws InvalidTypingException{
-		if (type != ValueType.FlipHorizontal && type != ValueType.FlipVertical && type != ValueType.ContrastBoost){
+		if (type != ValueType.FlipHorizontal && type != ValueType.FlipVertical && type != ValueType.ContrastBoost && type != ValueType.BilateralFilter){
 			throw new InvalidTypingException("Configuration type and value do not match");
 		}
 		this._bool = value;
@@ -36,14 +36,15 @@ public class ConfigurationValue {
 	}
 	
 	
-	public Object value() throws InvalidTypingException{
+	public Object value(){
 		if (this.type == ValueType.ColorTemperature){
 			return (Object)new Integer(this._int);
-		}else if (this.type == ValueType.FlipHorizontal || this.type == ValueType.FlipVertical || this.type == ValueType.ContrastBoost){
+		}else if (this.type == ValueType.FlipHorizontal || this.type == ValueType.FlipVertical || this.type == ValueType.ContrastBoost || this.type == ValueType.BilateralFilter){
 			return (Object)new Boolean(this._bool);
 		}else if (false){
 			return (Object)new Double(this._dbl);
 		}
-		throw new InvalidTypingException("ConfigurationValue doesn't know how to return a value for its type!");
+		System.err.println("ConfigurationValue doesn't know how to return a value for its type!");
+		return null;
 	}
 }

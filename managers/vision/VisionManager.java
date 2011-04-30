@@ -20,7 +20,8 @@ public class VisionManager {
 		ConfigurationDictionary cd = new ConfigurationDictionary();
 		
 		try {
-			cd.setKey("contrast", new ConfigurationValue(ConfigurationValue.ValueType.ContrastBoost, true));
+			cd.setKey("contrast", new ConfigurationValue(ConfigurationValue.ValueType.ContrastBoost, false));
+			cd.setKey("bilateral", new ConfigurationValue(ConfigurationValue.ValueType.BilateralFilter, true));
 		} catch (InvalidTypingException e) {
 			System.err.println("InvalidTypingException while setting up ConfigurationDictionary.");
 		}
@@ -80,8 +81,24 @@ public class VisionManager {
 		return img;
 	}
 	private static IplImage applyContrastBoost(IplImage img, ConfigurationValue boost){
-		cvEqualizeHist(img, img);
+		if (!(Boolean)boost.value()){return img;}
+		IplImage ch1 = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
+		IplImage ch2 = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
+		IplImage ch3 = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
+		cvSplit(img, ch1, ch2, ch3, null);
+		
+		cvEqualizeHist(ch1, ch1);
+		cvEqualizeHist(ch2, ch2);
+		cvEqualizeHist(ch3, ch3);
+		
+		cvMerge(ch1, ch2, ch3, null, img);
 		return img;
+	}
+	private static IplImage applyBilateralFilter(IplImage img, ConfigurationValue filter){
+		if (!(Boolean)filter.value()){return img;}
+		IplImage nimg = cvCloneImage(img);
+		cvSmooth(img, nimg, CV_BILATERAL, 5);
+		return nimg;
 	}
 	
 	private static IplImage _imageGlobalTransforms(IplImage img, ConfigurationDictionary config){
@@ -99,6 +116,8 @@ public class VisionManager {
 				img = applyFlipCorrection(img, currentValue);
 			}else if (currentValue.type == ConfigurationValue.ValueType.ContrastBoost){
 				img = applyContrastBoost(img, currentValue);
+			}else if (currentValue.type == ConfigurationValue.ValueType.BilateralFilter){
+				img = applyBilateralFilter(img, currentValue);
 			}else{
 				System.err.println("A type in a ConfigurationDictionary given to recolorImage() is invalid and non-processable.");
 			}
