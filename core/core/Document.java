@@ -68,12 +68,12 @@ public class Document {
 		
 	}
 	
-	public List<SearchHit> search(String[] query) {
+	public List<SearchHit> search(Set<Term> query, Searcher searcher) {
 		LinkedList<SearchHit> hits = new LinkedList<SearchHit>();
 		for (Page p : pages()) {
-			hits.addAll(p.search(query));
+			hits.addAll(p.search(query, searcher));
 		}
-		return null;
+		return hits;
 	}
 	
 }

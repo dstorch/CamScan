@@ -136,7 +136,7 @@ public class CoreManager {
 		CoreManager core = new CoreManager();
 		core.setWorkingDocument("tests/xml/testDocument/doc.xml");
 		core.export("tests/xml/testDocument/doc.xml", "foo.pdf");
-		core.search("foo");
+		core.search("Benjamin Franklin");
 		core.closeWorkingDocument();
 		core.shutdown();
 	}

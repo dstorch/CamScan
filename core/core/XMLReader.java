@@ -31,7 +31,7 @@ public class XMLReader {
 				
 				int order = Integer.parseInt(orderAtt.getStringValue());
 				
-				Page p = parsePage(metafile, order);
+				Page p = parsePage(metafile, order, d);
 				d.addPage(p);
 			}
 		}
@@ -39,8 +39,8 @@ public class XMLReader {
 		return d;
 	}
 	
-	private Page parsePage(String path, int order) throws FileNotFoundException, DocumentException {
-		Page p = new Page(order);
+	private Page parsePage(String path, int order, Document parent) throws FileNotFoundException, DocumentException {
+		Page p = new Page(parent, order);
 		p.setMetafile(path);
 		
 		SAXReader reader = new SAXReader();
