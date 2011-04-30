@@ -1,14 +1,19 @@
 package search;
 
-import java.io.*;
 import java.util.*;
 import core.*;
 
 public class SearchManager implements Searcher {
 	
+	private Stemmer _stemmer;
+	
+	public SearchManager() {
+		_stemmer = new Stemmer();
+	}
+	
 	
 	public SearchResults getSearchResults(String query, Document workingDocument, List<Document> allDocuments) {
-		String[] queryNew = sanitizeQuery(query);
+		String[] queryNew = sanitize(query);
 		
 		List<SearchHit> inWorkingDoc = workingDocument.search(queryNew);
 		
@@ -22,16 +27,18 @@ public class SearchManager implements Searcher {
 		return new SearchResultsImpl(inWorkingDoc, elsewhere);
 	}
 	
-	
-	public static void main(String[] args) throws IOException {
-		Searcher s = Searcher.Factory.create();
+	private String[] sanitize(String text) {
+		String textlower = text.toLowerCase();
+		String[] textNew = textlower.split("[^a-z0-9]+");
 		
-	}
-	
-	private String[] sanitizeQuery(String query) {
-		String qlower = query.toLowerCase();
-		String[] queryNew = qlower.split("[^a-z0-9]+");
-		return queryNew;
+		// remove stop words
+		
+		// apply Porter Stemming algorithm using Stemmer class
+		for (int i = 0; i < textNew.length; i++) {
+			textNew[i] = _stemmer.stemWord(textNew[i]);
+		}
+		
+		return textNew;
 	}
 	
 	public static String[] sanitizeFullText(String fullText) {
