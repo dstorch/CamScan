@@ -59,4 +59,12 @@ public class Corners {
 		
 	}
 	
+	public String toString(){
+		return String.format("<Corners TL: (%d,%d), TR: (%d,%d), BL: (%d,%d), BR: (%d,%d)>",
+				this._upleft.x, this._upleft.y,
+				this._upright.x, this._upright.y,
+				this._downleft.x, this._downleft.y,
+				this._downright.x, this._downright.y);
+	}
+	
 }
