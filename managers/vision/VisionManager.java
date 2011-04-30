@@ -42,7 +42,7 @@ public class VisionManager {
 		return new Corners(new Point(0,0), new Point(width,0), new Point(0,height), new Point(width,height));
 	}
 	public BufferedImage rerenderImage(BufferedImage img, Corners points, ConfigurationDictionary config){
-		img = this.recolorImage(img, config);
+		img = this.imageGlobalTransforms(img, config);
 		
 		Corners targets = this.idealizedReprojection(points);
 		
@@ -62,7 +62,7 @@ public class VisionManager {
 	private BufferedImage applyContrastBoost(BufferedImage img, ConfigurationValue boost){
 		return img;
 	}
-	public BufferedImage recolorImage(BufferedImage img, ConfigurationDictionary config){
+	public BufferedImage imageGlobalTransforms(BufferedImage img, ConfigurationDictionary config){
 		for(Object _name: config.getAllKeys()){
 			String name = (String)_name;
 			ConfigurationValue currentValue = config.getKey(name);
