@@ -30,6 +30,13 @@ public class Corners {
 		return _downleft;
 	}
 	
+	public int width(){
+		return _upright.x - _upleft.x;
+	}
+	public int height(){
+		return _downleft.y - _upleft.y;
+	}
+	
 	private void addPointAttribute(Element el, Point point) {
 		Integer x = new Integer(point.x);
 		Integer y = new Integer(point.y);
