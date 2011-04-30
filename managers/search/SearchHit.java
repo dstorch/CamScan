@@ -2,7 +2,7 @@ package search;
 
 import core.Page;
 
-public interface SearchHit {
+public interface SearchHit extends Comparable {
 
 	public Page link();
 	public String snippet();

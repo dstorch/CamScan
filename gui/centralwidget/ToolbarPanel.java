@@ -102,8 +102,7 @@ public class ToolbarPanel extends JPanel {
 	 * Unselects both mode radio buttons.
 	 */
 	public void unselectModeButtons() {
-
-		this.modeButtonGroup.clearSelection();
+		//this.modeButtonGroup.clearSelection();
 	}
 	
 	/****************************************

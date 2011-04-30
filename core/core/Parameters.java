@@ -43,6 +43,16 @@ public class Parameters {
 	 */
 	public static final String DOC_DIRECTORY = "workspace/docs";
 	
+	/**
+	 * Max number of search hits to report in the working document
+	 */
+	public static final int RESULTS_INDOC = 4;
+	
+	/**
+	 * Max number of search hits to report in all other documents
+	 */
+	public static final int RESULTS_ELSEWHERE = 10;
+	
 	/****************************************
 	 * 
 	 * Mutable Parameters
@@ -50,7 +60,7 @@ public class Parameters {
 	 ****************************************/
 	
 	/**
-	 * Reference to the Core Manager instance.
+	 * Reference to the global Core Manager instance.
 	 */
 	private static CoreManager coreManager;
 	

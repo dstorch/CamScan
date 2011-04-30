@@ -31,11 +31,6 @@ public class SearchManager implements Searcher {
 			querySet.add(t);
 		}
 		
-		// REMOVE WHEN READY!
-		for (Term t : querySet) {
-			System.out.println(t.word+" "+t.pos);
-		}
-		
 		// find hits in the working document
 		List<SearchHit> inWorkingDoc = workingDocument.search(querySet, this);
 		
@@ -47,12 +42,40 @@ public class SearchManager implements Searcher {
 			}
 		}
 		
-		// REMOVE WHEN READY!
+		// add search hits to a priority queue
+		PriorityQueue<SearchHit> pq = new PriorityQueue<SearchHit>();
+		pq.addAll(inWorkingDoc);
+		
+		// get the top results by repeatedly dequeueing from the priority queue
+		LinkedList<SearchHit> topInWorkingDoc = new LinkedList<SearchHit>();
+		int i = 0;
 		for (SearchHit hit : inWorkingDoc) {
-			System.out.println(hit.snippet()+" "+hit.score());
+			if (i < Parameters.RESULTS_INDOC) {
+				topInWorkingDoc.add(pq.poll());
+				i++;
+			} else {
+				break;
+			}
 		}
 		
-		return new SearchResultsImpl(inWorkingDoc, elsewhere);
+		// clear the priority queue, and repeat the process for
+		// hits outside of the working page
+		pq.clear();
+		pq.addAll(elsewhere);
+		
+		// get the top results
+		LinkedList<SearchHit> topElsewhere = new LinkedList<SearchHit>();
+		i = 0;
+		for (SearchHit hit : elsewhere) {
+			if (i < Parameters.RESULTS_ELSEWHERE) {
+				topElsewhere.add(pq.poll());
+				i++;
+			} else {
+				break;
+			}
+		}
+		
+		return new SearchResultsImpl(topInWorkingDoc, topElsewhere);
 	}
 	
 	public List<Term> sanitize(String text) {
