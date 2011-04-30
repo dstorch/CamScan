@@ -67,6 +67,10 @@ public class CoreManager {
 		return _workingDocument.name();
 	}
 	
+	public Document workingDocument() {
+		return _workingDocument;
+	}
+	
 	// called before the application exits
 	public void shutdown() throws IOException {
 		OutputFormat pretty = OutputFormat.createPrettyPrint();
@@ -121,30 +125,33 @@ public class CoreManager {
 		return null;
 	}
 	
+	// write a document out as a multipage pdf
 	public void exportToPdf(String docpath, String outfile) throws IOException {
 		_exporter.exportToPdf(docpath, outfile);
 	}
 	
-	public void exportImages(String docpath, String outfile) {
-		
+	// write a directory of image files
+	public void exportImages(Document document, String outdirectory) throws IOException {
+		_exporter.exportImages(document, outdirectory);
 	}
 	
-	public void exportText(String docpath, String outfile) {
-		
+	// write a text file containing the document text
+	public void exportText(Document document, String outfile) throws IOException {
+		_exporter.exportText(document, outfile);
 	}
 	
 	public SearchResults search(String query) {
 		SearchResults results = _searcher.getSearchResults(query, _workingDocument, _allDocuments);
 		
 		// REMOVE WHEN READY
-		System.out.println("In the working page: ");
-		for (SearchHit hit : results.inWorkingDoc()) {
-			System.out.println(hit.snippet()+" "+hit.score());
-		}
-		System.out.println("In all other pages: ");
-		for (SearchHit hit : results.elsewhere()) {
-			System.out.println(hit.snippet()+" "+hit.score());
-		}
+		//System.out.println("In the working page: ");
+		//for (SearchHit hit : results.inWorkingDoc()) {
+		//	System.out.println(hit.snippet()+" "+hit.score());
+		//}
+		//System.out.println("In all other pages: ");
+		//for (SearchHit hit : results.elsewhere()) {
+		//	System.out.println(hit.snippet()+" "+hit.score());
+		//}
 		
 		return results;
 	}
@@ -155,7 +162,9 @@ public class CoreManager {
 	public static void main(String[] args) throws DocumentException, IOException {
 		CoreManager core = new CoreManager();
 		core.setWorkingDocument("tests/xml/testDocument/doc.xml");
-		core.export("tests/xml/testDocument/doc.xml", "foo.pdf");
+		//core.exportToPdf("tests/xml/testDocument/doc.xml", "foo.pdf");
+		//core.exportText(core.workingDocument(), "../document.txt");
+		//core.exportImages(core.workingDocument(), "../copiedDoc");
 		core.search("Benjamin Franklin almanac");
 		core.closeWorkingDocument();
 		core.shutdown();
