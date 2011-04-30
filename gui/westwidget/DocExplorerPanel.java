@@ -59,7 +59,7 @@ public class DocExplorerPanel extends JPanel {
 		
 		this.pageExpPanel = pageExpPanel;
 		
-		this.docList = new JList(this.getDocuments(ParamHolder.getWorkspace()));
+		this.docList = new JList(/*this.getDocuments(ParamHolder.getWorkspace())*/);
 		
 		this.docList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		this.docList.getSelectionModel().addListSelectionListener(new SelectionListener());
