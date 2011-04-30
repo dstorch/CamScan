@@ -7,7 +7,7 @@ public class ExportManager implements Exporter {
 
 
 	
-	public void export(String document, String outfile) throws IOException {
+	public void exportToPdf(String document, String outfile) throws IOException {
 		Process process = Runtime.getRuntime().exec("python "+Parameters.EXPORT_PATH+" "+document+" "+outfile);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 		

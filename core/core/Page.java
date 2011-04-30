@@ -127,9 +127,6 @@ public class Page {
 			windowSet.remove(fullTextTerms.get(i - GREP_WINDOW));
 			windowSet.add(fullTextTerms.get(i));
 			
-			// REMOVE WHEN READY
-			printWindowSet(windowSet);
-			
 			// determine the amount of intersection between the grepping
 			// window and the query set
 			int score = 0;
@@ -198,6 +195,8 @@ public class Page {
 		return snippet.trim();
 	}
 	
+	
+	// DEBUGGING METHOD ONLY
 	private void printWindowSet(Set<Term> windowSet) {
 		System.out.print("set: "+_metafile+" ");
 		for (Term t : windowSet) {

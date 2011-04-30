@@ -121,12 +121,32 @@ public class CoreManager {
 		return null;
 	}
 	
-	public void export(String docpath, String outfile) throws IOException {
-		_exporter.export(docpath, outfile);
+	public void exportToPdf(String docpath, String outfile) throws IOException {
+		_exporter.exportToPdf(docpath, outfile);
+	}
+	
+	public void exportImages(String docpath, String outfile) {
+		
+	}
+	
+	public void exportText(String docpath, String outfile) {
+		
 	}
 	
 	public SearchResults search(String query) {
-		return _searcher.getSearchResults(query, _workingDocument, _allDocuments);
+		SearchResults results = _searcher.getSearchResults(query, _workingDocument, _allDocuments);
+		
+		// REMOVE WHEN READY
+		System.out.println("In the working page: ");
+		for (SearchHit hit : results.inWorkingDoc()) {
+			System.out.println(hit.snippet()+" "+hit.score());
+		}
+		System.out.println("In all other pages: ");
+		for (SearchHit hit : results.elsewhere()) {
+			System.out.println(hit.snippet()+" "+hit.score());
+		}
+		
+		return results;
 	}
 	
 	// not the main method for the application,
@@ -136,7 +156,7 @@ public class CoreManager {
 		CoreManager core = new CoreManager();
 		core.setWorkingDocument("tests/xml/testDocument/doc.xml");
 		core.export("tests/xml/testDocument/doc.xml", "foo.pdf");
-		core.search("Benjamin Franklin");
+		core.search("Benjamin Franklin almanac");
 		core.closeWorkingDocument();
 		core.shutdown();
 	}

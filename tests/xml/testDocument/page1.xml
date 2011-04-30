@@ -9,7 +9,7 @@
     <DOWNLEFT x="0" y="0"/>
   </CORNERS>
   <TEXT>
-    <FULLTEXT>This is the full text of the document. I will make *^3 to add all kinds of strange characters... and words to test how tolerant the search procedure is!!! We will also find a Frankline and a Benjamin search hit in this particular page.</FULLTEXT>
+    <FULLTEXT>This is the full text of the document. I will make *^3 to add all kinds of strange characters... and words to test how tolerant the search procedure is!!! We will also find a Frankline and a Benjamin search hit in this particular page. This time we will use another term for referring to the polymath. We will say Benjamin Franklin almanac and hopefully Benjamin will get us a higher rated hit this time when we use this other way of referring to him and his publication together. Also we will include one more hit to make sure that only four hits are shown (although maybe later we should use more than four hits). OK, now we have Benjamin Franklin!</FULLTEXT>
     <POSITIONS>
       <WORD xmin="0" ymin="0" xmax="10" ymax="10" value="foo"/>
     </POSITIONS>
