@@ -62,6 +62,7 @@ public class Parameters {
 	
 	/**
 	 * Returns the Core Manager instance.
+	 * Can only be called once.
 	 * 
 	 * @return The Core Manager instance
 	 */
