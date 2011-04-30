@@ -9,9 +9,8 @@ public class ConfigurationValue {
 	private boolean _bool;
 	public ValueType type;
 	
-	public enum ValueType{
-		RotationDegrees, RotationRadians, FlipHorizontal, FlipVertical, ColorTemperature,
-		ContrastBoost;
+	public static enum ValueType{
+		FlipHorizontal, FlipVertical, ColorTemperature, ContrastBoost;
 	}
 	
 	public ConfigurationValue(ValueType type, int value) throws InvalidTypingException{
@@ -22,7 +21,7 @@ public class ConfigurationValue {
 		this.type = type;
 	}
 	public ConfigurationValue(ValueType type, double value) throws InvalidTypingException{
-		if (type != ValueType.RotationDegrees && type != ValueType.RotationRadians && type != ValueType.ContrastBoost){
+		if (type != ValueType.ContrastBoost){
 			throw new InvalidTypingException("Configuration type and value do not match");
 		}
 		this._dbl = value;
@@ -42,7 +41,7 @@ public class ConfigurationValue {
 			return (Object)new Integer(this._int);
 		}else if (this.type == ValueType.FlipHorizontal || this.type == ValueType.FlipVertical){
 			return (Object)new Boolean(this._bool);
-		}else if (this.type == ValueType.RotationDegrees || this.type == ValueType.RotationRadians || this.type == ValueType.ContrastBoost){
+		}else if (this.type == ValueType.ContrastBoost){
 			return (Object)new Double(this._dbl);
 		}
 		throw new InvalidTypingException("ConfigurationValue doesn't know how to return a value for its type!");
