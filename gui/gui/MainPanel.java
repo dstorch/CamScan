@@ -3,10 +3,18 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
+import org.dom4j.DocumentException;
+
+import core.CoreManager;
+import core.Document;
+import core.Parameters;
 
 import westwidget.WestPanel;
 
@@ -30,8 +38,10 @@ public class MainPanel extends JPanel {
 
 	/**
 	 * Constructor.
+	 * @throws IOException 
+	 * @throws DocumentException 
 	 */
-	public MainPanel() {
+	public MainPanel() throws DocumentException, IOException {
 		super();
 		this.setLayout(new BorderLayout());
 		
@@ -53,6 +63,14 @@ public class MainPanel extends JPanel {
 //		// path is stored
 //		File file = fileChooser.getSelectedFile();
 //		ParamHolder.setWorkspace(file.getAbsolutePath());
+		
+		Parameters.setCoreManager(new CoreManager());
+		CoreManager manager = Parameters.getCoreManager();
+		
+		System.out.println("Should print docs:");
+		for (Document doc : manager.getDocuments()) {
+			System.out.println(doc.name());
+		}
 
 		// Setup the central panel
 		CentralPanel centralPanel = new CentralPanel();

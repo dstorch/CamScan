@@ -2,12 +2,15 @@ package gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+
+import org.dom4j.DocumentException;
 
 /**
  * The top-level class that contains the
@@ -34,8 +37,10 @@ public class App extends JFrame {
 
 	/**
 	 * Constructor.
+	 * @throws IOException 
+	 * @throws DocumentException 
 	 */
-	public App() {
+	public App() throws DocumentException, IOException {
 
 		/*
 		 * Setup the JFrame
