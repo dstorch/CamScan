@@ -7,6 +7,10 @@ import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 
+import static com.googlecode.javacv.cpp.opencv_core.*;
+import static com.googlecode.javacv.cpp.opencv_imgproc.*;
+import static com.googlecode.javacv.cpp.opencv_highgui.*;
+
 public class VisionManager {
 	public VisionManager(){}
 	
@@ -105,6 +109,19 @@ public class VisionManager {
 	}
 	public void outputToFile(BufferedImage img, String path, Corners points, ConfigurationDictionary config) throws IOException{
 		this.writeImageToFile(this.rerenderImage(img, points, config), path);
+	}
+	
+	public static void main(String[] args){
+		System.out.println("Vision library stub launcher");
+		IplImage image = cvLoadImage("tests/xml/testDocument/hamlet_1.png");
+        if (image != null) {
+        	IplImage gray = cvCreateImage(cvSize(image.width(), image.height()), 8, 1);
+        	cvCvtColor(image, gray, CV_RGB2GRAY);
+        	IplImage edges = cvCreateImage(cvSize(image.width(), image.height()), 16, 1);
+        	
+            //cvSobel(gray, edges, 1, 1, 5);
+            cvSaveImage("output.png", gray);
+        }
 	}
 	
 }
