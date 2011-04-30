@@ -17,7 +17,15 @@ import static com.googlecode.javacv.cpp.opencv_calib3d.*;
 
 public class VisionManager {
 	public static ConfigurationDictionary estimateConfigurationValues(BufferedImage img){
-		return new ConfigurationDictionary();
+		ConfigurationDictionary cd = new ConfigurationDictionary();
+		
+		try {
+			cd.setKey("contrast", new ConfigurationValue(ConfigurationValue.ValueType.ContrastBoost, true));
+		} catch (InvalidTypingException e) {
+			System.err.println("InvalidTypingException while setting up ConfigurationDictionary.");
+		}
+		
+		return cd;
 	}
 	
 	public static Point snapCorner(BufferedImage img, Point point){
@@ -47,10 +55,9 @@ public class VisionManager {
 		
 		return new Corners(new Point(0,0), new Point(width,0), new Point(0,height), new Point(width,height));
 	}
-	public static BufferedImage rerenderImage(BufferedImage img, Corners corners, ConfigurationDictionary config){
-		img = imageGlobalTransforms(img, config);
-		
+	public static BufferedImage rerenderImage(BufferedImage img, Corners corners, ConfigurationDictionary config){		
 		IplImage image = BufferedImageToIplImage(img);
+		image = _imageGlobalTransforms(image, config);
 		
     	Corners reprojected = idealizedReprojection(corners);
         
@@ -66,16 +73,18 @@ public class VisionManager {
 		return IplImageToBufferedImage(transformed);
 	}
 	
-	private static BufferedImage applyTemperatureCorrection(BufferedImage img, ConfigurationValue temp){
+	private static IplImage applyTemperatureCorrection(IplImage img, ConfigurationValue temp){
 		return img;
 	}
-	private static BufferedImage applyFlipCorrection(BufferedImage img, ConfigurationValue flip){
+	private static IplImage applyFlipCorrection(IplImage img, ConfigurationValue flip){
 		return img;
 	}
-	private static BufferedImage applyContrastBoost(BufferedImage img, ConfigurationValue boost){
+	private static IplImage applyContrastBoost(IplImage img, ConfigurationValue boost){
+		cvEqualizeHist(img, img);
 		return img;
 	}
-	public static BufferedImage imageGlobalTransforms(BufferedImage img, ConfigurationDictionary config){
+	
+	private static IplImage _imageGlobalTransforms(IplImage img, ConfigurationDictionary config){
 		if (config == null){return img;}
 		
 		for(Object _name: config.getAllKeys()){
@@ -95,6 +104,10 @@ public class VisionManager {
 			}
 		}
 		return img;
+	}
+	
+	public static BufferedImage imageGlobalTransforms(BufferedImage img, ConfigurationDictionary config){
+		return IplImageToBufferedImage( _imageGlobalTransforms(BufferedImageToIplImage(img), config) );
 	}
 	
 	public static Corners findCorners(BufferedImage img){
@@ -181,7 +194,7 @@ public class VisionManager {
         	
         	
         	Corners corners = new Corners(new Point(961, 531), new Point(2338, 182), new Point(1411, 2393), new Point(2874, 1986));        	
-        	outputToFile(IplImageToBufferedImage(image), "output.png", corners, null);
+        	outputToFile(IplImageToBufferedImage(image), "output.png", corners, estimateConfigurationValues(IplImageToBufferedImage(image)));
         	
         }else{
         	System.out.println("Error loading image");

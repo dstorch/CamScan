@@ -21,14 +21,14 @@ public class ConfigurationValue {
 		this.type = type;
 	}
 	public ConfigurationValue(ValueType type, double value) throws InvalidTypingException{
-		if (type != ValueType.ContrastBoost){
+		if (true){
 			throw new InvalidTypingException("Configuration type and value do not match");
 		}
 		this._dbl = value;
 		this.type = type;
 	}
 	public ConfigurationValue(ValueType type, boolean value) throws InvalidTypingException{
-		if (type != ValueType.FlipHorizontal && type != ValueType.FlipVertical){
+		if (type != ValueType.FlipHorizontal && type != ValueType.FlipVertical && type != ValueType.ContrastBoost){
 			throw new InvalidTypingException("Configuration type and value do not match");
 		}
 		this._bool = value;
@@ -39,9 +39,9 @@ public class ConfigurationValue {
 	public Object value() throws InvalidTypingException{
 		if (this.type == ValueType.ColorTemperature){
 			return (Object)new Integer(this._int);
-		}else if (this.type == ValueType.FlipHorizontal || this.type == ValueType.FlipVertical){
+		}else if (this.type == ValueType.FlipHorizontal || this.type == ValueType.FlipVertical || this.type == ValueType.ContrastBoost){
 			return (Object)new Boolean(this._bool);
-		}else if (this.type == ValueType.ContrastBoost){
+		}else if (false){
 			return (Object)new Double(this._dbl);
 		}
 		throw new InvalidTypingException("ConfigurationValue doesn't know how to return a value for its type!");
