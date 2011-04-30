@@ -144,10 +144,12 @@ public class VisionManager {
         	
             Corners corners = new Corners(new Point(961, 531), new Point(2338, 182), new Point(1411, 2393), new Point(2874, 1986));
         	System.out.println(corners);
-        	
         	Corners reprojected = idealizedReprojection(corners);
         	System.out.println(reprojected);
             
+        	IplImage transformed = cvCreateImage(cvSize(reprojected.width(), reprojected.height()), IPL_DEPTH_8U, 3);
+        	
+        	//cvWarpPerspective(const CvArr* src, CvArr* dst, const CvMat* mapMatrix, int flags=CV_INTER_LINEAR+CV_WARP_FILL_OUTLIERS, CvScalar fillval=cvScalarAll(0))
             
         }else{
         	System.out.println("Error loading image");
