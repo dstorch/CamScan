@@ -9,7 +9,7 @@
     <DOWNLEFT x="0" y="0"/>
   </CORNERS>
   <TEXT>
-    <FULLTEXT>This is the full text of the document. I will make *^3 to add all kinds of strange characters... and words to test how tolerant the search procedure is!!!</FULLTEXT>
+    <FULLTEXT>This is the full text of the document. I will make *^3 to add all kinds of strange characters... and words to test how tolerant the search procedure is!!! We will also find a Frankline and a Benjamin search hit in this particular page.</FULLTEXT>
     <POSITIONS>
       <WORD xmin="0" ymin="0" xmax="10" ymax="10" value="foo"/>
     </POSITIONS>

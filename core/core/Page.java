@@ -133,8 +133,12 @@ public class Page {
 			// determine the amount of intersection between the grepping
 			// window and the query set
 			int score = 0;
+			int position = 0;
 			for (Term t : windowSet) {
-				if (query.contains(t)) score++;
+				if (query.contains(t)) {
+					score++;
+					position = t.pos;
+				}
 			}
 			
 			// if there is an intersection, find the snippet and
@@ -143,12 +147,12 @@ public class Page {
 				if (score > 0) {
 					resultInWindow = true;
 					scoreInWindow = score;
-					String snippet = getSearchSnippet(windowSet, fullText);
+					String snippet = getSearchSnippet(windowSet, fullText, position);
 					lastHit = SearchHit.Factory.create(this, snippet, score);
 				}
 			} else if (resultInWindow) {
 				if (score > scoreInWindow) {
-					String snippet = getSearchSnippet(windowSet, fullText);
+					String snippet = getSearchSnippet(windowSet, fullText, position);
 					lastHit = SearchHit.Factory.create(this, snippet, score);
 					scoreInWindow = score;
 				} else if (score < scoreInWindow) {
@@ -157,14 +161,16 @@ public class Page {
 					hits.add(lastHit);
 				}
 			}
-			
 		}
+		
+		// if you exit the loop and there is still a hit, then add it
+		if (resultInWindow) hits.add(lastHit);
 		
 		return hits;
 	}
 	
 
-	private String getSearchSnippet(Set<Term> grepWindow, String fullText) {
+	private String getSearchSnippet(Set<Term> grepWindow, String fullText, int midPosition) {
 		
 		// collapse the full text into an array of strings
 		String[] fullTextArr = 	fullText.split("[^a-zA-Z0-9.,/-]+");
@@ -179,8 +185,8 @@ public class Page {
 		
 		// get the snippet
 		LinkedList<String> snippetList = new LinkedList<String>();
-		for (int i = minPosition; i < (minPosition + 2*GREP_WINDOW); i++) {
-			if (i < fullTextArr.length) snippetList.add(fullTextArr[i]);
+		for (int i = (midPosition - GREP_WINDOW); i < (midPosition + GREP_WINDOW); i++) {
+			if (i < fullTextArr.length && i > 0) snippetList.add(fullTextArr[i]);
 		}
 		
 		// get the snippet from the list
@@ -193,7 +199,7 @@ public class Page {
 	}
 	
 	private void printWindowSet(Set<Term> windowSet) {
-		System.out.print("set: ");
+		System.out.print("set: "+_metafile+" ");
 		for (Term t : windowSet) {
 			System.out.print("["+t.word+","+t.pos+"] ");
 		}
