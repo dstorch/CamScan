@@ -65,7 +65,7 @@ public class Parameters {
 	 * 
 	 * @return The Core Manager instance
 	 */
-	public CoreManager getCoreManager() {
+	public static CoreManager getCoreManager() {
 		return coreManager;
 	}
 	
@@ -81,7 +81,7 @@ public class Parameters {
 	 * 
 	 * @param cm The Core Manager instance to set
 	 */
-	public void setCoreManager(CoreManager cm) {
+	public static void setCoreManager(CoreManager cm) {
 		if (coreManager == null)
 			coreManager = cm;
 	}
