@@ -10,6 +10,7 @@ import java.io.IOException;
 import static com.googlecode.javacv.cpp.opencv_core.*;
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 import static com.googlecode.javacv.cpp.opencv_highgui.*;
+import static com.googlecode.javacv.cpp.opencv_calib3d.*;
 
 public class VisionManager {
 	public VisionManager(){}
@@ -52,7 +53,9 @@ public class VisionManager {
 		
 		//solve for the homography between points and targets
 		
+		
 		//backproject the target area
+		
 		
 		return img;
 	}
@@ -111,17 +114,42 @@ public class VisionManager {
 		this.writeImageToFile(this.rerenderImage(img, points, config), path);
 	}
 	
+	private BufferedImage IplImageToBufferedImage(IplImage img){
+		return null;
+	}
+	private IplImage BufferedImageToIplImage(BufferedImage img){
+		return null;
+	}
+	
 	public static void main(String[] args){
 		System.out.println("Vision library stub launcher");
-		IplImage image = cvLoadImage("tests/xml/testDocument/hamlet_1.png");
+		IplImage image = cvLoadImage("tests/images/DSC_7384.JPG");
+		System.out.println("Loaded");
         if (image != null) {
-        	IplImage gray = cvCreateImage(cvSize(image.width(), image.height()), 8, 1);
+        	/*
+        	IplImage gray = cvCreateImage(cvSize(image.width(), image.height()), IPL_DEPTH_8U, 1);
         	cvCvtColor(image, gray, CV_RGB2GRAY);
-        	IplImage edges = cvCreateImage(cvSize(image.width(), image.height()), 16, 1);
+        	IplImage edges = cvCreateImage(cvSize(image.width(), image.height()), IPL_DEPTH_32F, 1);
         	
-            //cvSobel(gray, edges, 1, 1, 5);
-            cvSaveImage("output.png", gray);
+        	//cvSmooth(gray, gray, CV_GAUSSIAN, 3);
+            //cvCanny(gray, edges, 100, 3, 5);
+        	//cvLaplace(gray, edges, 3);
+        	cvCornerHarris(gray, edges, 10, 3, 0.04); // (int) (Math.max(image.width(), image.height())*0.10)
+        	
+        	IplImage output = cvCreateImage(cvSize(image.width(), image.height()), IPL_DEPTH_8U, 1);
+        	cvConvertScale(edges, output, 1, 0);
+        	
+            cvSaveImage("output.png", output);
+            */
+        	
+            Corners corners = new Corners(new Point(961, 531), new Point(2338, 182), new Point(1411, 2393), new Point(2874, 1986));
+        	
+            
+            
+        }else{
+        	System.out.println("Error loading image");
         }
+        System.out.println("Done");
 	}
 	
 }
