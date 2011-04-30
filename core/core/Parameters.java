@@ -9,7 +9,7 @@ public class Parameters {
 	public static final String EXPORT_PATH = "managers/export/jpg2pdf.py";
 	
 	// path of the python script to invoke for exportation
-	public static final String SEARCHER_PATH = "managers/search/grepper.py";
+	public static final String STOP_WORDS = "managers/search/stopwords.txt";
 	
 	// path of raw files
 	public static final String RAW_DIRECTORY = "workspace/raw";

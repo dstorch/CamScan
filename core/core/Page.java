@@ -1,27 +1,32 @@
 package core;
 
 import java.io.*;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import org.dom4j.*;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.XMLWriter;
+import org.dom4j.io.*;
 import search.*;
 
 public class Page {
 	
 	private static final int GREP_WINDOW = 10;
 	
+	// major attributes
 	private PageText _text;
 	private Config _config;
 	private Corners _corners;
+	
+	// pathnames of files on disk
 	private String _raw;
 	private String _processed;
 	private String _metafile;
+	
+	// reference to the containing document
+	private Document _parentDoc;
+	
 	private int _order;
 	
-	public Page(int order) {
+	public Page(Document parent, int order) {
+		_parentDoc = parent;
 		_order = order;
 	}
 	
@@ -49,6 +54,9 @@ public class Page {
 	public Config config() {
 		return _config;
 	}
+	public Document getContainingDocument() {
+		return _parentDoc;
+	}
 	public void setOrder(int order) {
 		_order = order;
 	}
@@ -69,6 +77,9 @@ public class Page {
 	}
 	public void setConfig(Config c) {
 		_config = c;
+	}
+	public void setContainingDocument(Document parent) {
+		_parentDoc = parent;
 	}
 	
 	public void serialize() throws IOException {
@@ -96,22 +107,97 @@ public class Page {
 		
 	}
 
-	public List<SearchHit> search(String[] query) {
+	public List<SearchHit> search(Set<Term> query, Searcher searcher) {
 		LinkedList<SearchHit> hits = new LinkedList<SearchHit>();
 		String fullText = fullText();
 		
-		String[] fullTextTerms = SearchManager.sanitizeFullText(fullText);
+		List<Term> fullTextTerms = searcher.sanitize(fullText);
 		
-		HashSet<String> windowSet = new HashSet<String>();
+		// build the initial "grepping window"
+		HashSet<Term> windowSet = new HashSet<Term>();
 		for (int i = 0; i < GREP_WINDOW; i++) {
-			windowSet.add(fullTextTerms[i]);
+			windowSet.add(fullTextTerms.get(i));
 		}
 		
-		for (int i = GREP_WINDOW; i < fullTextTerms.length; i++) {
+		boolean resultInWindow = false;
+		float scoreInWindow = 0;
+		SearchHit lastHit = null;
+		for (int i = GREP_WINDOW; i < fullTextTerms.size(); i++) {
+			// increment the "grepping window"
+			windowSet.remove(fullTextTerms.get(i - GREP_WINDOW));
+			windowSet.add(fullTextTerms.get(i));
+			
+			// REMOVE WHEN READY
+			printWindowSet(windowSet);
+			
+			// determine the amount of intersection between the grepping
+			// window and the query set
+			int score = 0;
+			for (Term t : windowSet) {
+				if (query.contains(t)) score++;
+			}
+			
+			// if there is an intersection, find the snippet and
+			// create a new search hit
+			if (!resultInWindow) {
+				if (score > 0) {
+					resultInWindow = true;
+					scoreInWindow = score;
+					String snippet = getSearchSnippet(windowSet, fullText);
+					lastHit = SearchHit.Factory.create(this, snippet, score);
+				}
+			} else if (resultInWindow) {
+				if (score > scoreInWindow) {
+					String snippet = getSearchSnippet(windowSet, fullText);
+					lastHit = SearchHit.Factory.create(this, snippet, score);
+					scoreInWindow = score;
+				} else if (score < scoreInWindow) {
+					scoreInWindow = 0;
+					resultInWindow = false;
+					hits.add(lastHit);
+				}
+			}
 			
 		}
 		
-		return null;
+		return hits;
+	}
+	
+
+	private String getSearchSnippet(Set<Term> grepWindow, String fullText) {
+		
+		// collapse the full text into an array of strings
+		String[] fullTextArr = 	fullText.split("[^a-zA-Z0-9.,/-]+");
+		
+		// get the minimum position out of the terms
+		int minPosition = Integer.MAX_VALUE;
+		for (Term t : grepWindow) {
+			if (t.pos < minPosition) {
+				minPosition = t.pos;
+			}
+		}
+		
+		// get the snippet
+		LinkedList<String> snippetList = new LinkedList<String>();
+		for (int i = minPosition; i < (minPosition + 2*GREP_WINDOW); i++) {
+			if (i < fullTextArr.length) snippetList.add(fullTextArr[i]);
+		}
+		
+		// get the snippet from the list
+		String snippet = "";
+		for (String s : snippetList) {
+			snippet += s + " ";
+		}
+		
+		return snippet.trim();
+	}
+	
+	private void printWindowSet(Set<Term> windowSet) {
+		System.out.print("set: ");
+		for (Term t : windowSet) {
+			System.out.print("["+t.word+","+t.pos+"] ");
+		}
+		System.out.println("");
 	}
 
 }
