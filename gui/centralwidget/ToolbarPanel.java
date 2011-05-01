@@ -53,7 +53,7 @@ public class ToolbarPanel extends JPanel {
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		
-		this.setBackground(Color.GRAY);
+		//this.setBackground(Color.GRAY);
 		this.centralPanel = centralPanel;
 		
 		c.gridx = 0;

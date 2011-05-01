@@ -22,6 +22,8 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
+import core.Parameters;
+
 
 
 public class DDPanel extends JPanel implements DropTargetListener {
@@ -53,7 +55,6 @@ public class DDPanel extends JPanel implements DropTargetListener {
 		evt.acceptDrop(action);
 		try {
 			Transferable data = evt.getTransferable();
-			//DataFlavor flavors[] = data.getTransferDataFlavors();
 			if (data.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
 				List<File> list = (List<File>) data.getTransferData(DataFlavor.javaFileListFlavor);
 				this.processFiles(list);
@@ -76,7 +77,8 @@ public class DDPanel extends JPanel implements DropTargetListener {
 	 */
 	private void processFiles(List<File> files) throws IOException {
 		for (File file : files) {
-			this.copyDirectory(new File(file.getAbsolutePath()), new File(ParamHolder.getWorkspace() + File.separator + file.getName()));
+			Parameters.getCoreManager().createDocumentFromFolder(new File(file.getAbsolutePath()));
+			//this.copyDirectory(new File(file.getAbsolutePath()), new File(ParamHolder.getWorkspace() + File.separator + file.getName()));
 		}
 		
 		this.docExpPanel.update();

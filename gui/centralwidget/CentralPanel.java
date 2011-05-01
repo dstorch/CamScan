@@ -1,8 +1,11 @@
 package centralwidget;
 
 import java.awt.BorderLayout;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 /**
  * The Central Panel of this application.
@@ -62,7 +65,15 @@ public class CentralPanel extends JPanel {
 		this.add(this.toolbarPanel, BorderLayout.NORTH);
 		
 		// Setup and add the view panel.
-		this.viewPanel = new ViewPanel(); 
+		this.viewPanel = new ViewPanel();
+//		this.viewPanel.setPreferredSize(this.viewPanel.getPreferredSize());
+//		System.out.println(this.viewPanel.getPreferredSize());
+//		JScrollPane viewScrollPane = new JScrollPane(this.viewPanel);
+//		viewScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+//		viewScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+//		viewScrollPane.getHorizontalScrollBar().addAdjustmentListener(new HorizontalScrollBarListener());
+//		viewScrollPane.getVerticalScrollBar().setUnitIncrement(10);
+//		this.add(viewScrollPane);
 		this.add(this.viewPanel, BorderLayout.CENTER);
 		
 		// Setup the edit panel.
@@ -73,8 +84,18 @@ public class CentralPanel extends JPanel {
 		
 		// Add the button panel.
 		this.buttonPanel = new ButtonPanel();
-		this.buttonPanel.setVisible(false);
+		this.buttonPanel.setComponentsVisible(false);
 		this.add(this.buttonPanel, BorderLayout.SOUTH);
+	}
+	
+	private class HorizontalScrollBarListener implements AdjustmentListener {
+
+		@Override
+		public void adjustmentValueChanged(AdjustmentEvent e) {
+			System.out.println(e.getValue());
+			
+		}
+		
 	}
 	
 	/****************************************
@@ -97,10 +118,10 @@ public class CentralPanel extends JPanel {
 			this.searchResultsPanel.setVisible(false);
 			this.remove(this.searchResultsPanel);
 		}
-		
+
 		this.add(this.viewPanel, BorderLayout.CENTER);
 		this.viewPanel.setVisible(true);
-		this.buttonPanel.setVisible(false);
+		this.buttonPanel.setComponentsVisible(false);
 	}
 	
 	/**
@@ -120,7 +141,7 @@ public class CentralPanel extends JPanel {
 
 		this.add(this.editPanel, BorderLayout.CENTER);
 		this.editPanel.setVisible(true);
-		this.buttonPanel.setVisible(true);
+		this.buttonPanel.setComponentsVisible(true);
 	}
 	
 	/**
@@ -129,7 +150,7 @@ public class CentralPanel extends JPanel {
 	public void switchToSearchResultsPanel() {
 		
 		this.toolbarPanel.unselectModeButtons();
-		
+
 		if (this.viewPanel.getParent() != null) {
 			this.viewPanel.setVisible(false);
 			this.remove(this.viewPanel);
@@ -142,16 +163,19 @@ public class CentralPanel extends JPanel {
 
 		this.add(this.searchResultsPanel, BorderLayout.CENTER);
 		this.searchResultsPanel.setVisible(true);
-		this.searchResultsPanel.setVisible(true);
+		this.buttonPanel.setComponentsVisible(false);
 	}
 	
 	/**
-	 * Calls repaint() on the view and
+	 * Calls repaint() on the search, view and
 	 * edit panels to draw the image once
 	 * a new current image has been selected.
 	 */
-	public void drawCurrPage() {
+	public void updatePanels() {
 		this.viewPanel.repaint();
+		this.editPanel.updateCornersOnPanel();
 		this.editPanel.repaint();
+		this.searchResultsPanel.updateSearchResults();
+		this.searchResultsPanel.repaint();
 	}
 }

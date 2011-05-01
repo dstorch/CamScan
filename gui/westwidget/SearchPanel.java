@@ -9,6 +9,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import search.SearchResults;
+
+import core.Parameters;
+
 import centralwidget.CentralPanel;
 
 /**
@@ -29,6 +33,11 @@ public class SearchPanel extends JPanel implements ActionListener {
 	 * Reference to the central panel.
 	 */
 	private CentralPanel centralPanel;
+	
+	/**
+	 * The text field.
+	 */
+	private JTextField searchTextField;
 	
 	/****************************************
 	 * 
@@ -51,8 +60,8 @@ public class SearchPanel extends JPanel implements ActionListener {
 		this.add(searchLabel);
 		
 		// Setup the search text field.
-		JTextField searchTextField = new JTextField();
-		this.add(searchTextField);
+		this.searchTextField = new JTextField();
+		this.add(this.searchTextField);
 		
 		// Setup the search button.
 		JButton searchButton = new JButton("Search");
@@ -77,5 +86,8 @@ public class SearchPanel extends JPanel implements ActionListener {
 	 */
 	public void actionPerformed(ActionEvent arg0) {
 		this.centralPanel.switchToSearchResultsPanel();
+		SearchResults results = Parameters.getCoreManager().search(this.searchTextField.getText());
+		Parameters.setSearchResults(results);
+		this.centralPanel.updatePanels();
 	}
 }

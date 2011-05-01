@@ -3,6 +3,9 @@ package centralwidget;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -15,7 +18,23 @@ import core.Parameters;
  * @author Stelios
  *
  */
-public class ViewPanel extends JPanel {
+public class ViewPanel extends JPanel implements MouseWheelListener {
+	
+	/****************************************
+	 * 
+	 * Private Instance Variables
+	 * 
+	 ****************************************/
+	
+	/**
+	 * The buffered image representing the page.
+	 */
+	private BufferedImage img;
+	
+	/**
+	 * The scale factor.
+	 */
+	private double scaleFactor;
 	
 	/****************************************
 	 * 
@@ -29,6 +48,9 @@ public class ViewPanel extends JPanel {
 	public ViewPanel() {
 		super();
 		this.setBackground(Color.LIGHT_GRAY);
+		this.addMouseWheelListener(this);
+		
+		this.scaleFactor = 1;
 	}
 	
 	/****************************************
@@ -43,8 +65,33 @@ public class ViewPanel extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		Graphics2D brush = (Graphics2D) g;
+
+		if (this.img != Parameters.getCurrPageImg()) {
+			this.scaleFactor = 1;
+			this.img = Parameters.getCurrPageImg();
+		}	
 		
-		g.drawImage(Parameters.getCurrPageImg(), 0, 0, null);
+		int newW = (int) (this.img.getWidth() * this.scaleFactor);
+		int newH = (int) (this.img.getHeight() * this.scaleFactor);
+		g.drawImage(this.img, (this.getWidth() - newW)/2, (this.getHeight() - newH)/2, newW, newH, null);
+	}
+
+	/**
+	 * Handles the mouse wheel movement.
+	 * Used for zooming.
+	 */
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+
+		int notches = e.getWheelRotation();
+
+		if (notches < 0) {
+			if (this.scaleFactor > 0.2)
+				this.scaleFactor -= 0.1;
+		} else {
+			this.scaleFactor += 0.1;
+		}
+
+		this.repaint();
 	}
 }

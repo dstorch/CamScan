@@ -5,6 +5,7 @@ import gui.MainPanel;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.util.Vector;
 
 import javax.swing.JList;
@@ -87,6 +88,7 @@ public class PageExplorerPanel extends JPanel {
 	public void update() {
 		this.pageList.setListData(this.getPageNames());
 		this.listScroller.revalidate();
+		this.pageList.setSelectedIndex(0);
 	}
 	
 	/****************************************
@@ -127,12 +129,22 @@ public class PageExplorerPanel extends JPanel {
 		public void valueChanged(ListSelectionEvent e) {
 		    if (e.getValueIsAdjusting() == false) {
 		    	
+		    	// Serialize the previous page
+		    	if (Parameters.getWorkingPage() != null) {
+		    		try {
+						Parameters.getWorkingPage().serialize();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+		    	}
+		    	
 		    	// Get the current page and draw it on the panel.
 		        String currPageName = (String) pageList.getSelectedValue();
 		        if (currPageName != null) {
 		        	Page currPage = Parameters.getCoreManager().getWorkingDocPageFromOrder(Integer.parseInt(currPageName));
 		        	Parameters.setCurrPageImg(currPage.raw());
-		        	mainPanel.drawNewImage();
+		        	Parameters.setWorkingPage(currPage);
+		        	mainPanel.updateCentralPanels();
 		        }
 		    }
 		}
