@@ -87,6 +87,7 @@ public class PageExplorerPanel extends JPanel {
 	public void update() {
 		this.pageList.setListData(this.getPageNames());
 		this.listScroller.revalidate();
+		this.pageList.setSelectedIndex(0);
 	}
 	
 	/****************************************
@@ -132,7 +133,7 @@ public class PageExplorerPanel extends JPanel {
 		        if (currPageName != null) {
 		        	Page currPage = Parameters.getCoreManager().getWorkingDocPageFromOrder(Integer.parseInt(currPageName));
 		        	Parameters.setCurrPageImg(currPage.raw());
-		        	mainPanel.drawNewImage();
+		        	mainPanel.updateCentralPanels();
 		        }
 		    }
 		}

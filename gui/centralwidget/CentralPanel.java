@@ -3,6 +3,7 @@ package centralwidget;
 import java.awt.BorderLayout;
 
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 /**
  * The Central Panel of this application.
@@ -97,7 +98,7 @@ public class CentralPanel extends JPanel {
 			this.searchResultsPanel.setVisible(false);
 			this.remove(this.searchResultsPanel);
 		}
-		
+
 		this.add(this.viewPanel, BorderLayout.CENTER);
 		this.viewPanel.setVisible(true);
 		this.buttonPanel.setVisible(false);
@@ -129,7 +130,7 @@ public class CentralPanel extends JPanel {
 	public void switchToSearchResultsPanel() {
 		
 		this.toolbarPanel.unselectModeButtons();
-		
+
 		if (this.viewPanel.getParent() != null) {
 			this.viewPanel.setVisible(false);
 			this.remove(this.viewPanel);
@@ -146,12 +147,14 @@ public class CentralPanel extends JPanel {
 	}
 	
 	/**
-	 * Calls repaint() on the view and
+	 * Calls repaint() on the search, view and
 	 * edit panels to draw the image once
 	 * a new current image has been selected.
 	 */
-	public void drawCurrPage() {
+	public void updatePanels() {
 		this.viewPanel.repaint();
 		this.editPanel.repaint();
+		this.searchResultsPanel.updateSearchResults();
+		this.searchResultsPanel.repaint();
 	}
 }

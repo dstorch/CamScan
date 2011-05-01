@@ -1,5 +1,6 @@
 package gui;
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -49,6 +50,7 @@ public class App extends JFrame {
 		 *  Setup the JFrame
 		 */
 		super("CamScan");
+		this.setLayout(new BorderLayout());
 		this.app = this;
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
@@ -108,7 +110,7 @@ public class App extends JFrame {
 		MainPanel mainPanel = new MainPanel();
 
 		// Add the panel to the frame
-		this.add(mainPanel);
+		this.add(mainPanel, BorderLayout.CENTER);
 		this.pack();
 		this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 		this.setVisible(true);

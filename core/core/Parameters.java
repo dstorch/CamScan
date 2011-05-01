@@ -6,6 +6,8 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import search.SearchResults;
+
 public class Parameters {
 
 	/****************************************
@@ -75,9 +77,14 @@ public class Parameters {
 	 */
 	private static BufferedImage currPageImg;
 	
+	/**
+	 * The Search Results from the latest search.
+	 */
+	private static SearchResults searchResults;
+	
 	/****************************************
 	 * 
-	 * Getters for the Immutable Parameters
+	 * Getters for the Mutable Parameters
 	 * 
 	 ****************************************/
 	
@@ -99,9 +106,18 @@ public class Parameters {
 		return currPageImg;
 	}
 	
+	/**
+	 * Returns the search results from the latest search.
+	 * 
+	 * @return The search results from the latest search
+	 */
+	public static SearchResults getSearchResults() {
+		return searchResults;
+	}
+	
 	/****************************************
 	 * 
-	 * Setters for the Immutable Parameters
+	 * Setters for the Mutable Parameters
 	 * 
 	 ****************************************/
 	
@@ -129,5 +145,14 @@ public class Parameters {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Sets the search results from the latest search.
+	 * 
+	 * @param sr The search results to set
+	 */
+	public static void setSearchResults(SearchResults sr) {
+		searchResults = sr;
 	}
 }

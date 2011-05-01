@@ -56,25 +56,6 @@ public class MainPanel extends JPanel {
 	public MainPanel() throws DocumentException, IOException {
 		super();
 		this.setLayout(new BorderLayout());
-	
-//		// Setup and display the file chooser
-//		JFileChooser fileChooser = new JFileChooser();
-//		fileChooser.setDialogTitle("Select Workspace");
-//		fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-//		fileChooser.setAcceptAllFileFilterUsed(false);
-//		int returnVal = fileChooser.showOpenDialog(this);
-//
-//		// Handle the case where the user closes the file chooser
-//		// without choosing the workspace
-//		while (returnVal != JFileChooser.APPROVE_OPTION) {
-//			JOptionPane.showMessageDialog(this, "Please select a workspace.", "No Workspace Selected", JOptionPane.WARNING_MESSAGE);
-//			returnVal = fileChooser.showOpenDialog(this);
-//		}
-//		
-//		// Once the user selects the workspace, its absolute
-//		// path is stored
-//		File file = fileChooser.getSelectedFile();
-//		ParamHolder.setWorkspace(file.getAbsolutePath());
 		
 		Parameters.setCoreManager(new CoreManager());
 
@@ -95,7 +76,7 @@ public class MainPanel extends JPanel {
 	 * To be called one the current page has changed.
 	 * It updates the UI to show that page.
 	 */
-	public void drawNewImage() {
-		this.centralPanel.drawCurrPage();
+	public void updateCentralPanels() {
+		this.centralPanel.updatePanels();
 	}
 }
