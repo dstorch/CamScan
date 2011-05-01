@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <PAGE>
-  <IMG path="tests/xml/testDocument/hamlet_2.png" processed="tests/xml/testDocument/hamlet_2.png"/>
+  <IMG path="tests/xml/testDocument/hamlet_2.tiff" processed="tests/xml/testDocument/hamlet_2.tiff"/>
   <CORNERS>
     <UPRIGHT x="0" y="0"/>
     <DOWNRIGHT x="0" y="0"/>
@@ -16,9 +16,8 @@
   </TEXT>
   <CONFIG>
     <COLORTEMP value="0.0"/>
-    <CONTRASTBOOST value="0.0"/>
+    <CONTRASTBOOST value="no"/>
     <FLIPH value="yes"/>
     <FLIPV value="yes"/>
-    <ROTATE value="90.0"/>
   </CONFIG>
 </PAGE>

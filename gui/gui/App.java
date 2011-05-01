@@ -1,5 +1,6 @@
 package gui;
 
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -27,6 +28,9 @@ public class App extends JFrame {
 	 * 
 	 ****************************************/
 	
+	/**
+	 * Reference to the App class.
+	 */
 	private JFrame app;
 
 	/****************************************
@@ -43,15 +47,20 @@ public class App extends JFrame {
 	public App() throws DocumentException, IOException {
 
 		/*
-		 * Setup the JFrame
+		 *  Setup the JFrame
 		 */
 		super("CamScan");
+		this.setLayout(new BorderLayout());
 		this.app = this;
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 		// Setup the menu bar
 		JMenuBar menuBar = new JMenuBar();
 
+		/*
+		 * The File Menu
+		 */
+		
 		// Setup the file menu
 		JMenu fileMenu = new JMenu("File");
 		menuBar.add(fileMenu);
@@ -60,7 +69,49 @@ public class App extends JFrame {
 		JMenuItem quitMenuItem = new JMenuItem("Quit");
 		quitMenuItem.addActionListener(new QuitListener());
 		fileMenu.add(quitMenuItem);
+		
+		/*
+		 * The Import Menu
+		 */
+		
+		// Setup the import menu
+		JMenu importMenu = new JMenu("Import");
+		menuBar.add(importMenu);
+		
+		// Setup the menu items for the import menu
+		JMenuItem fromFileMenuItem = new JMenuItem("From File");
+		fromFileMenuItem.addActionListener(new ImportFromFileListener());
+		importMenu.add(fromFileMenuItem);
+		
+		JMenuItem fromFolderMenuItem = new JMenuItem("From Folder");
+		fromFolderMenuItem.addActionListener(new ImportFromFolderListener());
+		importMenu.add(fromFolderMenuItem);
+		
+		/*
+		 * The Export Menu
+		 */
+		
+		// Setup the export menu
+		JMenu exportMenu = new JMenu("Export");
+		menuBar.add(exportMenu);
+		
+		// Setup the menu items for the export menu
+		JMenuItem pdfMenuItem = new JMenuItem("PDF");
+		pdfMenuItem.addActionListener(new ExportPDFListener());
+		exportMenu.add(pdfMenuItem);
+		
+		JMenuItem imagesMenuItem = new JMenuItem("Images");
+		imagesMenuItem.addActionListener(new ExportImagesListener());
+		exportMenu.add(imagesMenuItem);
+		
+		JMenuItem textMenuItem = new JMenuItem("Extracted Text");
+		textMenuItem.addActionListener(new ExportTextListener());
+		exportMenu.add(textMenuItem);
 
+		/*
+		 * The About Menu
+		 */
+		
 		// Setup the about menu
 		JMenu helpMenu = new JMenu("Help");
 		menuBar.add(helpMenu);
@@ -70,6 +121,10 @@ public class App extends JFrame {
 		aboutMenuItem.addActionListener(new AboutListener());
 		helpMenu.add(aboutMenuItem);
 
+		/*
+		 * Setup the JFrame
+		 */
+		
 		// Assign the menu bar to this JFrame
 		this.setJMenuBar(menuBar);
 
@@ -77,7 +132,7 @@ public class App extends JFrame {
 		MainPanel mainPanel = new MainPanel();
 
 		// Add the panel to the frame
-		this.add(mainPanel);
+		this.add(mainPanel, BorderLayout.CENTER);
 		this.pack();
 		this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 		this.setVisible(true);
@@ -111,6 +166,56 @@ public class App extends JFrame {
 	private class QuitListener implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
 			System.exit(0); // Exit the program
+		}
+	}
+	
+	/**
+	 * The ActionListener class for the import from file
+	 * menu item.
+	 */
+	private class ImportFromFileListener implements ActionListener {
+		public void actionPerformed(ActionEvent arg0) {
+			// TODO Auto-generated method stub
+		}
+	}
+	
+	/**
+	 * The ActionListener class for the import from folder
+	 * menu item.
+	 */
+	private class ImportFromFolderListener implements ActionListener {
+		public void actionPerformed(ActionEvent arg0) {
+			// TODO Auto-generated method stub
+		}
+	}
+	
+	/**
+	 * The ActionListener class for the export as PDF
+	 * menu item.
+	 */
+	private class ExportPDFListener implements ActionListener {
+		public void actionPerformed(ActionEvent arg0) {
+			// TODO Auto-generated method stub
+		}
+	}
+	
+	/**
+	 * The ActionListener class for the export as images
+	 * menu item.
+	 */
+	private class ExportImagesListener implements ActionListener {
+		public void actionPerformed(ActionEvent arg0) {
+			// TODO Auto-generated method stub
+		}
+	}
+	
+	/**
+	 * The ActionListener class for the export as text
+	 * menu item.
+	 */
+	private class ExportTextListener implements ActionListener {
+		public void actionPerformed(ActionEvent arg0) {
+			// TODO Auto-generated method stub
 		}
 	}
 

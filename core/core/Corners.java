@@ -10,6 +10,14 @@ public class Corners {
 	private Point _upleft;
 	private Point _downleft;
 	
+	// default constructor guesses plausible corner locations
+	public Corners() {
+		_upleft = new Point(50, 50);
+		_downleft = new Point(50, 200);
+		_upright = new Point(100, 50);
+		_downright = new Point(100, 200);
+	}
+	
 	public Corners(Point upleft, Point upright, Point downleft, Point downright) {
 		_upright = upright;
 		_downright = downright;
@@ -28,6 +36,29 @@ public class Corners {
 	}
 	public Point downleft() {
 		return _downleft;
+	}
+	
+	public void setUpRight(Point p) {
+		_upright = p;
+	}
+	
+	public void setUpLeft(Point p) {
+		_upleft = p;
+	}
+	
+	public void setDownRight(Point p) {
+		_downright = p;
+	}
+	
+	public void setDownLeft(Point p) {
+		_downleft = p;
+	}
+	
+	public int width(){
+		return _upright.x - _upleft.x;
+	}
+	public int height(){
+		return _downleft.y - _upleft.y;
 	}
 	
 	private void addPointAttribute(Element el, Point point) {

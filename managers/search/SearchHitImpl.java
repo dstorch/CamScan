@@ -26,6 +26,12 @@ public class SearchHitImpl implements SearchHit {
 		return _score;
 	}
 
+	public int compareTo(Object o) {
+		SearchHit hit = (SearchHit) o;
+		Float score = new Float(_score);
+		return score.compareTo(hit.score()) * -1;
+	}
+
 	
 	
 }

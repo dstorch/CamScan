@@ -2,6 +2,10 @@ package core;
 
 import java.io.*;
 import java.util.*;
+import java.util.regex.Pattern;
+
+import ocr.ocrManager;
+
 import org.dom4j.*;
 import org.dom4j.io.*;
 import search.*;
@@ -50,6 +54,12 @@ public class CoreManager {
 			setWorkingPage(workingStr);
 		}
 		
+		for (Iterator i = root.elementIterator("TESSERACT"); i.hasNext();) {
+			Element tesseractEl = (Element) i.next();
+			String tessPath = tesseractEl.attribute("path").getStringValue();
+			ocrManager.TESS_PATH = tessPath;
+		}
+		
 		
 		for (Iterator i = root.elementIterator("DOCLIST"); i.hasNext();) {
 			Element docList = (Element) i.next();
@@ -67,6 +77,10 @@ public class CoreManager {
 		return _workingDocument.name();
 	}
 	
+	public Document workingDocument() {
+		return _workingDocument;
+	}
+	
 	// called before the application exits
 	public void shutdown() throws IOException {
 		OutputFormat pretty = OutputFormat.createPrettyPrint();
@@ -76,6 +90,11 @@ public class CoreManager {
 			org.dom4j.Document xmlDoc = DocumentHelper.createDocument();
 			Element root = DocumentHelper.createElement("STARTUP");
 			xmlDoc.setRootElement(root);
+			
+			// tesseract pathname
+			Element tesseract = DocumentHelper.createElement("TESSERACT");
+			tesseract.addAttribute("path", ocrManager.TESS_PATH);
+			root.add(tesseract);
 			
 			if (_workingDocument != null) {
 				Element workingdoc = DocumentHelper.createElement("WORKINGDOC");
@@ -116,17 +135,181 @@ public class CoreManager {
 	}
 	
 	// Called after an import in order to establish a new
-	// document object
-	public Document createDocument() {
-		return null;
+	// document object, if the user imports an entire folder
+	public Document createDocumentFromFolder(File sourceLocation) throws IOException {
+		
+		// put this document in workspace/docs by default
+		String name = sourceLocation.getName();
+		String directory = Parameters.DOC_DIRECTORY + "/" + name;
+		File dirFile = new File(directory);
+		if (!dirFile.mkdir()) throw new IOException("Import aborted: problem making new document directory!");
+		String pathname = directory + "/" + "doc.xml";
+		Document newDoc = new Document(name, pathname);
+	
+		File targetLocation = new File(Parameters.RAW_DIRECTORY);
+		recursiveImageCopy(sourceLocation, targetLocation, newDoc);
+		
+		// write the XML for the new document to disk
+		newDoc.serialize();
+		
+		return newDoc;
 	}
 	
-	public void export(String docpath, String outfile) throws IOException {
-		_exporter.export(docpath, outfile);
+	// recursively copies all image files to the workspace/
+	private void recursiveImageCopy(File sourceLocation, File targetLocation, Document d) throws IOException {
+		
+		if (sourceLocation.isDirectory()) {
+
+            if (!targetLocation.exists()) {
+                targetLocation.mkdir();
+            }
+
+            String[] children = sourceLocation.list();
+            for (int i=0; i<children.length; i++) {
+                recursiveImageCopy(new File(sourceLocation, children[i]),
+                        new File(targetLocation, children[i]), d);
+            }
+        } else {
+            
+        	// get the file extension
+        	String filename = sourceLocation.getName();
+        	String[] extensionArr = filename.split("[.]");
+        	String extension = "";
+        	if (extensionArr.length > 0) {
+        		extension = extensionArr[extensionArr.length-1];
+        	}
+        	
+        	if (extension.equals("tiff")) {
+        		
+        		// copy the image into the workspace
+	            InputStream in = new FileInputStream(sourceLocation);
+	            try {
+	            	OutputStream out = new FileOutputStream(targetLocation);
+	            	try {
+			         
+			            // Copy the bits from instream to outstream
+			            byte[] buf = new byte[1024];
+			            int len;
+			            while ((len = in.read(buf)) > 0) {
+			                out.write(buf, 0, len);
+			            }
+	            	} finally {
+	            		out.close();
+	            	}
+	            } finally {
+	            	 in.close();
+	            }
+	           
+	            // get the image file name without a ".tiff" extension
+	            String imageFile = sourceLocation.getName();
+	            String noExt = imageFile.substring(0,imageFile.length()-5);
+	            
+	            // construct the page and add it to the document
+	            Page p = new Page(d, -1);
+	            p.setRawFile(targetLocation.getPath());
+	            p.setProcessedFile(Parameters.PROCESSED_DIRECTORY+"/"+sourceLocation.getName());
+	            p.setMetafile(Parameters.DOC_DIRECTORY+"/"+d.name()+"/" + noExt+".xml");
+	            d.addPage(p);
+	            
+	            // comment this to run OCR! (see below also)
+	            p.setPageText(new PageText(""));
+	            
+	            // uncomment this to run OCR! (see above also)
+	            //p.setOcrResults();
+	            
+        	}
+
+        }
+		
+	}
+	
+	// called when the user imports a single photograph
+	// as a document
+	public Document createDocumentFromFile(File sourceLocation) throws IOException {
+		
+		// put this document in workspace/docs by default
+        // get the image file name without a ".tiff" extension
+        String imageFile = sourceLocation.getName();
+        String noExt = imageFile.substring(0,imageFile.length()-5);
+		String directory = Parameters.DOC_DIRECTORY + "/" + noExt;
+		File dirFile = new File(directory);
+		if (!dirFile.mkdir()) throw new IOException("Import aborted: problem making new document directory!");
+		String pathname = directory + "/" + "doc.xml";
+		Document newDoc = new Document(noExt, pathname);
+	
+		File targetLocation = new File(Parameters.RAW_DIRECTORY + "/" + sourceLocation.getName());
+		recursiveImageCopy(sourceLocation, targetLocation, newDoc);
+		
+		// write the XML for the new document to disk
+		newDoc.serialize();
+		
+		return newDoc;
+	}
+	
+	// write a document out as a multipage pdf
+	public void exportToPdf(String docpath, String outfile) throws IOException {
+		_exporter.exportToPdf(docpath, outfile);
+	}
+	
+	// write a directory of image files
+	public void exportImages(Document document, String outdirectory) throws IOException {
+		_exporter.exportImages(document, outdirectory);
+	}
+	
+	// write a text file containing the document text
+	public void exportText(Document document, String outfile) throws IOException {
+		_exporter.exportText(document, outfile);
 	}
 	
 	public SearchResults search(String query) {
-		return _searcher.getSearchResults(query, _workingDocument, _allDocuments);
+		SearchResults results = _searcher.getSearchResults(query, _workingDocument, _allDocuments);
+		
+		// REMOVE WHEN READY
+		//System.out.println("In the working page: ");
+		//for (SearchHit hit : results.inWorkingDoc()) {
+		//	System.out.println(hit.snippet()+" "+hit.score());
+		//}
+		//System.out.println("In all other pages: ");
+		//for (SearchHit hit : results.elsewhere()) {
+		//	System.out.println(hit.snippet()+" "+hit.score());
+		//}
+		
+		return results;
+	}
+	
+	/**
+	 * Given the name of a document, it sets its
+	 * instance of Document as the working
+	 * document.
+	 * 
+	 * @param docName The name of the document
+	 */
+	public void setWorkingDocumentFromName(String docName) {
+		
+		for (Document doc : _allDocuments) {
+			if (docName.equals(doc.name())) {
+				_workingDocument = doc;
+			}
+		}
+	}
+	
+	/**
+	 * Given an order, it returns the page of the given 
+	 * order from the working document.
+	 * 
+	 * @param order The order of the page to fetch
+	 * @return The page with the given order of the
+	 * working document.
+	 */
+	public Page getWorkingDocPageFromOrder(int order) {
+		
+		for (Page page : _workingDocument.pages()) {
+			if (order == page.order()) {
+				return page;
+			}
+		}
+		
+		return null;
 	}
 	
 	// not the main method for the application,
@@ -134,9 +317,13 @@ public class CoreManager {
 	// components independent of the GUI
 	public static void main(String[] args) throws DocumentException, IOException {
 		CoreManager core = new CoreManager();
+		core.createDocumentFromFile(new File("tests/xml/testDocument/hamlet_1.tiff"));
+		//core.createDocumentFromFolder(new File("tests/xml/testDocument"));
 		core.setWorkingDocument("tests/xml/testDocument/doc.xml");
-		core.export("tests/xml/testDocument/doc.xml", "foo.pdf");
-		core.search("Benjamin Franklin");
+		//core.exportToPdf("tests/xml/testDocument/doc.xml", "../foo.pdf");
+		//core.exportText(core.workingDocument(), "../document.txt");
+		//core.exportImages(core.workingDocument(), "../copiedDoc");
+		//core.search("Benjamin Franklin almanac");
 		core.closeWorkingDocument();
 		core.shutdown();
 	}

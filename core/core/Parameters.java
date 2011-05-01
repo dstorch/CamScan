@@ -1,5 +1,13 @@
 package core;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
+import search.SearchResults;
+
 public class Parameters {
 
 	/****************************************
@@ -43,6 +51,22 @@ public class Parameters {
 	 */
 	public static final String DOC_DIRECTORY = "workspace/docs";
 	
+	/**
+	 * The regular expression used to find image files
+	 */
+	//public static final String IMAGE_REGEX = ".png$|.jpg$|.tiff$|.jpeg$";
+	public static final String IMAGE_REGEX = ".tiff$";
+	
+	/**
+	 * Max number of search hits to report in the working document
+	 */
+	public static final int RESULTS_INDOC = 4;
+	
+	/**
+	 * Max number of search hits to report in all other documents
+	 */
+	public static final int RESULTS_ELSEWHERE = 10;
+	
 	/****************************************
 	 * 
 	 * Mutable Parameters
@@ -50,13 +74,28 @@ public class Parameters {
 	 ****************************************/
 	
 	/**
-	 * Reference to the Core Manager instance.
+	 * Reference to the global Core Manager instance.
 	 */
 	private static CoreManager coreManager;
 	
+	/**
+	 * The current page as a buffered image.
+	 */
+	private static BufferedImage currPageImg;
+	
+	/**
+	 * The Search Results from the latest search.
+	 */
+	private static SearchResults searchResults;
+	
+	/**
+	 * The working page.
+	 */
+	private static Page workingPage;
+	
 	/****************************************
 	 * 
-	 * Getters for the Immutable Parameters
+	 * Getters for the Mutable Parameters
 	 * 
 	 ****************************************/
 	
@@ -69,9 +108,36 @@ public class Parameters {
 		return coreManager;
 	}
 	
+	/**
+	 * Returns the current page buffered image.
+	 * 
+	 * @return The current page buffered image
+	 */
+	public static BufferedImage getCurrPageImg() {
+		return currPageImg;
+	}
+	
+	/**
+	 * Returns the search results from the latest search.
+	 * 
+	 * @return The search results from the latest search
+	 */
+	public static SearchResults getSearchResults() {
+		return searchResults;
+	}
+	
+	/**
+	 * Returns the working page.
+	 * 
+	 * @return The working page
+	 */
+	public static Page getWorkingPage() {
+		return workingPage;
+	}
+	
 	/****************************************
 	 * 
-	 * Setters for the Immutable Parameters
+	 * Setters for the Mutable Parameters
 	 * 
 	 ****************************************/
 	
@@ -84,5 +150,38 @@ public class Parameters {
 	public static void setCoreManager(CoreManager cm) {
 		if (coreManager == null)
 			coreManager = cm;
+	}
+	
+	/**
+	 * Given the path to the raw page image, it
+	 * sets the current page image as a buffered
+	 * image.
+	 * 
+	 * @param raw The path to the raw image.
+	 */
+	public static void setCurrPageImg(String raw) {
+		try {
+			currPageImg = ImageIO.read(new File(raw));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Sets the search results from the latest search.
+	 * 
+	 * @param sr The search results to set
+	 */
+	public static void setSearchResults(SearchResults sr) {
+		searchResults = sr;
+	}
+	
+	/**
+	 * Sets the working page.
+	 * 
+	 * @param p The working page to set
+	 */
+	public static void setWorkingPage(Page p) {
+		workingPage = p;
 	}
 }

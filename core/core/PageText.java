@@ -18,7 +18,7 @@ public class PageText {
 	public String fullText() {
 		return _fullText;
 	}
-	private List<Position> positions() {
+	public List<Position> positions() {
 		return _positions;
 	}
 	
