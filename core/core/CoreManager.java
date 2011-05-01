@@ -144,7 +144,7 @@ public class CoreManager {
 		
 		// write the XML for the new document to disk
 		newDoc.serialize();
-		
+		_allDocuments.add(newDoc);
 		return newDoc;
 	}
 	
