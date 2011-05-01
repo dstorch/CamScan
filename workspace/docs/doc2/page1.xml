@@ -16,9 +16,8 @@
   </TEXT>
   <CONFIG>
     <COLORTEMP value="0.0"/>
-    <CONTRASTBOOST value="0.0"/>
+    <CONTRASTBOOST value="no"/>
     <FLIPH value="no"/>
     <FLIPV value="yes"/>
-    <ROTATE value="0.0"/>
   </CONFIG>
 </PAGE>

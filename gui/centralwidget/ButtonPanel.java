@@ -31,11 +31,6 @@ public class ButtonPanel extends JPanel {
 	 */
 	private ArrayList<Component> controls;
 	
-	/**
-	 * The default color of the panel.
-	 */
-	private Color defaultColor;
-	
 	/****************************************
 	 * 
 	 * Constructor(s)
@@ -50,7 +45,6 @@ public class ButtonPanel extends JPanel {
 		this.setLayout(new GridLayout(2,4));
 		
 		this.controls = new ArrayList<Component>();
-		this.defaultColor = this.getBackground();
 		
 		// Setup all the buttons
 		JButton hFlipButton = new JButton("Horizontal Split");
@@ -96,10 +90,5 @@ public class ButtonPanel extends JPanel {
 		for (Component c : this.controls) {
 			c.setVisible(visible);
 		}
-		
-		if (visible)
-			this.setBackground(this.defaultColor);
-		else
-			this.setBackground(Color.LIGHT_GRAY);
 	}
 }

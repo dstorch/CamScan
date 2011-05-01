@@ -1,6 +1,8 @@
 package centralwidget;
 
 import java.awt.BorderLayout;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -63,7 +65,15 @@ public class CentralPanel extends JPanel {
 		this.add(this.toolbarPanel, BorderLayout.NORTH);
 		
 		// Setup and add the view panel.
-		this.viewPanel = new ViewPanel(); 
+		this.viewPanel = new ViewPanel();
+//		this.viewPanel.setPreferredSize(this.viewPanel.getPreferredSize());
+//		System.out.println(this.viewPanel.getPreferredSize());
+//		JScrollPane viewScrollPane = new JScrollPane(this.viewPanel);
+//		viewScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+//		viewScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+//		viewScrollPane.getHorizontalScrollBar().addAdjustmentListener(new HorizontalScrollBarListener());
+//		viewScrollPane.getVerticalScrollBar().setUnitIncrement(10);
+//		this.add(viewScrollPane);
 		this.add(this.viewPanel, BorderLayout.CENTER);
 		
 		// Setup the edit panel.
@@ -76,6 +86,16 @@ public class CentralPanel extends JPanel {
 		this.buttonPanel = new ButtonPanel();
 		this.buttonPanel.setComponentsVisible(false);
 		this.add(this.buttonPanel, BorderLayout.SOUTH);
+	}
+	
+	private class HorizontalScrollBarListener implements AdjustmentListener {
+
+		@Override
+		public void adjustmentValueChanged(AdjustmentEvent e) {
+			System.out.println(e.getValue());
+			
+		}
+		
 	}
 	
 	/****************************************
