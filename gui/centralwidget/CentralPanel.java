@@ -4,6 +4,13 @@ import java.awt.BorderLayout;
 
 import javax.swing.JPanel;
 
+/**
+ * The Central Panel of this application.
+ * The pages and the search results are displayed here.
+ * 
+ * @author Stelios
+ *
+ */
 public class CentralPanel extends JPanel {
 
 	/****************************************
@@ -55,7 +62,7 @@ public class CentralPanel extends JPanel {
 		this.add(this.toolbarPanel, BorderLayout.NORTH);
 		
 		// Setup and add the view panel.
-		this.viewPanel = new ViewPanel();
+		this.viewPanel = new ViewPanel(); 
 		this.add(this.viewPanel, BorderLayout.CENTER);
 		
 		// Setup the edit panel.

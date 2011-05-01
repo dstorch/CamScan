@@ -27,6 +27,9 @@ public class App extends JFrame {
 	 * 
 	 ****************************************/
 	
+	/**
+	 * Reference to the App class.
+	 */
 	private JFrame app;
 
 	/****************************************
@@ -43,7 +46,7 @@ public class App extends JFrame {
 	public App() throws DocumentException, IOException {
 
 		/*
-		 * Setup the JFrame
+		 *  Setup the JFrame
 		 */
 		super("CamScan");
 		this.app = this;
@@ -52,6 +55,10 @@ public class App extends JFrame {
 		// Setup the menu bar
 		JMenuBar menuBar = new JMenuBar();
 
+		/*
+		 * The File Menu
+		 */
+		
 		// Setup the file menu
 		JMenu fileMenu = new JMenu("File");
 		menuBar.add(fileMenu);
@@ -60,7 +67,27 @@ public class App extends JFrame {
 		JMenuItem quitMenuItem = new JMenuItem("Quit");
 		quitMenuItem.addActionListener(new QuitListener());
 		fileMenu.add(quitMenuItem);
+		
+		/*
+		 * The Import Menu
+		 */
+		
+		// Setup the import menu
+		JMenu importMenu = new JMenu("Import");
+		menuBar.add(importMenu);
+		
+		/*
+		 * The Export Menu
+		 */
+		
+		// Setup the export menu
+		JMenu exportMenu = new JMenu("Export");
+		menuBar.add(exportMenu);
 
+		/*
+		 * The About Menu
+		 */
+		
 		// Setup the about menu
 		JMenu helpMenu = new JMenu("Help");
 		menuBar.add(helpMenu);
@@ -70,6 +97,10 @@ public class App extends JFrame {
 		aboutMenuItem.addActionListener(new AboutListener());
 		helpMenu.add(aboutMenuItem);
 
+		/*
+		 * Setup the JFrame
+		 */
+		
 		// Assign the menu bar to this JFrame
 		this.setJMenuBar(menuBar);
 

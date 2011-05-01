@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import core.Parameters;
 
@@ -18,7 +19,7 @@ public class ViewPanel extends JPanel {
 	
 	/****************************************
 	 * 
-	 * Constructors.
+	 * Constructor(s)
 	 * 
 	 ****************************************/
 	
@@ -29,6 +30,12 @@ public class ViewPanel extends JPanel {
 		super();
 		this.setBackground(Color.LIGHT_GRAY);
 	}
+	
+	/****************************************
+	 * 
+	 * Public Methods
+	 * 
+	 ****************************************/
 	
 	/**
 	 * The paintComponent method.

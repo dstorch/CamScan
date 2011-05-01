@@ -32,6 +32,11 @@ public class EastPanel extends JPanel {
 	 * 
 	 ****************************************/
 	
+	/**
+	 * Constructor.
+	 * 
+	 * @param Reference to the main panel
+	 */
 	public EastPanel(MainPanel mainPanel) {
 		super();
 		
@@ -45,6 +50,9 @@ public class EastPanel extends JPanel {
 	 * 
 	 ****************************************/
 	
+	/**
+	 * Returns the page explorer panel.
+	 */
 	public PageExplorerPanel getPageExpPanel() {
 		return this.pageExpPanel;
 	}

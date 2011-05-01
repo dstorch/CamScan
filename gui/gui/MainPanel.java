@@ -77,7 +77,6 @@ public class MainPanel extends JPanel {
 //		ParamHolder.setWorkspace(file.getAbsolutePath());
 		
 		Parameters.setCoreManager(new CoreManager());
-		CoreManager manager = Parameters.getCoreManager();
 
 		// Setup the central panel
 		this.centralPanel = new CentralPanel();

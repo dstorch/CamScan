@@ -138,10 +138,17 @@ public class DocExplorerPanel extends JPanel {
 	private class SelectionListener implements ListSelectionListener {
 		public void valueChanged(ListSelectionEvent e) {
 			if (e.getValueIsAdjusting() == false) {
+				
+				// Get the current selection and set it as the working document.
 				String currDocName = (String) docList.getSelectedValue();   
 				Parameters.getCoreManager().setWorkingDocumentFromName(currDocName);
+				
+				// Update the page explorer panel with the pages of the
+				// new working document.
 				pageExpPanel.update();
 
+				// Get the very first page and display its image on the
+				// central panel.
 				Page currPage = Parameters.getCoreManager().workingDocument().pages().get(0);
 				Parameters.setCurrPageImg(currPage.raw());
 				centralPanel.drawCurrPage();

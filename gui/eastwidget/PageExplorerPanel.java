@@ -21,8 +21,8 @@ import core.Parameters;
 
 
 /**
- * The document tree that will appear on the
- * document explorer panel.
+ * The page tree that will appear on the
+ * page explorer panel.
  * 
  * @author Stelios
  *
@@ -126,8 +126,9 @@ public class PageExplorerPanel extends JPanel {
 	private class SelectionListener implements ListSelectionListener {
 		public void valueChanged(ListSelectionEvent e) {
 		    if (e.getValueIsAdjusting() == false) {
+		    	
+		    	// Get the current page and draw it on the panel.
 		        String currPageName = (String) pageList.getSelectedValue();
-		        
 		        if (currPageName != null) {
 		        	Page currPage = Parameters.getCoreManager().getWorkingDocPageFromOrder(Integer.parseInt(currPageName));
 		        	Parameters.setCurrPageImg(currPage.raw());
