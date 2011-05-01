@@ -140,7 +140,13 @@ public class DocExplorerPanel extends JPanel {
 			if (e.getValueIsAdjusting() == false) {
 				
 				// Get the current selection and set it as the working document.
-				String currDocName = (String) docList.getSelectedValue();   
+				String currDocName = (String) docList.getSelectedValue();
+				
+				if (currDocName == null) {
+					docList.setSelectedIndex(0);
+					currDocName = "0";
+				}
+			
 				Parameters.getCoreManager().setWorkingDocumentFromName(currDocName);
 				
 				// Update the page explorer panel with the pages of the

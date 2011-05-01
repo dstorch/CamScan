@@ -255,10 +255,10 @@ public class CoreManager {
 	            d.addPage(p);
 	            
 	            // comment this to run OCR! (see below also)
-	            //p.setPageText(new PageText(""));
+	            p.setPageText(new PageText(""));
 	            
 	            // uncomment this to run OCR! (see above also)
-	            p.setOcrResults();
+	            // p.setOcrResults();
 	            
         	}
 
