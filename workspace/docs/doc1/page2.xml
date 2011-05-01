@@ -3,10 +3,10 @@
 <PAGE>
   <IMG path="workspace/raw/hamlet_2.png" processed="workspace/raw/hamlet_2.png"/>
   <CORNERS>
-    <UPRIGHT x="0" y="0"/>
-    <DOWNRIGHT x="0" y="0"/>
-    <UPLEFT x="0" y="0"/>
-    <DOWNLEFT x="0" y="0"/>
+    <UPRIGHT x="100" y="50"/>
+    <DOWNRIGHT x="100" y="200"/>
+    <UPLEFT x="50" y="50"/>
+    <DOWNLEFT x="50" y="200"/>
   </CORNERS>
   <TEXT>
     <FULLTEXT>Another example of document test with potential nonsense inside due to bad OCR results. I will search for the term "Benjamin Franklin" in order to determine how well the searching really works.</FULLTEXT>

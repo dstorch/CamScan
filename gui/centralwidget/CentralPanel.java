@@ -153,6 +153,7 @@ public class CentralPanel extends JPanel {
 	 */
 	public void updatePanels() {
 		this.viewPanel.repaint();
+		this.editPanel.updateCornersOnPanel();
 		this.editPanel.repaint();
 		this.searchResultsPanel.updateSearchResults();
 		this.searchResultsPanel.repaint();

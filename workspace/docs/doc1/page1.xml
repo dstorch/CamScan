@@ -3,10 +3,10 @@
 <PAGE>
   <IMG path="workspace/raw/hamlet_1.png" processed="workspace/raw/hamlet_1.png"/>
   <CORNERS>
-    <UPRIGHT x="0" y="0"/>
-    <DOWNRIGHT x="0" y="0"/>
-    <UPLEFT x="0" y="0"/>
-    <DOWNLEFT x="0" y="0"/>
+    <UPRIGHT x="100" y="50"/>
+    <DOWNRIGHT x="100" y="200"/>
+    <UPLEFT x="50" y="50"/>
+    <DOWNLEFT x="50" y="200"/>
   </CORNERS>
   <TEXT>
     <FULLTEXT>This is the full text of the document. I will make *^3 to add all kinds of strange characters... and words to test how tolerant the search procedure is!!!</FULLTEXT>

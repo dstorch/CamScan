@@ -133,6 +133,7 @@ public class PageExplorerPanel extends JPanel {
 		        if (currPageName != null) {
 		        	Page currPage = Parameters.getCoreManager().getWorkingDocPageFromOrder(Integer.parseInt(currPageName));
 		        	Parameters.setCurrPageImg(currPage.raw());
+		        	Parameters.setWorkingPage(currPage);
 		        	mainPanel.updateCentralPanels();
 		        }
 		    }

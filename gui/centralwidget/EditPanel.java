@@ -3,6 +3,7 @@ package centralwidget;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -11,6 +12,8 @@ import java.awt.geom.Line2D;
 
 import javax.swing.JPanel;
 
+import core.Corners;
+import core.Page;
 import core.Parameters;
 
 /**
@@ -110,16 +113,12 @@ public class EditPanel extends JPanel implements MouseMotionListener {
 		this.lineDRDL = new Line2D.Double();
 		this.lineDLUL = new Line2D.Double();
 
-		this.moveCornerTo(cornerUL, 100, 100);
-		this.moveCornerTo(cornerUR, 150, 100);
-		this.moveCornerTo(cornerDR, 150, 200);
-		this.moveCornerTo(cornerDL, 100, 200);
+//		this.moveCornerTo(cornerUL, 100, 100);
+//		this.moveCornerTo(cornerUR, 150, 100);
+//		this.moveCornerTo(cornerDR, 150, 200);
+//		this.moveCornerTo(cornerDL, 100, 200);
 
-		this.moveLine(this.lineULUR, this.cornerUL, this.cornerUR);
-		this.moveLine(this.lineURDR, this.cornerUR, this.cornerDR);
-		this.moveLine(this.lineDRDL, this.cornerDR, this.cornerDL);
-		this.moveLine(this.lineDLUL, this.cornerDL, this.cornerUL);
-
+//		this.updateConnectingLines();
 		this.repaint();
 	}
 
@@ -128,6 +127,22 @@ public class EditPanel extends JPanel implements MouseMotionListener {
 	 * Public Methods
 	 * 
 	 ****************************************/
+	
+	/**
+	 * Updates the corners when the current page changes.
+	 */
+	public void updateCornersOnPanel() {
+		
+		Corners corners = Parameters.getWorkingPage().corners();
+		
+		this.moveCornerTo(cornerUL, corners.upleft().getX(), corners.upleft().getY());
+		this.moveCornerTo(cornerUR, corners.upright().getX(), corners.upright().getY());
+		this.moveCornerTo(cornerDR, corners.downright().getX(), corners.downright().getY());
+		this.moveCornerTo(cornerDL, corners.downleft().getX(), corners.downleft().getY());
+		
+		this.updateConnectingLines();
+		this.repaint();
+	}
 
 	/**
 	 * The paintComponent method.
@@ -161,6 +176,16 @@ public class EditPanel extends JPanel implements MouseMotionListener {
 	 * Private Methods
 	 * 
 	 ****************************************/
+	
+	/**
+	 * Updates all lines connecting the corners.
+	 */
+	private void updateConnectingLines() {
+		this.moveLine(this.lineULUR, this.cornerUL, this.cornerUR);
+		this.moveLine(this.lineURDR, this.cornerUR, this.cornerDR);
+		this.moveLine(this.lineDRDL, this.cornerDR, this.cornerDL);
+		this.moveLine(this.lineDLUL, this.cornerDL, this.cornerUL);
+	}
 
 	/**
 	 * Given a corner and a pair of x, y coordinates, it moves
@@ -207,22 +232,27 @@ public class EditPanel extends JPanel implements MouseMotionListener {
 	 */
 	public void mouseDragged(MouseEvent arg0) {
 		
+		Point p = new Point(arg0.getX(), arg0.getY());
 		if (this.isWithinCornerEllipse(this.cornerUL, arg0.getX(), arg0.getY())) {
 			this.moveCornerTo(cornerUL, arg0.getX() - this.cornerUL.getWidth()/2, arg0.getY() - this.cornerUL.getHeight()/2);
 			this.moveLine(this.lineDLUL, this.cornerDL, this.cornerUL);
 			this.moveLine(this.lineULUR, this.cornerUL, this.cornerUR);
+			Parameters.getWorkingPage().corners().setUpLeft(p);
 		} else if (this.isWithinCornerEllipse(this.cornerUR, arg0.getX(), arg0.getY())) {
 			this.moveCornerTo(cornerUR, arg0.getX() - this.cornerUR.getWidth()/2, arg0.getY() - this.cornerUR.getHeight()/2);
 			this.moveLine(this.lineULUR, this.cornerUL, this.cornerUR);
 			this.moveLine(this.lineURDR, this.cornerUR, this.cornerDR);
+			Parameters.getWorkingPage().corners().setUpRight(p);
 		} else if (this.isWithinCornerEllipse(this.cornerDL, arg0.getX(), arg0.getY())) {
 			this.moveCornerTo(cornerDL, arg0.getX() - this.cornerDL.getWidth()/2, arg0.getY() - this.cornerDL.getHeight()/2);
 			this.moveLine(this.lineDLUL, this.cornerDL, this.cornerUL);
 			this.moveLine(this.lineDRDL, this.cornerDR, this.cornerDL);
+			Parameters.getWorkingPage().corners().setDownLeft(p);
 		} else if (this.isWithinCornerEllipse(this.cornerDR, arg0.getX(), arg0.getY())) {
 			this.moveCornerTo(cornerDR, arg0.getX() - this.cornerDR.getWidth()/2, arg0.getY() - this.cornerDR.getHeight()/2);
 			this.moveLine(this.lineDRDL, this.cornerDR, this.cornerDL);
 			this.moveLine(this.lineURDR, this.cornerUR, this.cornerDR);
+			Parameters.getWorkingPage().corners().setDownRight(p);
 		}
 
 		this.repaint();

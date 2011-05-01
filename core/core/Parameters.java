@@ -87,6 +87,11 @@ public class Parameters {
 	 */
 	private static SearchResults searchResults;
 	
+	/**
+	 * The working page.
+	 */
+	private static Page workingPage;
+	
 	/****************************************
 	 * 
 	 * Getters for the Mutable Parameters
@@ -118,6 +123,15 @@ public class Parameters {
 	 */
 	public static SearchResults getSearchResults() {
 		return searchResults;
+	}
+	
+	/**
+	 * Returns the working page.
+	 * 
+	 * @return The working page
+	 */
+	public static Page getWorkingPage() {
+		return workingPage;
 	}
 	
 	/****************************************
@@ -159,5 +173,14 @@ public class Parameters {
 	 */
 	public static void setSearchResults(SearchResults sr) {
 		searchResults = sr;
+	}
+	
+	/**
+	 * Sets the working page.
+	 * 
+	 * @param p The working page to set
+	 */
+	public static void setWorkingPage(Page p) {
+		workingPage = p;
 	}
 }

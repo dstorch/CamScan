@@ -38,6 +38,22 @@ public class Corners {
 		return _downleft;
 	}
 	
+	public void setUpRight(Point p) {
+		_upright = p;
+	}
+	
+	public void setUpLeft(Point p) {
+		_upleft = p;
+	}
+	
+	public void setDownRight(Point p) {
+		_downright = p;
+	}
+	
+	public void setDownLeft(Point p) {
+		_downleft = p;
+	}
+	
 	public int width(){
 		return _upright.x - _upleft.x;
 	}
