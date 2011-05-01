@@ -1,6 +1,7 @@
 package centralwidget;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.MouseWheelEvent;
@@ -90,7 +91,7 @@ public class ViewPanel extends JPanel implements MouseWheelListener {
 		} else {
 			this.scaleFactor += 0.1;
 		}
-
+		
 		this.repaint();
 	}
 }
