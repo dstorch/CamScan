@@ -1,6 +1,9 @@
 package centralwidget;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.GridLayout;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -19,6 +22,22 @@ public class ButtonPanel extends JPanel {
 	
 	/****************************************
 	 * 
+	 * Private Instance Variables
+	 * 
+	 ****************************************/
+	
+	/**
+	 * All the controls.
+	 */
+	private ArrayList<Component> controls;
+	
+	/**
+	 * The default color of the panel.
+	 */
+	private Color defaultColor;
+	
+	/****************************************
+	 * 
 	 * Constructor(s)
 	 * 
 	 ****************************************/
@@ -28,32 +47,59 @@ public class ButtonPanel extends JPanel {
 	 */
 	public ButtonPanel() {
 		super();
-
 		this.setLayout(new GridLayout(2,4));
+		
+		this.controls = new ArrayList<Component>();
+		this.defaultColor = this.getBackground();
 		
 		// Setup all the buttons
 		JButton hFlipButton = new JButton("Horizontal Split");
 		this.add(hFlipButton);
+		this.controls.add(hFlipButton);
 		
 		JButton vFlipButton = new JButton("Vertical Split");
 		this.add(vFlipButton);
+		this.controls.add(vFlipButton);
 		
 		JButton rotateLeftButton = new JButton("Rotate Left");
 		this.add(rotateLeftButton);
+		this.controls.add(rotateLeftButton);
 		
 		JButton rotateRightButton = new JButton("Rotate Right");
 		this.add(rotateRightButton);
+		this.controls.add(rotateRightButton);
 		
 		JLabel contrastLabel = new JLabel("Contrast: ", SwingConstants.CENTER);
 		this.add(contrastLabel);
+		this.controls.add(contrastLabel);
 		
 		JSlider contrastSlider = new JSlider();
 		this.add(contrastSlider);
+		this.controls.add(contrastSlider);
 		
 		JLabel temperatureLabel = new JLabel("Temperature: ", SwingConstants.CENTER);
 		this.add(temperatureLabel);
+		this.controls.add(temperatureLabel);
 		
 		JSlider temperatureSlider = new JSlider();
 		this.add(temperatureSlider);
+		this.controls.add(temperatureSlider);
+	}
+	
+	/**
+	 * Sets the visibility of each individual component.
+	 * 
+	 * @param b True if the components should become visible,
+	 * false if otherwise
+	 */
+	public void setComponentsVisible(boolean visible) {
+		for (Component c : this.controls) {
+			c.setVisible(visible);
+		}
+		
+		if (visible)
+			this.setBackground(this.defaultColor);
+		else
+			this.setBackground(Color.LIGHT_GRAY);
 	}
 }

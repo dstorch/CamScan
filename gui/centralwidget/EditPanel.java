@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
@@ -111,12 +112,6 @@ public class EditPanel extends JPanel implements MouseMotionListener {
 		this.lineDRDL = new Line2D.Double();
 		this.lineDLUL = new Line2D.Double();
 
-//		this.moveCornerTo(cornerUL, 100, 100);
-//		this.moveCornerTo(cornerUR, 150, 100);
-//		this.moveCornerTo(cornerDR, 150, 200);
-//		this.moveCornerTo(cornerDL, 100, 200);
-
-//		this.updateConnectingLines();
 		this.repaint();
 	}
 
@@ -150,7 +145,8 @@ public class EditPanel extends JPanel implements MouseMotionListener {
 		super.paintComponent(g);
 		Graphics2D brush = (Graphics2D) g;
 
-		g.drawImage(Parameters.getCurrPageImg(), 0, 0, null);
+		BufferedImage img = Parameters.getCurrPageImg();
+		g.drawImage(img, (this.getWidth() - img.getWidth())/2, (this.getHeight() - img.getHeight())/2, null);
 		
 		brush.setColor(Color.BLACK);
 		brush.draw(this.lineULUR);

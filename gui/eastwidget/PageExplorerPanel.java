@@ -5,6 +5,7 @@ import gui.MainPanel;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.util.Vector;
 
 import javax.swing.JList;
@@ -127,6 +128,15 @@ public class PageExplorerPanel extends JPanel {
 	private class SelectionListener implements ListSelectionListener {
 		public void valueChanged(ListSelectionEvent e) {
 		    if (e.getValueIsAdjusting() == false) {
+		    	
+		    	// Serialize the previous page
+		    	if (Parameters.getWorkingPage() != null) {
+		    		try {
+						Parameters.getWorkingPage().serialize();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+		    	}
 		    	
 		    	// Get the current page and draw it on the panel.
 		        String currPageName = (String) pageList.getSelectedValue();

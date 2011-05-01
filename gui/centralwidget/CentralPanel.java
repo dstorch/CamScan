@@ -74,7 +74,7 @@ public class CentralPanel extends JPanel {
 		
 		// Add the button panel.
 		this.buttonPanel = new ButtonPanel();
-		this.buttonPanel.setVisible(false);
+		this.buttonPanel.setComponentsVisible(false);
 		this.add(this.buttonPanel, BorderLayout.SOUTH);
 	}
 	
@@ -101,7 +101,7 @@ public class CentralPanel extends JPanel {
 
 		this.add(this.viewPanel, BorderLayout.CENTER);
 		this.viewPanel.setVisible(true);
-		this.buttonPanel.setVisible(false);
+		this.buttonPanel.setComponentsVisible(false);
 	}
 	
 	/**
@@ -121,7 +121,7 @@ public class CentralPanel extends JPanel {
 
 		this.add(this.editPanel, BorderLayout.CENTER);
 		this.editPanel.setVisible(true);
-		this.buttonPanel.setVisible(true);
+		this.buttonPanel.setComponentsVisible(true);
 	}
 	
 	/**
@@ -143,7 +143,7 @@ public class CentralPanel extends JPanel {
 
 		this.add(this.searchResultsPanel, BorderLayout.CENTER);
 		this.searchResultsPanel.setVisible(true);
-		this.searchResultsPanel.setVisible(true);
+		this.buttonPanel.setComponentsVisible(false);
 	}
 	
 	/**

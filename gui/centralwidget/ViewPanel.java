@@ -3,6 +3,7 @@ package centralwidget;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -45,6 +46,7 @@ public class ViewPanel extends JPanel {
 		super.paintComponent(g);
 		Graphics2D brush = (Graphics2D) g;
 		
-		g.drawImage(Parameters.getCurrPageImg(), 0, 0, null);
+		BufferedImage img = Parameters.getCurrPageImg();
+		g.drawImage(img, (this.getWidth() - img.getWidth())/2, (this.getHeight() - img.getHeight())/2, null);
 	}
 }
