@@ -13,13 +13,15 @@ import core.Position;
 
 public class ocrManager {
 
-	private final static String TESS_PATH = "/home/mmicalle/mrm/local/bin/tesseract";
-	private final static String CONFIG_FILE = "/home/mmicalle/course/cs032/finalProject/tests/config.txt";
-	private final static String OUT_TXT_PATH = "/home/mmicalle/course/cs032/finalProject/tests/out.txt";
-	private final static String OUT_HTML_PATH = "/home/mmicalle/course/cs032/finalProject/tests/out.html";
-	private final static String OUT_XML_PATH = "/home/mmicalle/course/cs032/finalProject/tests/out.xml";
-	private final static String TEMP = "/home/mmicalle/course/cs032/finalProject/tests/out2.xml";
-	private final static String OUT_PATH = "/home/mmicalle/course/cs032/finalProject/tests/out";
+	// absolute path to the tesseract executable
+	public static String TESS_PATH = "/usr/local/bin/tesseract";
+	
+	private final static String CONFIG_FILE = "libraries/tesseract/config.txt";
+	private final static String OUT_TXT_PATH = "libraries/tesseract/temp/out.txt";
+	private final static String OUT_HTML_PATH = "libraries/tesseract/temp/out.html";
+	private final static String OUT_XML_PATH = "libraries/tesseract/temp/out.xml";
+	private final static String TEMP = "libraries/tesseract/temp/out2.xml";
+	private final static String OUT_PATH = "libraries/tesseract/temp/out";
 
 
 	/**
@@ -34,6 +36,7 @@ public class ocrManager {
 
 		// string to execute tesseract command
 		String arguments = TESS_PATH+" "+image_file+" "+OUT_PATH;
+		System.out.println(arguments);
 
 		try {
 			Process p = Runtime.getRuntime().exec(arguments);
@@ -131,8 +134,8 @@ public class ocrManager {
 			PageText populatedPT = traverseTree(root, pt);
 
 			// delete files
-			if(!outTXT.delete()) System.err.println("File not deleted");
-			if(!temp.delete()) System.err.println("File not deleted");
+			//if(!outTXT.delete()) System.err.println("File not deleted");
+			//if(!temp.delete()) System.err.println("File not deleted");
 
 			return populatedPT;
 
@@ -214,15 +217,14 @@ public class ocrManager {
 	}
 
 	public static void main(String[] args) {
-		ocrManager m = new ocrManager();
 
-		/*String output = m.get_ocr_text("/home/mmicalle/course/cs032/finalProject/tests/phototest.tif");
-
-		System.out.println("Text output: "+ output);
-		PageText pt = new PageText("test");
-
-
-		m.setPageText("/home/mmicalle/course/cs032/finalProject/tests/phototest.tif", pt);*/ 
-
+		PageText pt = ocrManager.getPageText("tests/images/phototest.tif");
+		
+		System.out.println(pt.fullText());
+		
+		for (Position p : pt.positions()) {
+			System.out.println(p.xmin()+" "+p.ymin()+" : "+p.word());
+		}
+		
 	} 
 }

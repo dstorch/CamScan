@@ -52,7 +52,8 @@ public class Parameters {
 	/**
 	 * The regular expression used to find image files
 	 */
-	public static final String IMAGE_REGEX = ".png$|.jpg$|.tif$|.jpeg$";
+	//public static final String IMAGE_REGEX = ".png$|.jpg$|.tiff$|.jpeg$";
+	public static final String IMAGE_REGEX = ".tiff$";
 	
 	/**
 	 * Max number of search hits to report in the working document

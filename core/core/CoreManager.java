@@ -4,6 +4,8 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import ocr.ocrManager;
+
 import org.dom4j.*;
 import org.dom4j.io.*;
 import search.*;
@@ -52,6 +54,12 @@ public class CoreManager {
 			setWorkingPage(workingStr);
 		}
 		
+		for (Iterator i = root.elementIterator("TESSERACT"); i.hasNext();) {
+			Element tesseractEl = (Element) i.next();
+			String tessPath = tesseractEl.attribute("path").getStringValue();
+			ocrManager.TESS_PATH = tessPath;
+		}
+		
 		
 		for (Iterator i = root.elementIterator("DOCLIST"); i.hasNext();) {
 			Element docList = (Element) i.next();
@@ -82,6 +90,11 @@ public class CoreManager {
 			org.dom4j.Document xmlDoc = DocumentHelper.createDocument();
 			Element root = DocumentHelper.createElement("STARTUP");
 			xmlDoc.setRootElement(root);
+			
+			// tesseract pathname
+			Element tesseract = DocumentHelper.createElement("TESSERACT");
+			tesseract.addAttribute("path", ocrManager.TESS_PATH);
+			root.add(tesseract);
 			
 			if (_workingDocument != null) {
 				Element workingdoc = DocumentHelper.createElement("WORKINGDOC");
@@ -127,7 +140,10 @@ public class CoreManager {
 		
 		// put this document in workspace/docs by default
 		String name = sourceLocation.getName();
-		String pathname = Parameters.DOC_DIRECTORY + "/" + name;
+		String directory = Parameters.DOC_DIRECTORY + "/" + name;
+		File dirFile = new File(directory);
+		if (!dirFile.mkdir()) throw new IOException("Import aborted: problem making new document directory!");
+		String pathname = directory + "/" + "doc.xml";
 		Document newDoc = new Document(name, pathname);
 	
 		File targetLocation = new File(Parameters.RAW_DIRECTORY);
@@ -155,9 +171,15 @@ public class CoreManager {
             }
         } else {
             
+        	// get the file extension
         	String filename = sourceLocation.getName();
+        	String[] extensionArr = filename.split("[.]");
+        	String extension = "";
+        	if (extensionArr.length > 0) {
+        		extension = extensionArr[extensionArr.length-1];
+        	}
         	
-        	if (Pattern.matches(Parameters.IMAGE_REGEX, filename)) {
+        	if (extension.equals("tiff")) {
         		
         		// copy the image into the workspace
 	            InputStream in = new FileInputStream(sourceLocation);
@@ -178,12 +200,22 @@ public class CoreManager {
 	            	 in.close();
 	            }
 	           
+	            // get the image file name without a ".tiff" extension
+	            String imageFile = sourceLocation.getName();
+	            String noExt = imageFile.substring(0,imageFile.length()-5);
+	            
 	            // construct the page and add it to the document
 	            Page p = new Page(d, -1);
 	            p.setRawFile(targetLocation.getPath());
 	            p.setProcessedFile(Parameters.PROCESSED_DIRECTORY+"/"+sourceLocation.getName());
-	            p.setMetafile(d.name() + "/" + sourceLocation.getName());
-	            p.setOcrResults();
+	            p.setMetafile(Parameters.DOC_DIRECTORY+"/"+d.name()+"/" + noExt+".xml");
+	            d.addPage(p);
+	            
+	            // comment this to run OCR! (see below also)
+	            p.setPageText(new PageText(""));
+	            
+	            // uncomment this to run OCR! (see above also)
+	            //p.setOcrResults();
 	            
         	}
 
@@ -193,8 +225,25 @@ public class CoreManager {
 	
 	// called when the user imports a single photograph
 	// as a document
-	public Document createDocumentFromFile() {
-		return null;
+	public Document createDocumentFromFile(File sourceLocation) throws IOException {
+		
+		// put this document in workspace/docs by default
+        // get the image file name without a ".tiff" extension
+        String imageFile = sourceLocation.getName();
+        String noExt = imageFile.substring(0,imageFile.length()-5);
+		String directory = Parameters.DOC_DIRECTORY + "/" + noExt;
+		File dirFile = new File(directory);
+		if (!dirFile.mkdir()) throw new IOException("Import aborted: problem making new document directory!");
+		String pathname = directory + "/" + "doc.xml";
+		Document newDoc = new Document(noExt, pathname);
+	
+		File targetLocation = new File(Parameters.RAW_DIRECTORY + "/" + sourceLocation.getName());
+		recursiveImageCopy(sourceLocation, targetLocation, newDoc);
+		
+		// write the XML for the new document to disk
+		newDoc.serialize();
+		
+		return newDoc;
 	}
 	
 	// write a document out as a multipage pdf
@@ -268,11 +317,13 @@ public class CoreManager {
 	// components independent of the GUI
 	public static void main(String[] args) throws DocumentException, IOException {
 		CoreManager core = new CoreManager();
+		core.createDocumentFromFile(new File("tests/xml/testDocument/hamlet_1.tiff"));
+		//core.createDocumentFromFolder(new File("tests/xml/testDocument"));
 		core.setWorkingDocument("tests/xml/testDocument/doc.xml");
-		core.exportToPdf("tests/xml/testDocument/doc.xml", "foo.pdf");
-		core.exportText(core.workingDocument(), "../document.txt");
-		core.exportImages(core.workingDocument(), "../copiedDoc");
-		core.search("Benjamin Franklin almanac");
+		//core.exportToPdf("tests/xml/testDocument/doc.xml", "../foo.pdf");
+		//core.exportText(core.workingDocument(), "../document.txt");
+		//core.exportImages(core.workingDocument(), "../copiedDoc");
+		//core.search("Benjamin Franklin almanac");
 		core.closeWorkingDocument();
 		core.shutdown();
 	}

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <PAGE>
-  <IMG path="tests/xml/testDocument/hamlet_1.png" processed="tests/xml/testDocument/hamlet_1.png"/>
+  <IMG path="tests/xml/testDocument/hamlet_1.tiff" processed="tests/xml/testDocument/hamlet_1.tiff"/>
   <CORNERS>
     <UPRIGHT x="0" y="0"/>
     <DOWNRIGHT x="0" y="0"/>
