@@ -1,5 +1,11 @@
 package core;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
+
 public class Parameters {
 
 	/****************************************
@@ -64,6 +70,11 @@ public class Parameters {
 	 */
 	private static CoreManager coreManager;
 	
+	/**
+	 * The current page as a buffered image.
+	 */
+	private static BufferedImage currPageImg;
+	
 	/****************************************
 	 * 
 	 * Getters for the Immutable Parameters
@@ -77,6 +88,15 @@ public class Parameters {
 	 */
 	public static CoreManager getCoreManager() {
 		return coreManager;
+	}
+	
+	/**
+	 * Returns the current page buffered image.
+	 * 
+	 * @return The current page buffered image
+	 */
+	public static BufferedImage getCurrPageImg() {
+		return currPageImg;
 	}
 	
 	/****************************************
@@ -94,5 +114,20 @@ public class Parameters {
 	public static void setCoreManager(CoreManager cm) {
 		if (coreManager == null)
 			coreManager = cm;
+	}
+	
+	/**
+	 * Given the path to the raw page image, it
+	 * sets the current page image as a buffered
+	 * image.
+	 * 
+	 * @param raw The path to the raw image.
+	 */
+	public static void setCurrPageImg(String raw) {
+		try {
+			currPageImg = ImageIO.read(new File(raw));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

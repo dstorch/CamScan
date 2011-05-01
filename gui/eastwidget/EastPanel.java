@@ -1,5 +1,7 @@
 package eastwidget;
 
+import gui.MainPanel;
+
 import javax.swing.JPanel;
 
 
@@ -30,10 +32,10 @@ public class EastPanel extends JPanel {
 	 * 
 	 ****************************************/
 	
-	public EastPanel() {
+	public EastPanel(MainPanel mainPanel) {
 		super();
 		
-		this.pageExpPanel = new PageExplorerPanel();
+		this.pageExpPanel = new PageExplorerPanel(mainPanel);
 		this.add(pageExpPanel);
 	}
 	

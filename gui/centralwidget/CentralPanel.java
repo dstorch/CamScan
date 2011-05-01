@@ -137,4 +137,14 @@ public class CentralPanel extends JPanel {
 		this.searchResultsPanel.setVisible(true);
 		this.searchResultsPanel.setVisible(true);
 	}
+	
+	/**
+	 * Calls repaint() on the view and
+	 * edit panels to draw the image once
+	 * a new current image has been selected.
+	 */
+	public void drawCurrPage() {
+		this.viewPanel.repaint();
+		this.editPanel.repaint();
+	}
 }

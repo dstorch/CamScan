@@ -156,6 +156,41 @@ public class CoreManager {
 		return results;
 	}
 	
+	/**
+	 * Given the name of a document, it sets its
+	 * instance of Document as the working
+	 * document.
+	 * 
+	 * @param docName The name of the document
+	 */
+	public void setWorkingDocumentFromName(String docName) {
+		
+		for (Document doc : _allDocuments) {
+			if (docName.equals(doc.name())) {
+				_workingDocument = doc;
+			}
+		}
+	}
+	
+	/**
+	 * Given an order, it returns the page of the given 
+	 * order from the working document.
+	 * 
+	 * @param order The order of the page to fetch
+	 * @return The page with the given order of the
+	 * working document.
+	 */
+	public Page getWorkingDocPageFromOrder(int order) {
+		
+		for (Page page : _workingDocument.pages()) {
+			if (order == page.order()) {
+				return page;
+			}
+		}
+		
+		return null;
+	}
+	
 	// not the main method for the application,
 	// just used for testing the core and integrating
 	// components independent of the GUI

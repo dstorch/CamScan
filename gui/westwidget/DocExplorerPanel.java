@@ -8,9 +8,16 @@ import java.util.Vector;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import centralwidget.CentralPanel;
+
+import core.Document;
+import core.Page;
+import core.Parameters;
 
 import eastwidget.PageExplorerPanel;
 import gui.ParamHolder;
@@ -38,12 +45,20 @@ public class DocExplorerPanel extends JPanel {
 	 */
 	private JList docList;
 	
+	/**
+	 * The list scroller.
+	 */
 	private JScrollPane listScroller;
 	
 	/**
 	 * Reference to the page explorer panel.
 	 */
 	private PageExplorerPanel pageExpPanel;
+	
+	/**
+	 * Reference to the Central Panel.
+	 */
+	private CentralPanel centralPanel;
 	
 	/****************************************
 	 * 
@@ -54,16 +69,18 @@ public class DocExplorerPanel extends JPanel {
 	/**
 	 * Constructor.
 	 */
-	public DocExplorerPanel(PageExplorerPanel pageExpPanel) {
+	public DocExplorerPanel(PageExplorerPanel pageExpPanel, CentralPanel centralPanel) {
 		super();
+		this.centralPanel = centralPanel;
 		
 		this.pageExpPanel = pageExpPanel;
 		
-		this.docList = new JList(/*this.getDocuments(ParamHolder.getWorkspace())*/);
+		this.docList = new JList(this.getDocumentNames());
 		
 		this.docList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		this.docList.getSelectionModel().addListSelectionListener(new SelectionListener());
 		this.docList.setLayoutOrientation(JList.VERTICAL);
+		this.docList.setSelectedIndex(0);
 		
 		this.listScroller = new JScrollPane(this.docList);
 		this.listScroller.setPreferredSize(new Dimension(150, 600));
@@ -81,7 +98,7 @@ public class DocExplorerPanel extends JPanel {
 	 * when files have been added or removed in the workspace.
 	 */
 	public void update() {
-		this.docList.setListData(this.getDocuments(ParamHolder.getWorkspace()));
+		this.docList.setListData(this.getDocumentNames());
 		this.listScroller.revalidate();
 	}
 	
@@ -92,30 +109,17 @@ public class DocExplorerPanel extends JPanel {
 	 ****************************************/
 	
 	/**
-	 * Given the path to the workspace, it returns
-	 * a vector of of all the Documents in that directory.
+	 * Returns a vector of of all the document names
+	 * in the workspace.
 	 * 
-	 * @param workspacePath The path to the workspace
+	 * @return Vector of all the document names in the
+	 * workspace
 	 */
-	private Vector<String> getDocuments(String workspacePath) {
+	private Vector<String> getDocumentNames() {
 		Vector<String> docs = new Vector<String>();
-		File dir = new File(workspacePath);
 		
-		// This filter only returns directories
-		FileFilter fileFilter = new FileFilter() {
-		    public boolean accept(File file) {
-		        return file.isDirectory();
-		    }
-		};
-		
-		File[] children = dir.listFiles(fileFilter);
-		
-		if (children != null) {
-			for (int i = 0; i < children.length; i++) {
-				
-		        // Get filename of directory
-				docs.add(children[i].getName());
-		    }
+		for (Document doc : Parameters.getCoreManager().getDocuments()) {
+			docs.add(doc.name());
 		}
 		
 		return docs;
@@ -133,10 +137,15 @@ public class DocExplorerPanel extends JPanel {
 	 */
 	private class SelectionListener implements ListSelectionListener {
 		public void valueChanged(ListSelectionEvent e) {
-		    if (e.getValueIsAdjusting() == false) {
-		        String currDocName = (String) docList.getSelectedValue();   
-		        //pageExpPanel.setPageList(pages);
-		    }
+			if (e.getValueIsAdjusting() == false) {
+				String currDocName = (String) docList.getSelectedValue();   
+				Parameters.getCoreManager().setWorkingDocumentFromName(currDocName);
+				pageExpPanel.update();
+
+				Page currPage = Parameters.getCoreManager().workingDocument().pages().get(0);
+				Parameters.setCurrPageImg(currPage.raw());
+				centralPanel.drawCurrPage();
+			}
 		}
 	}
 }

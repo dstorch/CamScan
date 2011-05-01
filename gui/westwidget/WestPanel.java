@@ -41,7 +41,7 @@ public class WestPanel extends JPanel {
 		this.add(searchPanel, BorderLayout.NORTH);
 		
 		// Setup the document explorer panel
-		DocExplorerPanel docExpPanel = new DocExplorerPanel(pageExpPanel);
+		DocExplorerPanel docExpPanel = new DocExplorerPanel(pageExpPanel, centralPanel);
 		this.add(docExpPanel, BorderLayout.CENTER);
 	
 		// Setup the drag'n'drop panel

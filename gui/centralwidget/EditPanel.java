@@ -11,6 +11,8 @@ import java.awt.geom.Line2D;
 
 import javax.swing.JPanel;
 
+import core.Parameters;
+
 /**
  * The display panel where the image will be displayed. The user will
  * also be able to customize the corners of the image/page by dragging
@@ -135,6 +137,8 @@ public class EditPanel extends JPanel implements MouseMotionListener {
 		super.paintComponent(g);
 		Graphics2D brush = (Graphics2D) g;
 
+		g.drawImage(Parameters.getCurrPageImg(), 0, 0, null);
+		
 		brush.setColor(Color.BLACK);
 		brush.draw(this.lineULUR);
 		brush.draw(this.lineURDR);
