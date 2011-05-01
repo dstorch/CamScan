@@ -8,13 +8,30 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
 
+/**
+ * The button panel that contains basic tools for
+ * manipulating the current page.
+ * 
+ * @author Stelios
+ *
+ */
 public class ButtonPanel extends JPanel {
 	
+	/****************************************
+	 * 
+	 * Constructor(s)
+	 * 
+	 ****************************************/
+	
+	/**
+	 * Constructor.
+	 */
 	public ButtonPanel() {
 		super();
 
 		this.setLayout(new GridLayout(2,4));
 		
+		// Setup all the buttons
 		JButton hFlipButton = new JButton("Horizontal Split");
 		this.add(hFlipButton);
 		

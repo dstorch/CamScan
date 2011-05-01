@@ -29,6 +29,17 @@ import eastwidget.EastPanel;
  *
  */
 public class MainPanel extends JPanel {
+	
+	/****************************************
+	 * 
+	 * Private Instance Variables
+	 * 
+	 ****************************************/
+	
+	/**
+	 * The Central Panel.
+	 */
+	private CentralPanel centralPanel;
 
 	/****************************************
 	 * 
@@ -38,13 +49,14 @@ public class MainPanel extends JPanel {
 
 	/**
 	 * Constructor.
+	 * 
 	 * @throws IOException 
 	 * @throws DocumentException 
 	 */
 	public MainPanel() throws DocumentException, IOException {
 		super();
 		this.setLayout(new BorderLayout());
-		
+	
 //		// Setup and display the file chooser
 //		JFileChooser fileChooser = new JFileChooser();
 //		fileChooser.setDialogTitle("Select Workspace");
@@ -65,23 +77,25 @@ public class MainPanel extends JPanel {
 //		ParamHolder.setWorkspace(file.getAbsolutePath());
 		
 		Parameters.setCoreManager(new CoreManager());
-		CoreManager manager = Parameters.getCoreManager();
-		
-		System.out.println("Should print docs:");
-		for (Document doc : manager.getDocuments()) {
-			System.out.println(doc.name());
-		}
 
 		// Setup the central panel
-		CentralPanel centralPanel = new CentralPanel();
-		this.add(centralPanel, BorderLayout.CENTER);
+		this.centralPanel = new CentralPanel();
+		this.add(this.centralPanel, BorderLayout.CENTER);
 		
 		// Setup the east panel
-		EastPanel eastPanel = new EastPanel();
+		EastPanel eastPanel = new EastPanel(this);
 		this.add(eastPanel, BorderLayout.EAST);
 
 		// Setup the west panel
-		WestPanel westPanel = new WestPanel(eastPanel.getPageExpPanel(), centralPanel);
+		WestPanel westPanel = new WestPanel(eastPanel.getPageExpPanel(), this.centralPanel);
 		this.add(westPanel, BorderLayout.WEST);
+	}
+	
+	/**
+	 * To be called one the current page has changed.
+	 * It updates the UI to show that page.
+	 */
+	public void drawNewImage() {
+		this.centralPanel.drawCurrPage();
 	}
 }

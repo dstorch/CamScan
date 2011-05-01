@@ -1,5 +1,7 @@
 package eastwidget;
 
+import gui.MainPanel;
+
 import java.awt.Dimension;
 import java.io.File;
 import java.io.FileFilter;
@@ -13,10 +15,14 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import core.Document;
+import core.Page;
+import core.Parameters;
+
 
 /**
- * The document tree that will appear on the
- * document explorer panel.
+ * The page tree that will appear on the
+ * page explorer panel.
  * 
  * @author Stelios
  *
@@ -35,6 +41,16 @@ public class PageExplorerPanel extends JPanel {
 	 */
 	private JList pageList;
 	
+	/**
+	 * The list scroller.
+	 */
+	private JScrollPane listScroller;
+	
+	/**
+	 * Reference to the Main Panel.
+	 */
+	private MainPanel mainPanel;
+	
 	/****************************************
 	 * 
 	 * Constructor(s)
@@ -44,26 +60,33 @@ public class PageExplorerPanel extends JPanel {
 	/**
 	 * Constructor.
 	 */
-	public PageExplorerPanel() {
+	public PageExplorerPanel(MainPanel mainPanel) {
 		
-		this.pageList = new JList(this.getDocuments("dummydocs"));
+		this.mainPanel = mainPanel;
+		this.pageList = new JList(this.getPageNames());
 		
 		this.pageList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		this.pageList.getSelectionModel().addListSelectionListener(new SelectionListener());
 		this.pageList.setLayoutOrientation(JList.VERTICAL);
 		
-		JScrollPane listScroller = new JScrollPane(this.pageList);
-		listScroller.setPreferredSize(new Dimension(150, 600));
-		this.add(listScroller);
+		this.listScroller = new JScrollPane(this.pageList);
+		this.listScroller.setPreferredSize(new Dimension(150, 600));
+		this.add(this.listScroller);
 	}
 	
-	/**
-	 * Sets the page list.
+	/****************************************
 	 * 
-	 * @param pages
+	 * Public Methods
+	 * 
+	 ****************************************/
+	
+	/**
+	 * Updates the Page Panel. To be called
+	 * when the working document has changed.
 	 */
-	public void setPageList(Vector<String> pages) {
-		this.pageList.setListData(pages);
+	public void update() {
+		this.pageList.setListData(this.getPageNames());
+		this.listScroller.revalidate();
 	}
 	
 	/****************************************
@@ -78,28 +101,16 @@ public class PageExplorerPanel extends JPanel {
 	 * 
 	 * @param workspacePath The path to the workspace
 	 */
-	private Vector<String> getDocuments(String workspacePath) {
-		Vector<String> docs = new Vector<String>();
-		File dir = new File(workspacePath);
+	private Vector<String> getPageNames() {
+		Vector<String> pages = new Vector<String>();
 		
-		// This filter only returns directories
-		FileFilter fileFilter = new FileFilter() {
-		    public boolean accept(File file) {
-		        return file.isDirectory();
-		    }
-		};
+		Document workingDoc = Parameters.getCoreManager().workingDocument();
 		
-		File[] children = dir.listFiles(fileFilter);
-		
-		if (children != null) {
-			for (int i = 0; i < children.length; i++) {
-				
-		        // Get filename of directory
-				docs.add(children[i].getName());
-		    }
+		for (Page page : workingDoc.pages()) {
+			pages.add(Integer.toString(page.order()));
 		}
 		
-		return docs;
+		return pages;
 	}
 	
 	/****************************************
@@ -115,7 +126,14 @@ public class PageExplorerPanel extends JPanel {
 	private class SelectionListener implements ListSelectionListener {
 		public void valueChanged(ListSelectionEvent e) {
 		    if (e.getValueIsAdjusting() == false) {
-		        String currDoc = (String) pageList.getSelectedValue();
+		    	
+		    	// Get the current page and draw it on the panel.
+		        String currPageName = (String) pageList.getSelectedValue();
+		        if (currPageName != null) {
+		        	Page currPage = Parameters.getCoreManager().getWorkingDocPageFromOrder(Integer.parseInt(currPageName));
+		        	Parameters.setCurrPageImg(currPage.raw());
+		        	mainPanel.drawNewImage();
+		        }
 		    }
 		}
 	}

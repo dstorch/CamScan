@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<PAGE>
+  <IMG path="workspace/raw/hamlet_1.png" processed="workspace/raw/hamlet_1.png"/>
+  <CORNERS>
+    <UPRIGHT x="0" y="0"/>
+    <DOWNRIGHT x="0" y="0"/>
+    <UPLEFT x="0" y="0"/>
+    <DOWNLEFT x="0" y="0"/>
+  </CORNERS>
+  <TEXT>
+    <FULLTEXT>This is the full text of the document. I will make *^3 to add all kinds of strange characters... and words to test how tolerant the search procedure is!!!</FULLTEXT>
+    <POSITIONS>
+      <WORD xmin="0" ymin="0" xmax="10" ymax="10" value="foo"/>
+    </POSITIONS>
+  </TEXT>
+  <CONFIG>
+    <COLORTEMP value="0.0"/>
+    <CONTRASTBOOST value="0.0"/>
+    <FLIPH value="no"/>
+    <FLIPV value="yes"/>
+    <ROTATE value="0.0"/>
+  </CONFIG>
+</PAGE>

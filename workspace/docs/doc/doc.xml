@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<DOCUMENT name="Hamlet">
-  <PAGES>
-    <PAGE order="1" metafile="workspace/docs/doc/page1.xml"/>
-    <PAGE order="2" metafile="workspace/docs/doc/page2.xml"/>
-  </PAGES>
-</DOCUMENT>

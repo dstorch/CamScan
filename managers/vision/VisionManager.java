@@ -17,7 +17,16 @@ import static com.googlecode.javacv.cpp.opencv_calib3d.*;
 
 public class VisionManager {
 	public static ConfigurationDictionary estimateConfigurationValues(BufferedImage img){
-		return new ConfigurationDictionary();
+		ConfigurationDictionary cd = new ConfigurationDictionary();
+		
+		try {
+			cd.setKey("contrast", new ConfigurationValue(ConfigurationValue.ValueType.ContrastBoost, false));
+			cd.setKey("bilateral", new ConfigurationValue(ConfigurationValue.ValueType.BilateralFilter, true));
+		} catch (InvalidTypingException e) {
+			System.err.println("InvalidTypingException while setting up ConfigurationDictionary.");
+		}
+		
+		return cd;
 	}
 	
 	public static Point snapCorner(BufferedImage img, Point point){
@@ -47,10 +56,9 @@ public class VisionManager {
 		
 		return new Corners(new Point(0,0), new Point(width,0), new Point(0,height), new Point(width,height));
 	}
-	public static BufferedImage rerenderImage(BufferedImage img, Corners corners, ConfigurationDictionary config){
-		img = imageGlobalTransforms(img, config);
-		
+	public static BufferedImage rerenderImage(BufferedImage img, Corners corners, ConfigurationDictionary config){		
 		IplImage image = BufferedImageToIplImage(img);
+		image = _imageGlobalTransforms(image, config);
 		
     	Corners reprojected = idealizedReprojection(corners);
         
@@ -66,16 +74,34 @@ public class VisionManager {
 		return IplImageToBufferedImage(transformed);
 	}
 	
-	private static BufferedImage applyTemperatureCorrection(BufferedImage img, ConfigurationValue temp){
+	private static IplImage applyTemperatureCorrection(IplImage img, ConfigurationValue temp){
 		return img;
 	}
-	private static BufferedImage applyFlipCorrection(BufferedImage img, ConfigurationValue flip){
+	private static IplImage applyFlipCorrection(IplImage img, ConfigurationValue flip){
 		return img;
 	}
-	private static BufferedImage applyContrastBoost(BufferedImage img, ConfigurationValue boost){
+	private static IplImage applyContrastBoost(IplImage img, ConfigurationValue boost){
+		if (!(Boolean)boost.value()){return img;}
+		IplImage ch1 = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
+		IplImage ch2 = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
+		IplImage ch3 = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
+		cvSplit(img, ch1, ch2, ch3, null);
+		
+		cvEqualizeHist(ch1, ch1);
+		cvEqualizeHist(ch2, ch2);
+		cvEqualizeHist(ch3, ch3);
+		
+		cvMerge(ch1, ch2, ch3, null, img);
 		return img;
 	}
-	public static BufferedImage imageGlobalTransforms(BufferedImage img, ConfigurationDictionary config){
+	private static IplImage applyBilateralFilter(IplImage img, ConfigurationValue filter){
+		if (!(Boolean)filter.value()){return img;}
+		IplImage nimg = cvCloneImage(img);
+		cvSmooth(img, nimg, CV_BILATERAL, 5);
+		return nimg;
+	}
+	
+	private static IplImage _imageGlobalTransforms(IplImage img, ConfigurationDictionary config){
 		if (config == null){return img;}
 		
 		for(Object _name: config.getAllKeys()){
@@ -90,11 +116,17 @@ public class VisionManager {
 				img = applyFlipCorrection(img, currentValue);
 			}else if (currentValue.type == ConfigurationValue.ValueType.ContrastBoost){
 				img = applyContrastBoost(img, currentValue);
+			}else if (currentValue.type == ConfigurationValue.ValueType.BilateralFilter){
+				img = applyBilateralFilter(img, currentValue);
 			}else{
 				System.err.println("A type in a ConfigurationDictionary given to recolorImage() is invalid and non-processable.");
 			}
 		}
 		return img;
+	}
+	
+	public static BufferedImage imageGlobalTransforms(BufferedImage img, ConfigurationDictionary config){
+		return IplImageToBufferedImage( _imageGlobalTransforms(BufferedImageToIplImage(img), config) );
 	}
 	
 	public static Corners findCorners(BufferedImage img){
@@ -181,7 +213,7 @@ public class VisionManager {
         	
         	
         	Corners corners = new Corners(new Point(961, 531), new Point(2338, 182), new Point(1411, 2393), new Point(2874, 1986));        	
-        	outputToFile(IplImageToBufferedImage(image), "output.png", corners, null);
+        	outputToFile(IplImageToBufferedImage(image), "output.png", corners, estimateConfigurationValues(IplImageToBufferedImage(image)));
         	
         }else{
         	System.out.println("Error loading image");

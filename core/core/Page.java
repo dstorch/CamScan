@@ -2,9 +2,7 @@ package core;
 
 import java.io.*;
 import java.util.*;
-
 import ocr.ocrManager;
-
 import org.dom4j.*;
 import org.dom4j.io.*;
 import search.*;
