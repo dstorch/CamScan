@@ -92,9 +92,7 @@ public class ocrManager {
 			if (!outXMLFile.exists()) outXMLFile.createNewFile();
 
 			// blocking statement to ensure tesseract has created html file
-			while(!outTXT.canRead()){
-				//System.err.println("file does not exist");
-			}
+			while(!outTXT.canRead()){}
 
 			FileInputStream Fin = new FileInputStream(OUT_HTML_PATH);
 			FileOutputStream Fout = new FileOutputStream(OUT_XML_PATH);
@@ -131,10 +129,9 @@ public class ocrManager {
 			System.out.println("python managers/ocr/cleanXML.py "+TEMP+" "+TEMP2);
 			Runtime.getRuntime().exec("python managers/ocr/cleanXML.py "+TEMP+" "+TEMP2);
 			
+			// block until the cleaned temp file has been produced
 			File tempFile = new File(TEMP2);
-			while(!tempFile.canRead()){
-				System.err.println("file does not exist");
-			}
+			while(!tempFile.canRead()){}
 			
 			SAXReader reader = new SAXReader();
 			org.dom4j.Document document = reader.read(new FileReader(TEMP2));
@@ -144,6 +141,7 @@ public class ocrManager {
 			// delete files
 			if(!outTXT.delete()) System.err.println("File not deleted");
 			if(!temp.delete()) System.err.println("File not deleted");
+			if(!tempFile.delete()) System.err.println("File not deleted");
 
 			return populatedPT;
 
