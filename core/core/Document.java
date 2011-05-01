@@ -16,6 +16,12 @@ public class Document {
 		_pages = new LinkedList<Page>();
 	}
 	
+	public Document(String name, String pathname) {
+		_pages = new LinkedList<Page>();
+		_name = name;
+		_pathname = pathname;
+	}
+	
 	public void setName(String name) {
 		_name = name;
 	}

@@ -13,13 +13,13 @@ import core.Position;
 
 public class ocrManager {
 
-	private final String TESS_PATH = "/home/mmicalle/mrm/local/bin/tesseract";
-	private final String CONFIG_FILE = "/home/mmicalle/course/cs032/finalProject/tests/config.txt";
-	private final String OUT_TXT_PATH = "/home/mmicalle/course/cs032/finalProject/tests/out.txt";
-	private final String OUT_HTML_PATH = "/home/mmicalle/course/cs032/finalProject/tests/out.html";
-	private final String OUT_XML_PATH = "/home/mmicalle/course/cs032/finalProject/tests/out.xml";
-	private final String TEMP = "/home/mmicalle/course/cs032/finalProject/tests/out2.xml";
-	private final String OUT_PATH = "/home/mmicalle/course/cs032/finalProject/tests/out";
+	private final static String TESS_PATH = "/home/mmicalle/mrm/local/bin/tesseract";
+	private final static String CONFIG_FILE = "/home/mmicalle/course/cs032/finalProject/tests/config.txt";
+	private final static String OUT_TXT_PATH = "/home/mmicalle/course/cs032/finalProject/tests/out.txt";
+	private final static String OUT_HTML_PATH = "/home/mmicalle/course/cs032/finalProject/tests/out.html";
+	private final static String OUT_XML_PATH = "/home/mmicalle/course/cs032/finalProject/tests/out.xml";
+	private final static String TEMP = "/home/mmicalle/course/cs032/finalProject/tests/out2.xml";
+	private final static String OUT_PATH = "/home/mmicalle/course/cs032/finalProject/tests/out";
 
 
 	/**
@@ -27,7 +27,7 @@ public class ocrManager {
 	 * @param image_file
 	 * @return the text outputted by tesseract on the image_file
 	 */
-	private String getOCRText(String image_file){
+	private static String getOCRText(String image_file){
 
 		// text of image_file
 		String text = "";
@@ -72,7 +72,7 @@ public class ocrManager {
 	 * @return
 	 * @throws DocumentException
 	 */
-	private PageText setPageText(String image_file, PageText pt){
+	private static PageText setPageText(String image_file, PageText pt){
 
 		// string to execute tesseract command
 		String arguments = TESS_PATH+" "+image_file+" "+OUT_PATH + " " + CONFIG_FILE;
@@ -155,7 +155,7 @@ public class ocrManager {
 	 * @param text
 	 * @return PageText file
 	 */
-	private PageText traverseTree(Element root, PageText text){
+	private static PageText traverseTree(Element root, PageText text){
 		Element body = root.element("body");
 		Element div1 = body.element("div");
 		Element div2 = div1.element("div");
@@ -182,7 +182,7 @@ public class ocrManager {
 	 * @param word
 	 * @return 
 	 */
-	private Position parseBBox(String bbox, String word){
+	private static Position parseBBox(String bbox, String word){
 		String[] bb = bbox.split(" ");
 		if(bb[0].equals("bbox")){
 			int minx = Integer.parseInt(bb[1]);
@@ -207,7 +207,7 @@ public class ocrManager {
 	 * @throws DocumentException 
 	 */
 
-	public PageText getPageText(String imageFile){
+	public static PageText getPageText(String imageFile){
 		String text = getOCRText(imageFile);
 		PageText pt = new PageText(text);
 		return setPageText(imageFile, pt);
