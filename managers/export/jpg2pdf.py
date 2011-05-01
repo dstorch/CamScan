@@ -15,8 +15,12 @@ class Word:
 		self.ymax = ymax
 		self.word = word
 
-	def draw(self, c) :
-		c.drawString(self.xmin, self.ymin, self.word)
+	def draw(self, c, height) :
+		
+		bbheight = self.ymax - self.ymin
+		
+		trueY = height - self.ymin - bbheight
+		c.drawString(self.xmin, trueY, self.word)
 
 	def xmin(self) :
 		return self.xmin
@@ -40,9 +44,11 @@ class Page:
 		self.processed = processed
 
 	def draw(self, c) :
+		width, height = c.drawImage(self.processed, 0, 0, width=None, height=None, mask=None)
 		for w in self.words :
-			w.draw(c)
+			w.draw(c, height)
 		c.drawImage(self.processed, 0, 0, width=None, height=None, mask=None)
+		c.setPageSize((width, height))
 
 	def addWord(self, word) :
 		self.words.append(word)
@@ -128,8 +134,8 @@ def main() :
 
 	doc = parseXML(documentfile)
 
-	# draw on the canvas using the DOM
-	c = canvas.Canvas(outfile)
+	# use the DOM to draw on the canvas
+	c = canvas.Canvas(outfile, bottomup=1)
 	doc.draw(c)
 	c.save()
 

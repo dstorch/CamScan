@@ -314,9 +314,9 @@ public class CoreManager {
 	public static void main(String[] args) throws DocumentException, IOException {
 		CoreManager core = new CoreManager();
 		//core.createDocumentFromFile(new File("tests/xml/testDocument/hamlet_1.tiff"));
-		core.createDocumentFromFolder(new File("tests/xml/testDocument"));
-		core.setWorkingDocument("tests/xml/testDocument/doc.xml");
-		//core.exportToPdf("tests/xml/testDocument/doc.xml", "../foo.pdf");
+		core.createDocumentFromFile(new File("../sample_page.tiff"));
+		core.setWorkingDocument("workspace/docs/sample_page/doc.xml");
+		core.exportToPdf("workspace/docs/sample_page/doc.xml", "../foo.pdf");
 		//core.exportText(core.workingDocument(), "../document.txt");
 		//core.exportImages(core.workingDocument(), "../copiedDoc");
 		//core.search("Benjamin Franklin almanac");

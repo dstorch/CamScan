@@ -8,7 +8,7 @@ infile = open(sys.argv[1])
 outfile = open(sys.argv[2], 'w')
 
 for line in infile :
-	arr = re.split("[^a-zA-Z0-9<>!?/ ]", line)
+	arr = re.split("[^a-zA-Z0-9<>!?/\"\"=''._() ]", line)
 	newLine = "".join(arr)
 	outfile.write(newLine+"\n")
 

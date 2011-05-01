@@ -21,6 +21,7 @@ public class ocrManager {
 	private final static String OUT_HTML_PATH = "libraries/tesseract/temp/out.html";
 	private final static String OUT_XML_PATH = "libraries/tesseract/temp/out.xml";
 	private final static String TEMP = "libraries/tesseract/temp/out2.xml";
+	private final static String TEMP2 = "libraries/tesseract/temp/out3.xml";
 	private final static String OUT_PATH = "libraries/tesseract/temp/out";
 
 
@@ -52,7 +53,7 @@ public class ocrManager {
 			String line = "";
 
 			while((line = in.readLine()) != null){
-				text += line;
+				text += line + "\n";
 			}
 
 			in.close();
@@ -127,8 +128,16 @@ public class ocrManager {
 				System.out.println("Could not delete file");
 			}
 			
+			System.out.println("python managers/ocr/cleanXML.py "+TEMP+" "+TEMP2);
+			Runtime.getRuntime().exec("python managers/ocr/cleanXML.py "+TEMP+" "+TEMP2);
+			
+			File tempFile = new File(TEMP2);
+			while(!tempFile.canRead()){
+				System.err.println("file does not exist");
+			}
+			
 			SAXReader reader = new SAXReader();
-			org.dom4j.Document document = reader.read(new FileReader(TEMP));
+			org.dom4j.Document document = reader.read(new FileReader(TEMP2));
 			Element root = document.getRootElement();
 			PageText populatedPT = traverseTree(root, pt);
 
@@ -159,22 +168,28 @@ public class ocrManager {
 	 */
 	private static PageText traverseTree(Element root, PageText text){
 		Element body = root.element("body");
-		Element div1 = body.element("div");
-		Element div2 = div1.element("div");
-		for (Iterator i = div2.elementIterator("p"); i.hasNext();) {
-			Element paragraphs = (Element) i.next();
-			for (Iterator j = paragraphs.elementIterator("span"); j.hasNext();) {
-				Element line = (Element) j.next();
-				for (Iterator k = line.elementIterator("span"); k.hasNext();){
-					Element word = (Element) k.next();
-					Attribute bbox = word.attribute("title");
-					String wordText = word.getStringValue().trim();
-					//System.out.println("Word: "+ wordText);
-					Position pos = parseBBox(bbox.getStringValue(), wordText);
-					text.addPosition(pos);
+		for(Iterator g = body.elementIterator("div"); g.hasNext();){
+			Element page = (Element) g.next();
+			for(Iterator h = page.elementIterator("div"); h.hasNext();){
+				Element block = (Element) h.next();
+				for (Iterator i = block.elementIterator("p"); i.hasNext();) {
+					Element paragraphs = (Element) i.next();
+					for (Iterator j = paragraphs.elementIterator("span"); j.hasNext();) {
+						Element line = (Element) j.next();
+						for (Iterator k = line.elementIterator("span"); k.hasNext();){
+							Element word = (Element) k.next();
+							Attribute bbox = word.attribute("title");
+							String wordText = word.getStringValue().trim();
+							//System.out.println("Word: "+ wordText);
+							Position pos = parseBBox(bbox.getStringValue(), wordText);
+							text.addPosition(pos);
+						}
+					}
 				}
 			}
 		}
+		
+
 		return text;
 	}
 
