@@ -80,7 +80,6 @@ public class ViewPanel extends JPanel implements MouseWheelListener {
 	 * Handles the mouse wheel movement.
 	 * Used for zooming.
 	 */
-	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 
 		int notches = e.getWheelRotation();

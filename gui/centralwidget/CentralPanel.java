@@ -90,7 +90,6 @@ public class CentralPanel extends JPanel {
 	
 	private class HorizontalScrollBarListener implements AdjustmentListener {
 
-		@Override
 		public void adjustmentValueChanged(AdjustmentEvent e) {
 			System.out.println(e.getValue());
 			
