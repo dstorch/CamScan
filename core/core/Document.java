@@ -39,8 +39,71 @@ public class Document {
 	public List<Page> pages() {
 		return _pages;
 	}
-	private String pathname() {
+	
+	// i.e. workspace/docs/mydoc/doc.xml
+	public String pathname() {
 		return _pathname;
+	}
+	
+	public void rename(String newName) throws IOException {
+		
+		// change the name of the directory on disk
+		String newPath = Parameters.DOC_DIRECTORY+"/"+newName;
+		String oldPath = pathname().substring(0, pathname().length()-8);
+		
+		
+		File oldDir = new File(oldPath);
+		File newDir = new File(newPath);
+		System.out.println("old directory: "+oldDir.getPath());
+		System.out.println("new directory: "+newDir.getPath());
+		if (!oldDir.renameTo(newDir)) throw new IOException("Could not rename document!");
+		
+		// set instance variables
+		setName(newName);
+		setPathName(newDir.getPath()+"/doc.xml");
+		
+		// set instance variables of the contained page objects
+		for (Page p : pages()) {
+			
+			// delete the old metafile
+			String oldMetafile = p.metafile();
+			//File f = new File(oldMetafile);
+			//f.delete();
+			
+			String[] pathfields = oldMetafile.split("/");
+			String name = pathfields[pathfields.length-1];
+			
+			// set path name variable for each page metafile
+			p.setMetafile(Parameters.DOC_DIRECTORY+"/"+newName+"/"+name);
+		}
+		
+		
+	}
+	
+	// WARNING: recursively deletes all directory contents
+	public boolean deleteDir(File dir) {
+	    
+		// if directory, then recur on children
+		if (dir.isDirectory()) {
+	        String[] children = dir.list();
+	        for (int i=0; i<children.length; i++) {
+	            boolean success = deleteDir(new File(dir, children[i]));
+	            
+	            // short circuit if recursive deletion fails
+	            if (!success) {
+	                return false;
+	            }
+	        }
+	    }
+
+	    // The directory is now empty so delete it
+	    return dir.delete();
+	}
+	
+	public void delete() throws IOException {
+		System.out.println("doc directory: "+Parameters.DOC_DIRECTORY+"/"+name());
+		File docDirectory = new File(Parameters.DOC_DIRECTORY+"/"+name());
+		if (!deleteDir(docDirectory)) throw new IOException("Problem deleting the document!");
 	}
 
 	public void serialize() throws IOException {

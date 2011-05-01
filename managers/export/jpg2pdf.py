@@ -17,9 +17,18 @@ class Word:
 
 	def draw(self, c, height) :
 		
+		# get descriptions of the bounding box based on OCR data
 		bbheight = self.ymax - self.ymin
-		
+		bbwidth = self.xmax - self.xmin
 		trueY = height - self.ymin - bbheight
+
+		# use the font size that gives the words the proper height
+		c.setFontSize(size=bbheight)
+
+		# extend the bounding-box width-wise by adding spaces
+		#stringWidth =  c.stringWidth(self.word, fontSize=bbheight) 
+		#charWidth = stringWidth / len(self.word)
+		
 		c.drawString(self.xmin, trueY, self.word)
 
 	def xmin(self) :

@@ -42,7 +42,7 @@ public class CoreManager {
 		for (Iterator i = root.elementIterator("WORKINGDOC"); i.hasNext();) {
 			Element workingdoc = (Element) i.next();
 			String workingStr = workingdoc.attribute("value").getStringValue();
-			setWorkingDocument(workingStr);
+			setWorkingDocumentFromName(workingStr);
 		}
 		
 		for (Iterator i = root.elementIterator("WORKINGPAGE"); i.hasNext();) {
@@ -76,6 +76,11 @@ public class CoreManager {
 	
 	// called before the application exits
 	public void shutdown() throws IOException {
+		writeStartupFile();
+	}
+	
+	// writes the startup file to disk based on the list of all documents
+	public void writeStartupFile() throws IOException {
 		OutputFormat pretty = OutputFormat.createPrettyPrint();
 		XMLWriter filewriter = new XMLWriter(new FileWriter(Parameters.STARTUP_FILE), pretty);
 		
@@ -91,7 +96,7 @@ public class CoreManager {
 			
 			if (_workingDocument != null) {
 				Element workingdoc = DocumentHelper.createElement("WORKINGDOC");
-				workingdoc.addAttribute("value", workingdoc.getName());
+				workingdoc.addAttribute("value", _workingDocument.pathname());
 				root.add(workingdoc);
 			}
 			
@@ -101,7 +106,7 @@ public class CoreManager {
 			
 			for (Document doc : _allDocuments) {
 				Element docEl = DocumentHelper.createElement("DOC");
-				docEl.addAttribute("value", doc.name());
+				docEl.addAttribute("value", doc.pathname());
 				docList.add(docEl);
 			}
 			
@@ -111,11 +116,6 @@ public class CoreManager {
 		}
 	}
 	
-	public Document setWorkingDocument(String path) throws FileNotFoundException, DocumentException {
-		_workingDocument =  _xmlReader.parseDocument(path);
-		return _workingDocument;
-	}
-	
 	public void setWorkingPage(String path) {
 		// TODO: implement this method!
 	}
@@ -123,8 +123,54 @@ public class CoreManager {
 	// when a working document is "closed" it is serialized
 	// to the disk
 	public void closeWorkingDocument() throws IOException {
-		_workingDocument.serialize();
-		_workingDocument = null;
+		if (_workingDocument != null) {
+			_workingDocument.serialize();
+		}
+	}
+	
+	public void renameDocument(String docName, String newName) throws IOException {
+		for (Document d : _allDocuments) {
+			if (docName.equals(d.name())) {
+				renameDocument(d, newName);
+			}
+		}
+	}
+	
+	public void renameDocument(Document d, String newName) throws IOException {
+		d.rename(newName);
+		d.serialize();
+		writeStartupFile();
+	}
+	
+	public void deleteDocument(String docName) throws IOException {
+		Document toDelete = null;
+		for (Document d : _allDocuments) {
+			if (docName.equals(d.name())) {
+				toDelete = d;
+			}
+		}
+		
+		deleteDocument(toDelete);
+	}
+	
+	public void deleteDocument(Document d) throws IOException {
+		d.delete();
+		_allDocuments.remove(d);
+		System.out.println(_allDocuments.contains(d));
+		d = null;
+		
+		// make sure that all references to the document are
+		// deleted (so that it gets garbage collected, and will
+		// not get serialized)
+		if (_workingDocument != null) {
+			if (_workingDocument.equals(d)) _workingDocument = null;
+			System.out.println(_workingDocument.name());
+		}
+		
+	
+		
+		System.out.println(d);
+		writeStartupFile();
 	}
 	
 	// Called after an import in order to establish a new
@@ -142,9 +188,12 @@ public class CoreManager {
 		File targetLocation = new File(Parameters.RAW_DIRECTORY);
 		recursiveImageCopy(sourceLocation, targetLocation, newDoc);
 		
-		// write the XML for the new document to disk
-		newDoc.serialize();
+		// add the new document to the list of documents
 		_allDocuments.add(newDoc);
+		
+		// update data for the new document on the disk
+		newDoc.serialize();
+		writeStartupFile();
 		return newDoc;
 	}
 	
@@ -233,11 +282,12 @@ public class CoreManager {
 		File targetLocation = new File(Parameters.RAW_DIRECTORY + "/" + sourceLocation.getName());
 		recursiveImageCopy(sourceLocation, targetLocation, newDoc);
 		
-		// write the XML for the new document to disk
-		newDoc.serialize();
-		
 		// add the document to the global list of documents
 		_allDocuments.add(newDoc);
+		
+		// write the XML for the new document to disk
+		newDoc.serialize();
+		writeStartupFile();
 		
 		return newDoc;
 	}
@@ -261,14 +311,14 @@ public class CoreManager {
 		SearchResults results = _searcher.getSearchResults(query, _workingDocument, _allDocuments);
 		
 		// REMOVE WHEN READY
-		//System.out.println("In the working page: ");
-		//for (SearchHit hit : results.inWorkingDoc()) {
-		//	System.out.println(hit.snippet()+" "+hit.score());
-		//}
-		//System.out.println("In all other pages: ");
-		//for (SearchHit hit : results.elsewhere()) {
-		//	System.out.println(hit.snippet()+" "+hit.score());
-		//}
+		System.out.println("In the working page: ");
+		for (SearchHit hit : results.inWorkingDoc()) {
+			System.out.println(hit.snippet()+" "+hit.score());
+		}
+		System.out.println("In all other pages: ");
+		for (SearchHit hit : results.elsewhere()) {
+			System.out.println(hit.snippet()+" "+hit.score());
+		}
 		
 		return results;
 	}
@@ -315,11 +365,13 @@ public class CoreManager {
 		CoreManager core = new CoreManager();
 		//core.createDocumentFromFile(new File("tests/xml/testDocument/hamlet_1.tiff"));
 		core.createDocumentFromFile(new File("../sample_page.tiff"));
-		core.setWorkingDocument("workspace/docs/sample_page/doc.xml");
-		core.exportToPdf("workspace/docs/sample_page/doc.xml", "../foo.pdf");
+		//core.setWorkingDocumentFromName("sample_page");
+		//core.exportToPdf("workspace/docs/sample_page/doc.xml", "../foo.pdf");
 		//core.exportText(core.workingDocument(), "../document.txt");
 		//core.exportImages(core.workingDocument(), "../copiedDoc");
-		//core.search("Benjamin Franklin almanac");
+		//core.search("political situation");
+		core.renameDocument("sample_page", "sample_page_2");
+		core.deleteDocument("sample_page_2");
 		core.closeWorkingDocument();
 		core.shutdown();
 	}
