@@ -13,6 +13,8 @@ import javax.swing.JOptionPane;
 
 import org.dom4j.DocumentException;
 
+import core.Parameters;
+
 /**
  * The top-level class that contains the
  * main line.
@@ -165,6 +167,12 @@ public class App extends JFrame {
 	 */
 	private class QuitListener implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
+			try {
+				Parameters.getCoreManager().shutdown();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			System.exit(0); // Exit the program
 		}
 	}

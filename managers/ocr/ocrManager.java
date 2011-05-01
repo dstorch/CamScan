@@ -125,17 +125,16 @@ public class ocrManager {
 			//Delete the original file
 			if (!outXMLFile.delete()) {
 				System.out.println("Could not delete file");
-			} 
-
-
+			}
+			
 			SAXReader reader = new SAXReader();
 			org.dom4j.Document document = reader.read(new FileReader(TEMP));
 			Element root = document.getRootElement();
 			PageText populatedPT = traverseTree(root, pt);
 
 			// delete files
-			//if(!outTXT.delete()) System.err.println("File not deleted");
-			//if(!temp.delete()) System.err.println("File not deleted");
+			if(!outTXT.delete()) System.err.println("File not deleted");
+			if(!temp.delete()) System.err.println("File not deleted");
 
 			return populatedPT;
 
@@ -218,7 +217,7 @@ public class ocrManager {
 
 	public static void main(String[] args) {
 
-		PageText pt = ocrManager.getPageText("tests/images/phototest.tif");
+		PageText pt = ocrManager.getPageText("../sample_page.tiff");
 		
 		System.out.println(pt.fullText());
 		

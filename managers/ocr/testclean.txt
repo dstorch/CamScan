@@ -1,0 +1,4 @@
+This is a file with amper&sands added in&
+I am hoping that all ampersands & will be remo,
+but <XML> tags </XML> and <?xml> and so forth
+should be removed!

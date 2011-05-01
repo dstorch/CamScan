@@ -2,10 +2,7 @@ package core;
 
 import java.io.*;
 import java.util.*;
-import java.util.regex.Pattern;
-
 import ocr.ocrManager;
-
 import org.dom4j.*;
 import org.dom4j.io.*;
 import search.*;
@@ -71,10 +68,6 @@ public class CoreManager {
 		}
 		
 
-	}
-	
-	private String workingDocName() {
-		return _workingDocument.name();
 	}
 	
 	public Document workingDocument() {
@@ -212,10 +205,10 @@ public class CoreManager {
 	            d.addPage(p);
 	            
 	            // comment this to run OCR! (see below also)
-	            p.setPageText(new PageText(""));
+	            //p.setPageText(new PageText(""));
 	            
 	            // uncomment this to run OCR! (see above also)
-	            //p.setOcrResults();
+	            p.setOcrResults();
 	            
         	}
 
@@ -242,6 +235,9 @@ public class CoreManager {
 		
 		// write the XML for the new document to disk
 		newDoc.serialize();
+		
+		// add the document to the global list of documents
+		_allDocuments.add(newDoc);
 		
 		return newDoc;
 	}
@@ -317,8 +313,8 @@ public class CoreManager {
 	// components independent of the GUI
 	public static void main(String[] args) throws DocumentException, IOException {
 		CoreManager core = new CoreManager();
-		core.createDocumentFromFile(new File("tests/xml/testDocument/hamlet_1.tiff"));
-		//core.createDocumentFromFolder(new File("tests/xml/testDocument"));
+		//core.createDocumentFromFile(new File("tests/xml/testDocument/hamlet_1.tiff"));
+		core.createDocumentFromFolder(new File("tests/xml/testDocument"));
 		core.setWorkingDocument("tests/xml/testDocument/doc.xml");
 		//core.exportToPdf("tests/xml/testDocument/doc.xml", "../foo.pdf");
 		//core.exportText(core.workingDocument(), "../document.txt");

@@ -108,8 +108,10 @@ public class PageExplorerPanel extends JPanel {
 		
 		Document workingDoc = Parameters.getCoreManager().workingDocument();
 		
-		for (Page page : workingDoc.pages()) {
-			pages.add(Integer.toString(page.order()));
+		if (workingDoc != null) {
+			for (Page page : workingDoc.pages()) {
+				pages.add(Integer.toString(page.order()));
+			}
 		}
 		
 		return pages;
