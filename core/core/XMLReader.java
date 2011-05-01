@@ -165,8 +165,9 @@ public class XMLReader {
 		
 		for (Iterator i = config.elementIterator("CONTRASTBOOST"); i.hasNext();) {
 			Element element = (Element) i.next();
-			float boost = Float.parseFloat(element.attribute("value").getStringValue());
-			cf.setColorTemp(boost);
+			String boostStr = element.attribute("value").getStringValue();
+			boolean boost = (boostStr.equals("yes"));
+			cf.setContrastBoost(boost);
 		}
 		
 		for (Iterator i = config.elementIterator("FLIPH"); i.hasNext();) {
@@ -183,11 +184,6 @@ public class XMLReader {
 			cf.setFlipV(flipped);
 		}
 		
-		for (Iterator i = config.elementIterator("ROTATE"); i.hasNext();) {
-			Element element = (Element) i.next();
-			float rotate = Float.parseFloat(element.attribute("value").getStringValue());
-			cf.setRotate(rotate);
-		}
 		
 		return cf;
 	}

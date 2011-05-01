@@ -2,6 +2,9 @@ package core;
 
 import java.io.*;
 import java.util.*;
+
+import ocr.ocrManager;
+
 import org.dom4j.*;
 import org.dom4j.io.*;
 import search.*;
@@ -28,6 +31,8 @@ public class Page {
 	public Page(Document parent, int order) {
 		_parentDoc = parent;
 		_order = order;
+		_config = new Config();
+		_corners = new Corners();
 	}
 	
 	public int order() {
@@ -80,6 +85,10 @@ public class Page {
 	}
 	public void setContainingDocument(Document parent) {
 		_parentDoc = parent;
+	}
+	
+	public void setOcrResults() {
+		_text = ocrManager.getPageText(_raw);
 	}
 	
 	public void serialize() throws IOException {

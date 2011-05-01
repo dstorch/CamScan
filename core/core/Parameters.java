@@ -44,6 +44,11 @@ public class Parameters {
 	public static final String DOC_DIRECTORY = "workspace/docs";
 	
 	/**
+	 * The regular expression used to find image files
+	 */
+	public static final String IMAGE_REGEX = ".png$|.jpg$|.tif$|.jpeg$";
+	
+	/**
 	 * Max number of search hits to report in the working document
 	 */
 	public static final int RESULTS_INDOC = 4;

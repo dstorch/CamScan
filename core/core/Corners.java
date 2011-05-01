@@ -10,6 +10,14 @@ public class Corners {
 	private Point _upleft;
 	private Point _downleft;
 	
+	// default constructor guesses plausible corner locations
+	public Corners() {
+		_upleft = new Point(50, 50);
+		_downleft = new Point(50, 200);
+		_upright = new Point(100, 50);
+		_downright = new Point(100, 200);
+	}
+	
 	public Corners(Point upleft, Point upright, Point downleft, Point downright) {
 		_upright = upright;
 		_downright = downright;

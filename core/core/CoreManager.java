@@ -2,6 +2,8 @@ package core;
 
 import java.io.*;
 import java.util.*;
+import java.util.regex.Pattern;
+
 import org.dom4j.*;
 import org.dom4j.io.*;
 import search.*;
@@ -120,8 +122,78 @@ public class CoreManager {
 	}
 	
 	// Called after an import in order to establish a new
-	// document object
-	public Document createDocument() {
+	// document object, if the user imports an entire folder
+	public Document createDocumentFromFolder(File sourceLocation) throws IOException {
+		
+		// put this document in workspace/docs by default
+		String name = sourceLocation.getName();
+		String pathname = Parameters.DOC_DIRECTORY + "/" + name;
+		Document newDoc = new Document(name, pathname);
+	
+		File targetLocation = new File(Parameters.RAW_DIRECTORY);
+		recursiveImageCopy(sourceLocation, targetLocation, newDoc);
+		
+		// write the XML for the new document to disk
+		newDoc.serialize();
+		
+		return newDoc;
+	}
+	
+	// recursively copies all image files to the workspace/
+	private void recursiveImageCopy(File sourceLocation, File targetLocation, Document d) throws IOException {
+		
+		if (sourceLocation.isDirectory()) {
+
+            if (!targetLocation.exists()) {
+                targetLocation.mkdir();
+            }
+
+            String[] children = sourceLocation.list();
+            for (int i=0; i<children.length; i++) {
+                recursiveImageCopy(new File(sourceLocation, children[i]),
+                        new File(targetLocation, children[i]), d);
+            }
+        } else {
+            
+        	String filename = sourceLocation.getName();
+        	
+        	if (Pattern.matches(Parameters.IMAGE_REGEX, filename)) {
+        		
+        		// copy the image into the workspace
+	            InputStream in = new FileInputStream(sourceLocation);
+	            try {
+	            	OutputStream out = new FileOutputStream(targetLocation);
+	            	try {
+			         
+			            // Copy the bits from instream to outstream
+			            byte[] buf = new byte[1024];
+			            int len;
+			            while ((len = in.read(buf)) > 0) {
+			                out.write(buf, 0, len);
+			            }
+	            	} finally {
+	            		out.close();
+	            	}
+	            } finally {
+	            	 in.close();
+	            }
+	           
+	            // construct the page and add it to the document
+	            Page p = new Page(d, -1);
+	            p.setRawFile(targetLocation.getPath());
+	            p.setProcessedFile(Parameters.PROCESSED_DIRECTORY+"/"+sourceLocation.getName());
+	            p.setMetafile(d.name() + "/" + sourceLocation.getName());
+	            p.setOcrResults();
+	            
+        	}
+
+        }
+		
+	}
+	
+	// called when the user imports a single photograph
+	// as a document
+	public Document createDocumentFromFile() {
 		return null;
 	}
 	
@@ -162,9 +234,9 @@ public class CoreManager {
 	public static void main(String[] args) throws DocumentException, IOException {
 		CoreManager core = new CoreManager();
 		core.setWorkingDocument("tests/xml/testDocument/doc.xml");
-		//core.exportToPdf("tests/xml/testDocument/doc.xml", "foo.pdf");
-		//core.exportText(core.workingDocument(), "../document.txt");
-		//core.exportImages(core.workingDocument(), "../copiedDoc");
+		core.exportToPdf("tests/xml/testDocument/doc.xml", "foo.pdf");
+		core.exportText(core.workingDocument(), "../document.txt");
+		core.exportImages(core.workingDocument(), "../copiedDoc");
 		core.search("Benjamin Franklin almanac");
 		core.closeWorkingDocument();
 		core.shutdown();
