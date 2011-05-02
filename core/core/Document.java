@@ -65,11 +65,8 @@ public class Document {
 		// set instance variables of the contained page objects
 		for (Page p : pages()) {
 			
-			// delete the old metafile
-			String oldMetafile = p.metafile();
-			//File f = new File(oldMetafile);
-			//f.delete();
-			
+			// get the name of the metafile (not the complete pathname)
+			String oldMetafile = p.metafile();			
 			String[] pathfields = oldMetafile.split("/");
 			String name = pathfields[pathfields.length-1];
 			
@@ -101,7 +98,6 @@ public class Document {
 	}
 	
 	public void delete() throws IOException {
-		System.out.println("doc directory: "+Parameters.DOC_DIRECTORY+"/"+name());
 		File docDirectory = new File(Parameters.DOC_DIRECTORY+"/"+name());
 		if (!deleteDir(docDirectory)) throw new IOException("Problem deleting the document!");
 	}
