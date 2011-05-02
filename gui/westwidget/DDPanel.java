@@ -1,7 +1,6 @@
 package westwidget;
 
-import gui.ParamHolder;
-
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.datatransfer.DataFlavor;
@@ -13,36 +12,86 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.dnd.DropTargetEvent;
 import java.awt.dnd.DropTargetListener;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.List;
 
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
+import javax.swing.border.LineBorder;
 
 import core.Parameters;
 
 
-
+/**
+ * The Drag and Drop class. The user can use it to
+ * drag and drop directories of images and create new
+ * documents out of them.
+ * 
+ * @author Stelios
+ *
+ */
 public class DDPanel extends JPanel implements DropTargetListener {
 
+	/****************************************
+	 * 
+	 * Private Instance Variables
+	 * 
+	 ****************************************/
+	
 	/**
 	 * The drop target.
 	 */
 	private DocExplorerPanel docExpPanel;
+	
+	/****************************************
+	 * 
+	 * Constructor(s)
+	 * 
+	 ****************************************/
 	
 	/**
 	 * Constructor.
 	 */
 	public DDPanel(DocExplorerPanel docExpPanel) {
 		super();
-		this.setBackground(Color.YELLOW);
+		this.setBackground(Color.WHITE);
 		this.setPreferredSize(new Dimension(150, 100));
+		this.setBorder(new LineBorder(Color.GRAY));
+		this.setLayout(new BorderLayout());
+		
+		JLabel dndLabel = new JLabel("Drag 'n' Drop Box", SwingConstants.CENTER);
+		this.add(dndLabel, BorderLayout.CENTER);
+		
 		this.docExpPanel = docExpPanel;
 		new DropTarget(this, this);
 	}
+	
+	/****************************************
+	 * 
+	 * Public Methods
+	 * 
+	 ****************************************/
+
+	/**
+	 * Processes the files passed in the drag'n'drop panel.
+	 * 
+	 * @param files List of all the files
+	 * @throws IOException
+	 */
+	private void processFiles(List<File> files) throws IOException {
+		for (File file : files) {
+			Parameters.getCoreManager().createDocumentFromFolder(new File(file.getAbsolutePath()));
+		}
+		
+		this.docExpPanel.update();
+	}
+	
+	/****************************************
+	 * 
+	 * Event Methods
+	 * 
+	 ****************************************/
 	
 	/**
 	 * Handles the drop action.
@@ -50,7 +99,7 @@ public class DDPanel extends JPanel implements DropTargetListener {
 	 * @param evt
 	 */
 	public void drop(DropTargetDropEvent evt) {
-		//final List result = new ArrayList();
+		
 		int action = evt.getDropAction();
 		evt.acceptDrop(action);
 		try {
@@ -67,55 +116,6 @@ public class DDPanel extends JPanel implements DropTargetListener {
 			evt.dropComplete(true);
 			repaint();
 		}
-	}
-
-	/**
-	 * Processes the files passed in the drag'n'drop panel.
-	 * 
-	 * @param files List of all the files
-	 * @throws IOException
-	 */
-	private void processFiles(List<File> files) throws IOException {
-		for (File file : files) {
-			Parameters.getCoreManager().createDocumentFromFolder(new File(file.getAbsolutePath()));
-		}
-		
-		this.docExpPanel.update();
-	}
-
-	/**
-	 * Copies a file from the given path to the target path.
-	 * 
-	 * @param fromFileName The path where the file is
-	 * @param toFileName The target path (filename included).
-	 * @throws IOException
-	 */
-	public void copyDirectory(File sourceLocation, File targetLocation) throws IOException {
-		  if (sourceLocation.isDirectory()) {
-
-	            if (!targetLocation.exists()) {
-	                targetLocation.mkdir();
-	            }
-    
-	            String[] children = sourceLocation.list();
-	            for (int i=0; i<children.length; i++) {
-	                copyDirectory(new File(sourceLocation, children[i]),
-	                        new File(targetLocation, children[i]));
-	            }
-	        } else {
-	            
-	            InputStream in = new FileInputStream(sourceLocation);
-	            OutputStream out = new FileOutputStream(targetLocation);
-	            
-	            // Copy the bits from instream to outstream
-	            byte[] buf = new byte[1024];
-	            int len;
-	            while ((len = in.read(buf)) > 0) {
-	                out.write(buf, 0, len);
-	            }
-	            in.close();
-	            out.close();
-	        }
 	}
 	
 	public void dragEnter(DropTargetDragEvent arg0) {}

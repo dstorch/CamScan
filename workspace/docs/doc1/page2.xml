@@ -4,7 +4,7 @@
   <IMG path="workspace/raw/hamlet_2.png" processed="workspace/raw/hamlet_2.png"/>
   <CORNERS>
     <UPRIGHT x="1063" y="110"/>
-    <DOWNRIGHT x="1065" y="806"/>
+    <DOWNRIGHT x="1063" y="801"/>
     <UPLEFT x="523" y="112"/>
     <DOWNLEFT x="529" y="798"/>
   </CORNERS>
