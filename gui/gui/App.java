@@ -3,8 +3,10 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -13,6 +15,7 @@ import javax.swing.JOptionPane;
 
 import org.dom4j.DocumentException;
 
+import core.Document;
 import core.Parameters;
 
 /**
@@ -183,7 +186,14 @@ public class App extends JFrame {
 	 */
 	private class ImportFromFileListener implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
-			// TODO Auto-generated method stub
+			
+			File file = getUserFile();
+			
+			try {
+				Parameters.getCoreManager().createDocumentFromFile(file);
+			} catch (IOException e) {
+				JOptionPane.showMessageDialog(app, e.getMessage(), "Import Error", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 	
@@ -193,7 +203,14 @@ public class App extends JFrame {
 	 */
 	private class ImportFromFolderListener implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
-			// TODO Auto-generated method stub
+
+			File folder = getUserDirectory();
+			
+			try {
+				Parameters.getCoreManager().createDocumentFromFolder(folder);
+			} catch (IOException e) {
+				JOptionPane.showMessageDialog(app, e.getMessage(), "Import Error", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 	
@@ -203,17 +220,40 @@ public class App extends JFrame {
 	 */
 	private class ExportPDFListener implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
-			// TODO Auto-generated method stub
+			
+			File folder = getUserDirectory();
+			
+			Document workingDocument = Parameters.getCoreManager().workingDocument();
+			String workingPath = workingDocument.pathname();
+			String outpath = folder.getPath() + "/" + workingDocument.name();
+			
+			try {
+				Parameters.getCoreManager().exportToPdf(workingPath, outpath);
+			} catch (IOException e) {
+				JOptionPane.showMessageDialog(app, e.getMessage(), "Export Error", JOptionPane.ERROR_MESSAGE);
+			}
+			
 		}
 	}
 	
+
 	/**
 	 * The ActionListener class for the export as images
 	 * menu item.
 	 */
 	private class ExportImagesListener implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
-			// TODO Auto-generated method stub
+
+			File folder = getUserDirectory();
+			
+			Document workingDocument = Parameters.getCoreManager().workingDocument();
+			String outpath = folder.getPath() + "/" + workingDocument.name();
+			
+			try {
+				Parameters.getCoreManager().exportImages(workingDocument, outpath);
+			} catch (IOException e) {
+				JOptionPane.showMessageDialog(app, e.getMessage(), "Export Error", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 	
@@ -223,10 +263,46 @@ public class App extends JFrame {
 	 */
 	private class ExportTextListener implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
-			// TODO Auto-generated method stub
+	File folder = getUserDirectory();
+			
+			Document workingDocument = Parameters.getCoreManager().workingDocument();
+			String outpath = folder.getPath() + "/" + workingDocument.name();
+			
+			try {
+				Parameters.getCoreManager().exportText(workingDocument, outpath);
+			} catch (IOException e) {
+				JOptionPane.showMessageDialog(app, e.getMessage(), "Export Error", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 
+	/**
+	 * This method defines the interface by which the user selects
+	 * directories for import and export.
+	 * @see getUserFile()
+	 * 
+	 * @return a File representing the directory selected by the user
+	 */
+	private File getUserDirectory() {
+		JFileChooser fc = new JFileChooser();
+		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		fc.showOpenDialog(app);
+		return fc.getSelectedFile();
+	}
+	
+	/**
+	 * This method defines the interface by which the user selects
+	 * FILES for import and export.
+	 * @see getUserDirectory()
+	 * 
+	 * @return a File representing the directory selected by the user
+	 */
+	private File getUserFile() {
+		JFileChooser fc = new JFileChooser();
+		fc.showOpenDialog(app);
+		return fc.getSelectedFile();
+	}
+	
 	/**
 	 * The ActionListener class for the about menu item.
 	 */
