@@ -15,7 +15,7 @@ public class ocrManager {
 
 	// absolute path to the tesseract executable
 	public static String TESS_PATH = "/usr/local/bin/tesseract";
-	
+
 	private final static String CONFIG_FILE = "libraries/tesseract/config.txt";
 	private final static String OUT_TXT_PATH = "libraries/tesseract/temp/out.txt";
 	private final static String OUT_HTML_PATH = "libraries/tesseract/temp/out.html";
@@ -125,14 +125,14 @@ public class ocrManager {
 			if (!outXMLFile.delete()) {
 				System.out.println("Could not delete file");
 			}
-			
+
 			System.out.println("python managers/ocr/cleanXML.py "+TEMP+" "+TEMP2);
 			Runtime.getRuntime().exec("python managers/ocr/cleanXML.py "+TEMP+" "+TEMP2);
-			
+
 			// block until the cleaned temp file has been produced
 			File tempFile = new File(TEMP2);
 			while(!tempFile.canRead()){}
-			
+
 			SAXReader reader = new SAXReader();
 			org.dom4j.Document document = reader.read(new FileReader(TEMP2));
 			Element root = document.getRootElement();
@@ -186,7 +186,7 @@ public class ocrManager {
 				}
 			}
 		}
-		
+
 
 		return text;
 	}
@@ -231,12 +231,12 @@ public class ocrManager {
 	public static void main(String[] args) {
 
 		PageText pt = ocrManager.getPageText("../sample_page.tiff");
-		
+
 		System.out.println(pt.fullText());
-		
+
 		for (Position p : pt.positions()) {
 			System.out.println(p.xmin()+" "+p.ymin()+" : "+p.word());
 		}
-		
+
 	} 
 }

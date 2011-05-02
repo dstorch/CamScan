@@ -254,10 +254,10 @@ public class CoreManager {
 	            d.addPage(p);
 	            
 	            // comment this to run OCR! (see below also)
-	            p.setPageText(new PageText(""));
+	            //p.setPageText(new PageText(""));
 	            
 	            // uncomment this to run OCR! (see above also)
-	            // p.setOcrResults();
+	            p.setOcrResults();
 	            
         	}
 
@@ -364,14 +364,14 @@ public class CoreManager {
 	public static void main(String[] args) throws DocumentException, IOException {
 		CoreManager core = new CoreManager();
 		//core.createDocumentFromFile(new File("tests/xml/testDocument/hamlet_1.tiff"));
-		core.createDocumentFromFile(new File("../sample_page.tiff"));
+		core.createDocumentFromFile(new File("../sample2.tiff"));
 		//core.setWorkingDocumentFromName("sample_page");
 		//core.exportToPdf("workspace/docs/sample_page/doc.xml", "../foo.pdf");
 		//core.exportText(core.workingDocument(), "../document.txt");
 		//core.exportImages(core.workingDocument(), "../copiedDoc");
 		//core.search("political situation");
-		core.renameDocument("sample_page", "sample_page_2");
-		core.deleteDocument("sample_page_2");
+		core.renameDocument("sample2", "sample_page_2");
+		//core.deleteDocument("sample_page_2");
 		core.closeWorkingDocument();
 		core.shutdown();
 	}
