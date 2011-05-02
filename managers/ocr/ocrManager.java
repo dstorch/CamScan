@@ -14,7 +14,8 @@ import core.Position;
 public class ocrManager {
 
 	// absolute path to the tesseract executable
-	public static String TESS_PATH = "/usr/local/bin/tesseract";
+	public static String TESS_PATH = "/opt/local/bin/tesseract";
+        //public static String TESS_PATH = "tesseract";
 
 	private final static String CONFIG_FILE = "libraries/tesseract/config.txt";
 	private final static String OUT_TXT_PATH = "libraries/tesseract/temp/out.txt";
@@ -92,7 +93,7 @@ public class ocrManager {
 			if (!outXMLFile.exists()) outXMLFile.createNewFile();
 
 			// blocking statement to ensure tesseract has created html file
-			while(!outTXT.canRead()){}
+			while(!outTXT.canRead()){System.err.println("Cannot read file");}
 
 			FileInputStream Fin = new FileInputStream(OUT_HTML_PATH);
 			FileOutputStream Fout = new FileOutputStream(OUT_XML_PATH);
@@ -229,8 +230,9 @@ public class ocrManager {
 	}
 
 	public static void main(String[] args) {
+                System.out.println("Calling getPageText...");
 
-		PageText pt = ocrManager.getPageText("../sample2.tiff");
+		PageText pt = ocrManager.getPageText("../1col-300.tiff");
 
 		System.out.println(pt.fullText());
 
