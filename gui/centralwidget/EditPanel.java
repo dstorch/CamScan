@@ -11,6 +11,7 @@ import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
+import javax.swing.border.LineBorder;
 
 import core.Corners;
 import core.Parameters;
@@ -101,6 +102,7 @@ public class EditPanel extends JPanel implements MouseMotionListener {
 
 		this.addMouseMotionListener(this);
 		this.setBackground(Color.LIGHT_GRAY);
+		this.setBorder(new LineBorder(Color.GRAY));
 
 		this.cornerUL = new Ellipse2D.Double();
 		this.cornerUR = new Ellipse2D.Double();
@@ -146,7 +148,9 @@ public class EditPanel extends JPanel implements MouseMotionListener {
 		Graphics2D brush = (Graphics2D) g;
 
 		BufferedImage img = Parameters.getCurrPageImg();
-		g.drawImage(img, (this.getWidth() - img.getWidth())/2, (this.getHeight() - img.getHeight())/2, null);
+		
+		if (img != null)
+			g.drawImage(img, (this.getWidth() - img.getWidth())/2, (this.getHeight() - img.getHeight())/2, null);
 		
 		brush.setColor(Color.BLACK);
 		brush.draw(this.lineULUR);
