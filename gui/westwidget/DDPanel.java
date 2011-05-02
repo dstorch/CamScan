@@ -78,7 +78,6 @@ public class DDPanel extends JPanel implements DropTargetListener {
 	private void processFiles(List<File> files) throws IOException {
 		for (File file : files) {
 			Parameters.getCoreManager().createDocumentFromFolder(new File(file.getAbsolutePath()));
-			//this.copyDirectory(new File(file.getAbsolutePath()), new File(ParamHolder.getWorkspace() + File.separator + file.getName()));
 		}
 		
 		this.docExpPanel.update();

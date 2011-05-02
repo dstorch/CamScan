@@ -194,7 +194,6 @@ public class CoreManager {
 		// update data for the new document on the disk
 		newDoc.serialize();
 		writeStartupFile();
-		
 		return newDoc;
 	}
 	
