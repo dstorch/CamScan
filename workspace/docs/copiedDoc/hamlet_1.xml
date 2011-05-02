@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<PAGE>
+  <IMG path="workspace/raw/hamlet_1.tiff" processed="workspace/processed/hamlet_1.tiff"/>
+  <CORNERS>
+    <UPRIGHT x="726" y="6"/>
+    <DOWNRIGHT x="724" y="641"/>
+    <UPLEFT x="190" y="24"/>
+    <DOWNLEFT x="181" y="638"/>
+  </CORNERS>
+  <TEXT>
+    <FULLTEXT>7»W , UiWVUMMMM 4 A HW ”W|M»»»»»Y NUT fH &amp; @ » KKlMKl!K!l»!KHHHHHIHWWHKW” WWW”WWWWWWW&amp;I WT</FULLTEXT>
+    <POSITIONS>
+      <WORD xmin="1" ymin="557" xmax="564" ymax="768" value="7AcircraquoW 
+            UiWVUMMMM 4 A HW
+            acirc128157WMAcircraquoAcircraquoAcircraquoAcircraquoAcircraquoY
+            NUT fH amp  Acircraquo"/>
+      <WORD xmin="9" ymin="634" xmax="548" ymax="846" value="KKlMKl!K!lAcircraquo!KHHHHHIHWWHKWacirc128157
+            WWWacirc128157WWWWWWWampI WT"/>
+    </POSITIONS>
+  </TEXT>
+  <CONFIG>
+    <COLORTEMP value="0.0"/>
+    <CONTRASTBOOST value="no"/>
+    <FLIPH value="no"/>
+    <FLIPV value="no"/>
+  </CONFIG>
+</PAGE>
