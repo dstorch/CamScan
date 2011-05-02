@@ -225,7 +225,7 @@ public class App extends JFrame {
 			
 			Document workingDocument = Parameters.getCoreManager().workingDocument();
 			String workingPath = workingDocument.pathname();
-			String outpath = folder.getPath() + "/" + workingDocument.name();
+			String outpath = folder.getPath() + "/" + workingDocument.name() + ".pdf";
 			
 			try {
 				Parameters.getCoreManager().exportToPdf(workingPath, outpath);
@@ -266,7 +266,7 @@ public class App extends JFrame {
 	File folder = getUserDirectory();
 			
 			Document workingDocument = Parameters.getCoreManager().workingDocument();
-			String outpath = folder.getPath() + "/" + workingDocument.name();
+			String outpath = folder.getPath() + "/" + workingDocument.name() + ".txt";
 			
 			try {
 				Parameters.getCoreManager().exportText(workingDocument, outpath);
