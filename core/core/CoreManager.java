@@ -366,11 +366,11 @@ public class CoreManager {
 		//core.createDocumentFromFile(new File("tests/xml/testDocument/hamlet_1.tiff"));
 		core.createDocumentFromFile(new File("../sample2.tiff"));
 		//core.setWorkingDocumentFromName("sample_page");
-		//core.exportToPdf("workspace/docs/sample_page/doc.xml", "../foo.pdf");
+		core.exportToPdf("workspace/docs/sample2/doc.xml", "../foo.pdf");
 		//core.exportText(core.workingDocument(), "../document.txt");
 		//core.exportImages(core.workingDocument(), "../copiedDoc");
 		//core.search("political situation");
-		core.renameDocument("sample2", "sample_page_2");
+		//core.renameDocument("sample2", "sample_page_2");
 		//core.deleteDocument("sample_page_2");
 		core.closeWorkingDocument();
 		core.shutdown();

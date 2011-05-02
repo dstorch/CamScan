@@ -16,20 +16,21 @@ class Word:
 		self.word = word
 
 	def draw(self, c, height) :
-		
+        
 		# get descriptions of the bounding box based on OCR data
 		bbheight = self.ymax - self.ymin
 		bbwidth = self.xmax - self.xmin
 		trueY = height - self.ymin - bbheight
+ 
+ 		# create the text object, and make it render as invisible
+		text = c.beginText(self.xmin, trueY)
+		text.setTextRenderMode(3)
 
 		# use the font size that gives the words the proper height
-		c.setFontSize(size=bbheight)
+		text.setFont('Courier', bbheight)
+		text.textOut(self.word)
 
-		# extend the bounding-box width-wise by adding spaces
-		#stringWidth =  c.stringWidth(self.word, fontSize=bbheight) 
-		#charWidth = stringWidth / len(self.word)
-		
-		c.drawString(self.xmin, trueY, self.word)
+		c.drawText(text)
 
 	def xmin(self) :
 		return self.xmin
@@ -53,10 +54,15 @@ class Page:
 		self.processed = processed
 
 	def draw(self, c) :
+		
+		# draw the image on the canvas
 		width, height = c.drawImage(self.processed, 0, 0, width=None, height=None, mask=None)
+		
+		# draw the words
 		for w in self.words :
 			w.draw(c, height)
-		c.drawImage(self.processed, 0, 0, width=None, height=None, mask=None)
+		
+		# determine pdf page size based on the image dimensions
 		c.setPageSize((width, height))
 
 	def addWord(self, word) :

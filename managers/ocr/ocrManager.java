@@ -230,7 +230,7 @@ public class ocrManager {
 
 	public static void main(String[] args) {
 
-		PageText pt = ocrManager.getPageText("../sample_page.tiff");
+		PageText pt = ocrManager.getPageText("../sample2.tiff");
 
 		System.out.println(pt.fullText());
 
