@@ -10,6 +10,10 @@ public class PageText {
 	private String _fullText;
 	private List<Position> _positions;
 
+	public PageText() {
+		_positions = new LinkedList<Position>();
+	}
+	
 	public PageText(String fullText) {
 		_fullText = fullText;
 		_positions = new LinkedList<Position>();
@@ -24,6 +28,10 @@ public class PageText {
 	
 	public void addPosition(Position p) {
 		_positions.add(p);
+	}
+	
+	public void setFullText(String text) {
+		_fullText = text;
 	}
 	
 	public void serialize(Element root) {

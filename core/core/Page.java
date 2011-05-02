@@ -85,7 +85,7 @@ public class Page {
 		_parentDoc = parent;
 	}
 	
-	public void setOcrResults() {
+	public void setOcrResults() throws IOException {
 		_text = ocrManager.getPageText(_raw);
 	}
 	
