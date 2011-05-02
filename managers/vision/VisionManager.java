@@ -10,6 +10,8 @@ import com.googlecode.javacv.cpp.opencv_core.CvMat;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+
 import static com.googlecode.javacv.cpp.opencv_core.*;
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 import static com.googlecode.javacv.cpp.opencv_highgui.*;
@@ -20,8 +22,8 @@ public class VisionManager {
 		ConfigurationDictionary cd = new ConfigurationDictionary();
 		
 		try {
-			cd.setKey("contrast", new ConfigurationValue(ConfigurationValue.ValueType.ContrastBoost, false));
-			cd.setKey("bilateral", new ConfigurationValue(ConfigurationValue.ValueType.BilateralFilter, true));
+			cd.setKey("contrast", new ConfigurationValue(ConfigurationValue.ValueType.ContrastBoost, true));
+			cd.setKey("bilateral", new ConfigurationValue(ConfigurationValue.ValueType.BilateralFilter, false));
 		} catch (InvalidTypingException e) {
 			System.err.println("InvalidTypingException while setting up ConfigurationDictionary.");
 		}
@@ -82,7 +84,32 @@ public class VisionManager {
 	}
 	private static IplImage applyContrastBoost(IplImage img, ConfigurationValue boost){
 		if (!(Boolean)boost.value()){return img;}
-		IplImage ch1 = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
+		
+		IplImage gray = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
+    	cvCvtColor(img, gray, CV_RGB2GRAY);
+		cvEqualizeHist(gray, gray);
+		
+		IplImage hsl = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 3);
+		cvCvtColor(img, hsl, CV_RGB2HLS);
+		
+		final ByteBuffer graybuf = gray.getByteBuffer();
+		final ByteBuffer hslbuf = hsl.getByteBuffer();
+		
+		byte equalized;
+		
+		for(int y=0;y<img.height();y++){
+			for (int x=0;x<img.width();x++){
+				equalized = graybuf.get( y*img.width() + x );
+				hslbuf.put(y*img.width()*3 + x*3 + 1, equalized );
+			}
+		}
+		
+		
+		cvCvtColor(hsl, img, CV_HLS2RGB);
+		
+		//cvMerge(gray, gray, gray, null, img);
+		
+		/*IplImage ch1 = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
 		IplImage ch2 = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
 		IplImage ch3 = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
 		cvSplit(img, ch1, ch2, ch3, null);
@@ -91,7 +118,8 @@ public class VisionManager {
 		cvEqualizeHist(ch2, ch2);
 		cvEqualizeHist(ch3, ch3);
 		
-		cvMerge(ch1, ch2, ch3, null, img);
+		cvMerge(ch1, ch2, ch3, null, img);*/
+		
 		return img;
 	}
 	private static IplImage applyBilateralFilter(IplImage img, ConfigurationValue filter){
@@ -195,6 +223,7 @@ public class VisionManager {
 		IplImage image = cvLoadImage("tests/images/DSC_7384.JPG");
 		System.out.println("Loaded");
         if (image != null) {
+        	
         	/*
         	IplImage gray = cvCreateImage(cvSize(image.width(), image.height()), IPL_DEPTH_8U, 1);
         	cvCvtColor(image, gray, CV_RGB2GRAY);
@@ -204,6 +233,9 @@ public class VisionManager {
             //cvCanny(gray, edges, 100, 3, 5);
         	//cvLaplace(gray, edges, 3);
         	cvCornerHarris(gray, edges, 10, 3, 0.04); // (int) (Math.max(image.width(), image.height())*0.10)
+        	
+        	CvMat harris_response = cvCreateMat(edges);
+        	System.out.println(edges.get(5,5));
         	
         	IplImage output = cvCreateImage(cvSize(image.width(), image.height()), IPL_DEPTH_8U, 1);
         	cvConvertScale(edges, output, 1, 0);
