@@ -32,6 +32,7 @@ public class Page {
 		_order = order;
 		_config = new ConfigurationDictionary();
 		_corners = new Corners();
+		_text = new PageText();
 	}
 	
 	public int order() {
@@ -87,7 +88,11 @@ public class Page {
 	}
 	
 	public void setOcrResults() throws IOException {
-		_text = ocrManager.getPageText(_raw);
+		String[] fields = metafile().split("/");
+		PageText text = ocrManager.getPageText(_raw, fields[fields.length-1]);
+		synchronized (this) {
+			_text = text;
+		}
 	}
 	
 	public void serialize() throws IOException {
