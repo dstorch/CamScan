@@ -147,7 +147,7 @@ public class EditPanel extends JPanel implements MouseMotionListener {
 		super.paintComponent(g);
 		Graphics2D brush = (Graphics2D) g;
 
-		BufferedImage img = Parameters.getCurrPageImg();
+		BufferedImage img = Parameters.getCoreManager().getWorkingImage();
 		
 		if (img != null)
 			g.drawImage(img, (this.getWidth() - img.getWidth())/2, (this.getHeight() - img.getHeight())/2, null);

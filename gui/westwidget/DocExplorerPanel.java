@@ -3,6 +3,7 @@ package westwidget;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.util.Vector;
 
 import javax.swing.JList;
@@ -147,7 +148,11 @@ public class DocExplorerPanel extends JPanel {
 					currDocName = "0";
 				}
 			
-				Parameters.getCoreManager().setWorkingDocumentFromName(currDocName);
+				try {
+					Parameters.getCoreManager().setWorkingDocumentFromName(currDocName);
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 				
 				// Update the page explorer panel with the pages of the
 				// new working document.
@@ -155,9 +160,6 @@ public class DocExplorerPanel extends JPanel {
 
 				// Get the very first page and display its image on the
 				// central panel.
-				Page currPage = Parameters.getCoreManager().workingDocument().pages().get(0);
-				Parameters.setCurrPageImg(currPage.raw());
-				Parameters.getCoreManager().setWorkingPage(currPage);
 				centralPanel.updatePanels();
 			}
 		}

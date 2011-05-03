@@ -23,8 +23,10 @@ public class CoreManager {
     private XMLReader _xmlReader;
     private List<Document> _allDocuments;
     
+    // instance variables telling the GUI which page to display
     private Document _workingDocument;
     private Page _workingPage;
+    private BufferedImage _workingImage;
 
     public CoreManager() throws DocumentException, IOException {
         _xmlReader = new XMLReader();
@@ -39,7 +41,7 @@ public class CoreManager {
     }
 
     // called from the constructor when the application launches
-	public void startup() throws FileNotFoundException, DocumentException {
+	public void startup() throws DocumentException, IOException {
 		SAXReader reader = new SAXReader();
 		org.dom4j.Document document = reader.read(new FileReader(Parameters.STARTUP_FILE));
 		Element root = document.getRootElement();
@@ -150,8 +152,9 @@ public class CoreManager {
 		_workingPage = _xmlReader.parsePage(path, order, _workingDocument);
 	}
 	
-	public void setWorkingPage(Page page) {
+	public void setWorkingPageAndImage(Page page) throws IOException {
 		_workingPage = page;
+		_workingImage = page.getRawImgFromDisk();
 	}
 	
 	// when a working document is "closed" it is serialized
@@ -258,7 +261,7 @@ public class CoreManager {
 		Document newDoc = new Document(name, pathname);
 		
 		File targetLocation = new File(Parameters.RAW_DIRECTORY);
-		importPages(sourceLocation, targetLocation, newDoc, 1);
+		importPages(sourceLocation, targetLocation, newDoc, 0);
 		
 		// add the new document to the list of documents
 		_allDocuments.add(newDoc);
@@ -289,18 +292,15 @@ public class CoreManager {
             }
         } else {
 
-            // get the file extension
             String filename = sourceLocation.getName();
-            String[] extensionArr = filename.split("[.]");
-            String extension = "";
-
-            if (extensionArr.length > 0) {
-                extension = extensionArr[extensionArr.length - 1];
-            }
+           
             boolean validExt = false;
-            for(int i = 0; i<Parameters.imgExtensions.length;i++) validExt = validExt || (extension.equals(Parameters.imgExtensions[i]));
+            for (int i = 0; i<Parameters.imgExtensions.length;i++) {
+            	if (filename.endsWith(Parameters.imgExtensions[i])) validExt = true;
+            }
 
             if (validExt) {
+            	
                 // copy the image into the workspace
                 InputStream in = new FileInputStream(sourceLocation);
 
@@ -325,7 +325,8 @@ public class CoreManager {
 
                 // get the image file name without a ".tiff" extension
                 String imageFile = sourceLocation.getName();
-                String noExt = imageFile.substring(0, imageFile.length() - 5);
+                int lastIndex = imageFile.lastIndexOf(".");
+                String noExt = imageFile.substring(0, lastIndex);
 
                 // construct the page and add it to the document
                 Page p = new Page(d, order);
@@ -334,7 +335,6 @@ public class CoreManager {
                 p.setRawFile(targetLocation.getPath());
                 p.setProcessedFile(Parameters.PROCESSED_DIRECTORY + "/" + sourceLocation.getName());
                 p.setMetafile(Parameters.DOC_DIRECTORY + "/" + d.name() + "/" + noExt + ".xml");
-
 
                 // guess initial configuration values
                 p.initGuesses();
@@ -370,7 +370,7 @@ public class CoreManager {
         Document newDoc = new Document(noExt, pathname);
 
         File targetLocation = new File(Parameters.RAW_DIRECTORY + "/" + sourceLocation.getName());
-        importPages(sourceLocation, targetLocation, newDoc, 1);
+        importPages(sourceLocation, targetLocation, newDoc, 0);
 
         // add the document to the global list of documents
         _allDocuments.add(newDoc);
@@ -442,16 +442,26 @@ public class CoreManager {
      * document.
      *
      * @param docName The name of the document
+     * @throws IOException 
      */
-    public void setWorkingDocumentFromName(String docName) {
+    public void setWorkingDocumentFromName(String docName) throws IOException {
 
         for (Document doc : _allDocuments) {
             if (docName.equals(doc.name())) {
                 _workingDocument = doc;
+                setWorkingPageAndImage(doc.pages().get(0));
             }
         }
     }
 
+    public Page getWorkingPage() {
+		return _workingPage;
+	}
+    
+    public BufferedImage getWorkingImage() {
+    	return _workingImage;
+    }
+    
     /**
      * Given an order, it returns the page of the given
      * order from the working document.
@@ -460,7 +470,7 @@ public class CoreManager {
      * @return The page with the given order of the
      * working document.
      */
-    public Page getWorkingDocPageFromOrder(int order) {
+    public Page getWorkingDocPageFromName(int order) {
 
         for (Page page : _workingDocument.pages()) {
             if (order == page.order()) {
@@ -471,59 +481,54 @@ public class CoreManager {
         return null;
     }
 
-    // called when changing from edit mode to view mode
-    // uses changes made in edit mode and rerenders the image
-    public void updateWorkingImage() {
-        Page curr = Parameters.getCoreManager().getWorkingPage();
-        if (curr != null) {
-        	BufferedImage newImage = VisionManager.rerenderImage(Parameters.getCurrPageImg(), curr.corners(), curr.config());
-        	Parameters.setCurrPageImg(newImage);
-        }
-    }
-
-
-    public Page getWorkingPage() {
-		return _workingPage;
-	}
-
-	// called when user tries to place corner; tries to make a better point given the user's guess
-    // writes the current process image to workspace/processed (as Tiff file)
-    public void writeProcessedTiff() {
-        String[] s = Parameters.getCoreManager().getWorkingPage().metafile().split("/");
-        String path = "workspace/processed/" + s[s.length - 1] + ".tiff";
-
-        VisionManager.writeTIFF(Parameters.getCurrPageImg(), path);
-    }
-
-    // writes the current process image to workspace/processed (as PNG file)?
-    public void writeProcessedFile() throws IOException {
-        String[] s = Parameters.getCoreManager().getWorkingPage().metafile().split("/");
-        String path = "workspace/processed/" + s[s.length - 1] + ".png";
-
-        Page curr = Parameters.getCoreManager().getWorkingPage();
-        VisionManager.outputToFile(Parameters.getCurrPageImg(), path, curr.corners(), curr.config());
-    }
-
-    // Called every time entering Edit Mode or Configuration Dictionary is changed
-    public void getEditImageTransform() {
-        Parameters.setCurrPageImg(VisionManager.imageGlobalTransforms(Parameters.getCurrPageImg(),
-        		Parameters.getCoreManager().getWorkingPage().config()));
-    }
-
-    // sets corners and config file for the initial guesses of an imported document
-    private void initGuesses(Document d) throws IOException {
-        for (Page p : d.pages()) {
-            BufferedImage buff = ImageIO.read(new File(p.raw()));
-            // guess and set corners and configuration values of Page
-            p.setCorners(VisionManager.findCorners(buff));
-            p.setConfig(VisionManager.estimateConfigurationValues(buff));
-        }
-    }
-
-    // called when user tries to place corner; tries to make a better point given the user's guess
-    public Point snapCorner(Point pt) {
-        return VisionManager.snapCorner(Parameters.getCurrPageImg(), pt);
-    }
+//    // called when changing from edit mode to view mode
+//    // uses changes made in edit mode and rerenders the image
+//    public void updateWorkingImage() {
+//        Page curr = Parameters.getCoreManager().getWorkingPage();
+//        if (curr != null) {
+//        	BufferedImage newImage = VisionManager.rerenderImage(Parameters.getCurrPageImg(), curr.corners(), curr.config());
+//        	Parameters.setCurrPageImg(newImage);
+//        }
+//    }
+//
+//	// called when user tries to place corner; tries to make a better point given the user's guess
+//    // writes the current process image to workspace/processed (as Tiff file)
+//    public void writeProcessedTiff() {
+//        String[] s = Parameters.getCoreManager().getWorkingPage().metafile().split("/");
+//        String path = "workspace/processed/" + s[s.length - 1] + ".tiff";
+//
+//        VisionManager.writeTIFF(Parameters.getCurrPageImg(), path);
+//    }
+//
+//    // writes the current process image to workspace/processed (as PNG file)?
+//    public void writeProcessedFile() throws IOException {
+//        String[] s = Parameters.getCoreManager().getWorkingPage().metafile().split("/");
+//        String path = "workspace/processed/" + s[s.length - 1] + ".png";
+//
+//        Page curr = Parameters.getCoreManager().getWorkingPage();
+//        VisionManager.outputToFile(Parameters.getCurrPageImg(), path, curr.corners(), curr.config());
+//    }
+//
+//    // Called every time entering Edit Mode or Configuration Dictionary is changed
+//    public void getEditImageTransform() {
+//        Parameters.setCurrPageImg(VisionManager.imageGlobalTransforms(Parameters.getCurrPageImg(),
+//        		Parameters.getCoreManager().getWorkingPage().config()));
+//    }
+//
+//    // sets corners and config file for the initial guesses of an imported document
+//    private void initGuesses(Document d) throws IOException {
+//        for (Page p : d.pages()) {
+//            BufferedImage buff = ImageIO.read(new File(p.raw()));
+//            // guess and set corners and configuration values of Page
+//            p.setCorners(VisionManager.findCorners(buff));
+//            p.setConfig(VisionManager.estimateConfigurationValues(buff));
+//        }
+//    }
+//
+//    // called when user tries to place corner; tries to make a better point given the user's guess
+//    public Point snapCorner(Point pt) {
+//        return VisionManager.snapCorner(Parameters.getCurrPageImg(), pt);
+//    }
 
     // not the main method for the application,
     // just used for testing the core and integrating

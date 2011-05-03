@@ -139,7 +139,7 @@ public class App extends JFrame {
 		// Instantiate the main panel
 		MainPanel mainPanel = new MainPanel();
 		
-		//java.net.URL url = ClassLoader.getSystemResource("/Users/davidstorch/Desktop/glyphish-icons/icons/96-book.png");
+		// CamScan logo: won't work on all platforms
 		Image i = Toolkit.getDefaultToolkit().getImage(Parameters.LOGO);
 		this.setIconImage(i);
 		
@@ -212,6 +212,7 @@ public class App extends JFrame {
 				JOptionPane.showMessageDialog(app, e.getMessage(), "Import Error", JOptionPane.ERROR_MESSAGE);
 			}
 			
+			// TODO
 			//Parameters.updateGUI();
 		}
 	}
