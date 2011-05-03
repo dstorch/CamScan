@@ -36,6 +36,10 @@ public class ConfigurationValue {
 	}
 	
 	
+	public static String type2name(ValueType type){
+		
+	}
+	
 	public Object value(){
 		if (this.type == ValueType.ColorTemperature){
 			return (Object)new Integer(this._int);

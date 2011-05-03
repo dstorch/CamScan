@@ -25,10 +25,19 @@ public class ConfigurationDictionary {
 			for (Iterator i = config.elementIterator(key); i.hasNext();) {
 				Element element = (Element) i.next();
 				String value = element.attribute("value").getStringValue();
-				ConfigurationValue.ValueType currentType;
+				ConfigurationValue.ValueType currentType = elementNames.get(element.getName());
 				
-				//add it to me!
-				
+				try{
+					if (currentType == ConfigurationValue.ValueType.FlipHorizontal || currentType == ConfigurationValue.ValueType.FlipVertical || currentType == ConfigurationValue.ValueType.BilateralFilter || currentType == ConfigurationValue.ValueType.ContrastBoost){
+						this.setKey(ConfigurationValue.type2name(currentType), new ConfigurationValue(currentType, value.equals("true")? true:false));
+					}else if (currentType == ConfigurationValue.ValueType.ColorTemperature){
+						this.setKey("temperature", new ConfigurationValue(currentType, Integer.parseInt(value)));
+					}else{
+						System.err.println("Not sure how to process a type!");
+					}
+				}catch(InvalidTypingException e){
+					System.err.println("Couldn't create configuration value for element valued: " + value + " (type " + element.getName() + ").");
+				}
 			}
 		}
 	}
