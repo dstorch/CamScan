@@ -12,6 +12,7 @@ public class PageText {
 
 	public PageText() {
 		_positions = new LinkedList<Position>();
+		_fullText = "";
 	}
 	
 	public PageText(String fullText) {

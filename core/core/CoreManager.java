@@ -2,6 +2,8 @@ package core;
 
 import java.io.*;
 import java.util.*;
+
+import ocr.OCRThread;
 import ocr.ocrManager;
 import org.dom4j.*;
 import org.dom4j.io.*;
@@ -156,7 +158,6 @@ public class CoreManager {
 	public void deleteDocument(Document d) throws IOException {
 		d.delete();
 		_allDocuments.remove(d);
-		System.out.println(_allDocuments.contains(d));
 		d = null;
 		
 		// make sure that all references to the document are
@@ -167,15 +168,16 @@ public class CoreManager {
 			System.out.println(_workingDocument.name());
 		}
 		
-	
-		
-		System.out.println(d);
 		writeStartupFile();
 	}
 	
 	// Called after an import in order to establish a new
 	// document object, if the user imports an entire folder
 	public Document createDocumentFromFolder(File sourceLocation) throws IOException {
+		
+		if (sourceLocation.isFile()) {
+			return createDocumentFromFile(sourceLocation);
+		}
 		
 		// put this document in workspace/docs by default
 		String name = sourceLocation.getName();
@@ -184,7 +186,7 @@ public class CoreManager {
 		if (!dirFile.mkdir()) throw new IOException("Import aborted: problem making new document directory!");
 		String pathname = directory + "/" + "doc.xml";
 		Document newDoc = new Document(name, pathname);
-	
+		
 		File targetLocation = new File(Parameters.RAW_DIRECTORY);
 		recursiveImageCopy(sourceLocation, targetLocation, newDoc);
 		
@@ -251,18 +253,20 @@ public class CoreManager {
 	            p.setRawFile(targetLocation.getPath());
 	            p.setProcessedFile(Parameters.PROCESSED_DIRECTORY+"/"+sourceLocation.getName());
 	            p.setMetafile(Parameters.DOC_DIRECTORY+"/"+d.name()+"/" + noExt+".xml");
-	            d.addPage(p);
+	            d.addPage(p); 
 	            
-	            // comment this to run OCR! (see below also)
-	            //p.setPageText(new PageText(""));
 	            
-	            // uncomment this to run OCR! (see above also)
-	            p.setOcrResults();
+	            // do OCR!
+	            launchOcrThread(p);
 	            
         	}
 
         }
-		
+	}
+	
+	private void launchOcrThread(Page page) {
+		OCRThread t = new OCRThread(page);
+		t.start();
 	}
 	
 	// called when the user imports a single photograph
@@ -283,6 +287,7 @@ public class CoreManager {
 		recursiveImageCopy(sourceLocation, targetLocation, newDoc);
 		
 		// add the document to the global list of documents
+		System.out.println(newDoc.name());
 		_allDocuments.add(newDoc);
 		
 		// write the XML for the new document to disk
@@ -293,8 +298,28 @@ public class CoreManager {
 	}
 	
 	// write a document out as a multipage pdf
-	public void exportToPdf(String docpath, String outfile) throws IOException {
-		_exporter.exportToPdf(docpath, outfile);
+	public void exportToPdf(String pathname, String outfile) throws IOException {
+		
+		// get the document based on name
+		Document doc = null;
+		for (Document d : _allDocuments) {
+			if (pathname.equals(d.pathname())) {
+				System.out.println(d.pathname());
+				doc = d;
+			}
+		}
+		
+		if (doc == null) throw new IOException("Problem exporting document!");
+		
+		// run OCR on each page---the bottleneck for pdf export!
+		for (Page p : doc.pages()) {
+			p.setOcrResults();
+		}
+		
+		// serialize the document, to commit the ocr results to disk
+		doc.serialize();
+		
+		_exporter.exportToPdf(pathname, outfile);
 	}
 	
 	// write a directory of image files
