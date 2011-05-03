@@ -9,6 +9,8 @@ import search.*;
 import vision.*;
 import export.*;
 import java.awt.image.BufferedImage;
+import java.awt.Point;
+import javax.imageio.ImageIO;
 
 @SuppressWarnings("rawtypes")
 public class CoreManager {
@@ -412,7 +414,25 @@ public class CoreManager {
 
     // writes the current process image to workspace/processed
     public void writeProcessedImage(){
-        
+        String[] s = Parameters.getWorkingPage().metafile().split("/");
+        String path = "workspace/processed/"+s[s.length-1]+".tiff";
+
+        _vision.writeTIFF(Parameters.getCurrPageImg(), path);
+    }
+
+    // sets corners and config file for the initial guesses of an imported document
+    public void initGuesses(Document d) throws IOException{
+        for (Page p : d.pages()){
+            BufferedImage buff = ImageIO.read(new File(p.raw()));
+            // guess and set corners and configuration values of Page
+            p.setCorners(_vision.findCorners(buff));
+            p.setConfig(_vision.estimateConfigurationValues(buff));
+        }
+    }
+
+    // called when user tries to place corner; tries to make a better point given the user's guess
+    public Point snapCorner(Point pt){
+        return _vision.snapCorner(Parameters.getCurrPageImg(), pt);
     }
 
 
