@@ -31,6 +31,8 @@ public class VisionManager {
 		try {
 			cd.setKey(new ConfigurationValue(ConfigurationValue.ValueType.ContrastBoost, false));
 			cd.setKey(new ConfigurationValue(ConfigurationValue.ValueType.BilateralFilter, false));
+			cd.setKey(new ConfigurationValue(ConfigurationValue.ValueType.FlipHorizontal, false));
+			cd.setKey(new ConfigurationValue(ConfigurationValue.ValueType.FlipVertical, false));
 		} catch (InvalidTypingException e) {
 			System.err.println("InvalidTypingException while setting up ConfigurationDictionary.");
 		}
@@ -97,6 +99,7 @@ public class VisionManager {
 		return img;
 	}
 	private static IplImage applyFlipCorrection(IplImage img, ConfigurationValue flip){
+		if (!(Boolean)flip.value()){return img;}
 		int flipmode = 0;
 		if (flip.type == ConfigurationValue.ValueType.FlipVertical){
 			flipmode = 1;
@@ -209,8 +212,9 @@ public class VisionManager {
 	
 	private static void writeImageToFile(BufferedImage img, String path) throws IOException{
 		//ImageIO is slow and clunky, switch to cvSave?
-		File output = new File(path);;
-		ImageIO.write(img, "png", output);
+		//File output = new File(path);;
+		//ImageIO.write(img, "png", output);
+		cvSaveImage(path, BufferedImageToIplImage(img));
 	}
 	
 	/*
