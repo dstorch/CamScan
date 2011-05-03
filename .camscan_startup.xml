@@ -2,5 +2,7 @@
 
 <STARTUP>
   <TESSERACT path="/usr/local/bin/tesseract"/>
-  <DOCLIST/>
+  <DOCLIST>
+    <DOC value="workspace/docs/mexican_war_tex/doc.xml"/>
+  </DOCLIST>
 </STARTUP>
