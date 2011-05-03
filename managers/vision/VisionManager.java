@@ -164,7 +164,7 @@ public class VisionManager {
 	
 	public static Corners findCorners(BufferedImage img){
 		//TODO
-		
+		System.out.println(img);
 		
 		//take the magnitude of the differential
 		
