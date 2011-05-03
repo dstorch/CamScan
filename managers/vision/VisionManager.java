@@ -18,6 +18,12 @@ import static com.googlecode.javacv.cpp.opencv_highgui.*;
 import static com.googlecode.javacv.cpp.opencv_calib3d.*;
 
 public class VisionManager {
+	
+	/*
+	 * Estimate good values for the configuration dictionary for a raw image.
+	 * Only call once on import.
+	 * ConfigurationDictionary specifies the transformations done by imageGlobalTransform.
+	 */
 	public static ConfigurationDictionary estimateConfigurationValues(BufferedImage img){
 		//TODO: color temp., flippedness, pick the right other defaults
 		ConfigurationDictionary cd = new ConfigurationDictionary();
@@ -25,6 +31,8 @@ public class VisionManager {
 		try {
 			cd.setKey(new ConfigurationValue(ConfigurationValue.ValueType.ContrastBoost, false));
 			cd.setKey(new ConfigurationValue(ConfigurationValue.ValueType.BilateralFilter, false));
+			cd.setKey(new ConfigurationValue(ConfigurationValue.ValueType.FlipHorizontal, false));
+			cd.setKey(new ConfigurationValue(ConfigurationValue.ValueType.FlipVertical, false));
 		} catch (InvalidTypingException e) {
 			System.err.println("InvalidTypingException while setting up ConfigurationDictionary.");
 		}
@@ -32,6 +40,9 @@ public class VisionManager {
 		return cd;
 	}
 	
+	/*
+	 * Given a user point in the raw image snap it to a close, but slightly more accurate point.
+	 */
 	public static Point snapCorner(BufferedImage img, Point point){
 		//TODO!
 		return point;
@@ -60,6 +71,11 @@ public class VisionManager {
 		
 		return new Corners(new Point(0,0), new Point(width,0), new Point(0,height), new Point(width,height));
 	}
+	
+	/*
+	 * Return the image after applying global transformations and the homography implicit in the four corners.
+	 * The result will be a flat, pretty page.
+	 */
 	public static BufferedImage rerenderImage(BufferedImage img, Corners corners, ConfigurationDictionary config){		
 		IplImage image = BufferedImageToIplImage(img);
 		image = _imageGlobalTransforms(image, config);
@@ -83,7 +99,12 @@ public class VisionManager {
 		return img;
 	}
 	private static IplImage applyFlipCorrection(IplImage img, ConfigurationValue flip){
-		//TODO!
+		if (!(Boolean)flip.value()){return img;}
+		int flipmode = 0;
+		if (flip.type == ConfigurationValue.ValueType.FlipVertical){
+			flipmode = 1;
+		}
+		cvFlip(img, img, flipmode);
 		return img;
 	}
 	private static IplImage applyContrastBoost(IplImage img, ConfigurationValue boost){
@@ -111,8 +132,7 @@ public class VisionManager {
 		
 		cvCvtColor(hsl, img, CV_HLS2RGB);
 		
-		//cvMerge(gray, gray, gray, null, img);
-		
+		//alternate algorithm balancing each channel seperately. leads to weird chroma artifacts.
 		/*IplImage ch1 = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
 		IplImage ch2 = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
 		IplImage ch3 = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
@@ -158,10 +178,18 @@ public class VisionManager {
 		return img;
 	}
 	
+	/*
+	 * Apply global transformations to an image as specified by the ConfigurationDictionary.
+	 * This image is the one which should be shown in edit mode. It does not need to be applied before
+	 * calling rerenderImage (as rerender does it interally.)
+	 */
 	public static BufferedImage imageGlobalTransforms(BufferedImage img, ConfigurationDictionary config){
 		return IplImageToBufferedImage( _imageGlobalTransforms(BufferedImageToIplImage(img), config) );
 	}
 	
+	/*
+	 * Return the best estimate of the four corners of a piece of paper in the image.
+	 */
 	public static Corners findCorners(BufferedImage img){
 		//TODO
 		
@@ -181,16 +209,24 @@ public class VisionManager {
 		return new Corners(new Point(0,0), new Point(img.getWidth(),0), new Point(0,img.getHeight()), new Point(img.getWidth(),img.getHeight()));
 	}
 	
+	
 	private static void writeImageToFile(BufferedImage img, String path) throws IOException{
 		//ImageIO is slow and clunky, switch to cvSave?
-		File output = new File(path);;
-		ImageIO.write(img, "png", output);
+		//File output = new File(path);;
+		//ImageIO.write(img, "png", output);
+		cvSaveImage(path, BufferedImageToIplImage(img));
 	}
 	
+	/*
+	 * Write an image out to a path as a TIFF
+	 */
 	public static void writeTIFF(BufferedImage img, String path){
 		cvSaveImage(path, BufferedImageToIplImage(img));
 	}
 	
+	/*
+	 * Write a rendered image out to a path. Like calling rerenderImage, but instead of returning it writes the image to a file.
+	 */
 	public static void outputToFile(BufferedImage img, String path, Corners points, ConfigurationDictionary config) throws IOException{
 		writeImageToFile(rerenderImage(img, points, config), path);
 	}
@@ -236,28 +272,45 @@ public class VisionManager {
 		System.out.println("Loaded");
         if (image != null) {
         	
-        	/*
-        	IplImage gray = cvCreateImage(cvSize(image.width(), image.height()), IPL_DEPTH_8U, 1);
-        	cvCvtColor(image, gray, CV_RGB2GRAY);
-        	IplImage edges = cvCreateImage(cvSize(image.width(), image.height()), IPL_DEPTH_32F, 1);
+        	int nw = 0;
+        	int nh = 0;
+        	if (image.width() > image.height()){
+        		nw = 640;
+        		nh = (int) ((image.height()*1.0/image.width())*nw);
+        	}else{
+        		nh = 640;
+        		nw = (int) ((image.width()*1.0/image.height())*nh);
+        	}
+        	
+        	IplImage bgray = cvCreateImage(cvSize(image.width(), image.height()), IPL_DEPTH_8U, 1);
+        	cvCvtColor(image, bgray, CV_RGB2GRAY);
+        	cvSmooth(bgray, bgray, CV_GAUSSIAN, 5);
+        	
+        	IplImage gray = cvCreateImage(cvSize(nw, nh), IPL_DEPTH_8U, 1);
+        	cvResize(bgray, gray);
+        	
+        	IplImage edges = cvCreateImage(cvSize(nw, nh), IPL_DEPTH_32F, 1);
         	
         	//cvSmooth(gray, gray, CV_GAUSSIAN, 3);
             //cvCanny(gray, edges, 100, 3, 5);
         	//cvLaplace(gray, edges, 3);
-        	cvCornerHarris(gray, edges, 10, 3, 0.04); // (int) (Math.max(image.width(), image.height())*0.10)
+        	cvCornerMinEigenVal(gray, edges, 80, 3); // (int) (Math.max(image.width(), image.height())*0.10)
         	
-        	CvMat harris_response = cvCreateMat(edges);
-        	System.out.println(edges.get(5,5));
+        	//cvShowImage("egdes", edges);
+        	//cvWaitKey();
         	
-        	IplImage output = cvCreateImage(cvSize(image.width(), image.height()), IPL_DEPTH_8U, 1);
+        	//CvMat harris_response = cvGetMat(edges);
+        	//System.out.println(edges.get(5,5));
+        	
+        	IplImage output = cvCreateImage(cvSize(nw, nh), IPL_DEPTH_8U, 1);
         	cvConvertScale(edges, output, 1, 0);
         	
             cvSaveImage("output.png", output);
-            */
+            
         	
         	
-        	Corners corners = new Corners(new Point(961, 531), new Point(2338, 182), new Point(1411, 2393), new Point(2874, 1986));        	
-        	outputToFile(IplImageToBufferedImage(image), "output.png", corners, estimateConfigurationValues(IplImageToBufferedImage(image)));
+        	//Corners corners = new Corners(new Point(961, 531), new Point(2338, 182), new Point(1411, 2393), new Point(2874, 1986));        	
+        	//outputToFile(IplImageToBufferedImage(image), "output.png", corners, estimateConfigurationValues(IplImageToBufferedImage(image)));
         	
         }else{
         	System.out.println("Error loading image");
