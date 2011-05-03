@@ -12,7 +12,9 @@ public class ConfigurationDictionary {
 	public ConfigurationDictionary(){
 		this.map = new HashMap<String, ConfigurationValue>();
 	}
-	public ConfigurationDictionary(Element config){		
+	public ConfigurationDictionary(Element config){
+		this.map = new HashMap<String, ConfigurationValue>();
+		
 		HashMap<String, ConfigurationValue.ValueType> elementNames = new HashMap<String, ConfigurationValue.ValueType>();
 		elementNames.put("COLORTEMP", ConfigurationValue.ValueType.ColorTemperature);
 		elementNames.put("CONTRASTBOOST", ConfigurationValue.ValueType.ContrastBoost);
