@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <STARTUP>
+<<<<<<< HEAD
+=======
   <TESSERACT path="/usr/local/bin/tesseract"/>
+  <WORKINGDOC value="workspace/docs/sample2/doc.xml"/>
   <DOCLIST>
-    <DOC value="workspace/docs/1col-300/doc.xml"/>
   </DOCLIST>
+>>>>>>> 32a0abe07106e4522306ac333ecc1f31407df65b
 </STARTUP>

@@ -211,6 +211,8 @@ public class App extends JFrame {
 			} catch (IOException e) {
 				JOptionPane.showMessageDialog(app, e.getMessage(), "Import Error", JOptionPane.ERROR_MESSAGE);
 			}
+			
+			//Parameters.updateGUI();
 		}
 	}
 	

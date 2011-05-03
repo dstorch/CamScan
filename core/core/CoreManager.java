@@ -20,9 +20,11 @@ public class CoreManager {
 
     private Exporter _exporter;
     private Searcher _searcher;
-    private Document _workingDocument;
     private XMLReader _xmlReader;
     private List<Document> _allDocuments;
+    
+    private Document _workingDocument;
+    private Page _workingPage;
 
     public CoreManager() throws DocumentException, IOException {
         _xmlReader = new XMLReader();
@@ -37,59 +39,60 @@ public class CoreManager {
     }
 
     // called from the constructor when the application launches
-    public void startup() throws FileNotFoundException, DocumentException {
-        SAXReader reader = new SAXReader();
-        org.dom4j.Document document = reader.read(new FileReader(Parameters.STARTUP_FILE));
-        Element root = document.getRootElement();
+	public void startup() throws FileNotFoundException, DocumentException {
+		SAXReader reader = new SAXReader();
+		org.dom4j.Document document = reader.read(new FileReader(Parameters.STARTUP_FILE));
+		Element root = document.getRootElement();
+		
+		// keep track of whether something went wrong, and throw a warning
+		// if necessary
+		boolean throwWarning = false;
+		
+		for (Iterator i = root.elementIterator("WORKINGDOC"); i.hasNext();) {
+			Element workingdoc = (Element) i.next();
+			String workingStr = workingdoc.attribute("value").getStringValue();
+			setWorkingDocumentFromName(workingStr);
+		}
+		
+		for (Iterator i = root.elementIterator("WORKINGPAGE"); i.hasNext();) {
+			Element workingPage = (Element) i.next();
+			String workingStr = workingPage.attribute("value").getStringValue();
+			String order = workingPage.attribute("order").getStringValue();
+			setWorkingPage(workingStr, Integer.parseInt(order));
+		}
+		
+		for (Iterator i = root.elementIterator("TESSERACT"); i.hasNext();) {
+			Element tesseractEl = (Element) i.next();
+			String tessPath = tesseractEl.attribute("path").getStringValue();
+			ocrManager.TESS_PATH = tessPath;
+		}
+		
+		
+		for (Iterator i = root.elementIterator("DOCLIST"); i.hasNext();) {
+			Element docList = (Element) i.next();
+			for (Iterator j = docList.elementIterator("DOC"); j.hasNext();) {
+				Element singleDoc = (Element) j.next();
+				String docStr = singleDoc.attribute("value").getStringValue();
+				
+				// get the new document by parsing XML
+				Document newDoc = _xmlReader.parseDocument(docStr);
+				
+				if (newDoc != null) {
+					_allDocuments.add(newDoc);
+				} else {
+					throwWarning = true;
+				}
+			}
+		}
+		
+		// if a problem has occurred, throw a file not found exception
+		// so that the GUI can display a warning message
+		if (throwWarning) {
+			JOptionPane.showMessageDialog(Parameters.getFrame(), "Some of your files could not be located!",
+					"Startup Warning", JOptionPane.WARNING_MESSAGE);
+		}
 
-        // keep track of whether something went wrong, and throw a warning
-        // if necessary
-        boolean throwWarning = false;
-
-        for (Iterator i = root.elementIterator("WORKINGDOC"); i.hasNext();) {
-            Element workingdoc = (Element) i.next();
-            String workingStr = workingdoc.attribute("value").getStringValue();
-            setWorkingDocumentFromName(workingStr);
-        }
-
-        for (Iterator i = root.elementIterator("WORKINGPAGE"); i.hasNext();) {
-            Element workingPage = (Element) i.next();
-            String workingStr = workingPage.attribute("value").getStringValue();
-            setWorkingPage(workingStr);
-        }
-
-        for (Iterator i = root.elementIterator("TESSERACT"); i.hasNext();) {
-            Element tesseractEl = (Element) i.next();
-            String tessPath = tesseractEl.attribute("path").getStringValue();
-            ocrManager.TESS_PATH = tessPath;
-        }
-
-
-        for (Iterator i = root.elementIterator("DOCLIST"); i.hasNext();) {
-            Element docList = (Element) i.next();
-            for (Iterator j = docList.elementIterator("DOC"); j.hasNext();) {
-                Element singleDoc = (Element) j.next();
-                String docStr = singleDoc.attribute("value").getStringValue();
-
-                // get the new document by parsing XML
-                Document newDoc = _xmlReader.parseDocument(docStr);
-
-                if (newDoc != null) {
-                    _allDocuments.add(newDoc);
-                } else {
-                    throwWarning = true;
-                }
-            }
-        }
-
-        // if a problem has occurred, throw a file not found exception
-        // so that the GUI can display a warning message
-        if (throwWarning) {
-            JOptionPane.showMessageDialog(Parameters.getFrame(), "Some of your files could not be located!",
-                    "Startup Warning", JOptionPane.WARNING_MESSAGE);
-        }
-
-    }
+	}
 
     public Document workingDocument() {
         return _workingDocument;
@@ -101,95 +104,103 @@ public class CoreManager {
     }
 
     // writes the startup file to disk based on the list of all documents
-    public void writeStartupFile() throws IOException {
-        OutputFormat pretty = OutputFormat.createPrettyPrint();
-        XMLWriter filewriter = new XMLWriter(new FileWriter(Parameters.STARTUP_FILE), pretty);
-
-        try {
-            org.dom4j.Document xmlDoc = DocumentHelper.createDocument();
-            Element root = DocumentHelper.createElement("STARTUP");
-            xmlDoc.setRootElement(root);
-
-            // tesseract pathname
-            Element tesseract = DocumentHelper.createElement("TESSERACT");
-            tesseract.addAttribute("path", ocrManager.TESS_PATH);
-            root.add(tesseract);
-
-            if (_workingDocument != null) {
-                Element workingdoc = DocumentHelper.createElement("WORKINGDOC");
-                workingdoc.addAttribute("value", _workingDocument.pathname());
-                root.add(workingdoc);
-            }
-
-
-            Element docList = DocumentHelper.createElement("DOCLIST");
-            root.add(docList);
-
-            for (Document doc : _allDocuments) {
-                Element docEl = DocumentHelper.createElement("DOC");
-                docEl.addAttribute("value", doc.pathname());
-                docList.add(docEl);
-            }
-
-            filewriter.write(xmlDoc);
-        } finally {
-            filewriter.close();
-        }
-    }
-
-    public void setWorkingPage(String path) {
-        // TODO: implement this method!
-    }
-
-    // when a working document is "closed" it is serialized
-    // to the disk
-    public void closeWorkingDocument() throws IOException {
-        if (_workingDocument != null) {
-            _workingDocument.serialize();
-        }
-    }
-
-    public void renameDocument(String docName, String newName) throws IOException {
-        for (Document d : _allDocuments) {
-            if (docName.equals(d.name())) {
-                renameDocument(d, newName);
-            }
-        }
-    }
-
-    public void renameDocument(Document d, String newName) throws IOException {
-        d.rename(newName);
-        d.serialize();
-        writeStartupFile();
-    }
-
-    public void deleteDocument(String docName) throws IOException {
-        Document toDelete = null;
-        for (Document d : _allDocuments) {
-            if (docName.equals(d.name())) {
-                toDelete = d;
-            }
-        }
-
-        deleteDocument(toDelete);
-    }
-
-    public void deleteDocument(Document d) throws IOException {
-        d.delete();
-        _allDocuments.remove(d);
-        d = null;
-
-        // make sure that all references to the document are
-        // deleted (so that it gets garbage collected, and will
-        // not get serialized)
-        if (_workingDocument != null) {
-            if (_workingDocument.equals(d)) {
-                _workingDocument = null;
-            }
-        }
-
-        writeStartupFile();
-    }
+	public void writeStartupFile() throws IOException {
+		OutputFormat pretty = OutputFormat.createPrettyPrint();
+		XMLWriter filewriter = new XMLWriter(new FileWriter(Parameters.STARTUP_FILE), pretty);
+		
+		try {
+			org.dom4j.Document xmlDoc = DocumentHelper.createDocument();
+			Element root = DocumentHelper.createElement("STARTUP");
+			xmlDoc.setRootElement(root);
+			
+			// tesseract pathname
+			Element tesseract = DocumentHelper.createElement("TESSERACT");
+			tesseract.addAttribute("path", ocrManager.TESS_PATH);
+			root.add(tesseract);
+			
+			if (_workingDocument != null) {
+				Element workingdoc = DocumentHelper.createElement("WORKINGDOC");
+				workingdoc.addAttribute("value", _workingDocument.pathname());
+				root.add(workingdoc);
+			}
+			
+			if (_workingPage != null) {
+				Element workingdoc = DocumentHelper.createElement("WORKINGPAGE");
+				workingdoc.addAttribute("value", _workingPage.metafile());
+				workingdoc.addAttribute("order", new Integer(_workingPage.order()).toString());
+				root.add(workingdoc);
+			}
+			
+			Element docList = DocumentHelper.createElement("DOCLIST");
+			root.add(docList);
+			
+			for (Document doc : _allDocuments) {
+				Element docEl = DocumentHelper.createElement("DOC");
+				docEl.addAttribute("value", doc.pathname());
+				docList.add(docEl);
+			}
+			
+			filewriter.write(xmlDoc);
+		} finally {
+			filewriter.close();
+		}
+	}
+	
+	public void setWorkingPage(String path, int order) throws FileNotFoundException, DocumentException {
+		_workingPage = _xmlReader.parsePage(path, order, _workingDocument);
+	}
+	
+	public void setWorkingPage(Page page) {
+		_workingPage = page;
+	}
+	
+	// when a working document is "closed" it is serialized
+	// to the disk
+	public void closeWorkingDocument() throws IOException {
+		if (_workingDocument != null) {
+			_workingDocument.serialize();
+		}
+	}
+	
+	public void renameDocument(String docName, String newName) throws IOException {
+		for (Document d : _allDocuments) {
+			if (docName.equals(d.name())) {
+				renameDocument(d, newName);
+			}
+		}
+	}
+	
+	public void renameDocument(Document d, String newName) throws IOException {
+		d.rename(newName);
+		d.serialize();
+		writeStartupFile();
+	}
+	
+	public void deleteDocument(String docName) throws IOException {
+		Document toDelete = null;
+		for (Document d : _allDocuments) {
+			if (docName.equals(d.name())) {
+				toDelete = d;
+			}
+		}
+		
+		deleteDocument(toDelete);
+	}
+	
+	public void deleteDocument(Document d) throws IOException {
+		d.delete();
+		_allDocuments.remove(d);
+		d = null;
+		
+		// make sure that all references to the document are
+		// deleted (so that it gets garbage collected, and will
+		// not get serialized)
+		if (_workingDocument != null) {
+			if (_workingDocument.equals(d)) _workingDocument = null;
+		}
+		
+		writeStartupFile();
+	}
 
     // Merges two inputted documents (appends pages of d2 to end of d1)
     public void mergeDocuments(Document d1, Document d2) throws IOException {
@@ -231,35 +242,35 @@ public class CoreManager {
     }
 
     // Called after an import in order to establish a new
-    // document object, if the user imports an entire folder
-    public Document createDocumentFromFolder(File sourceLocation) throws IOException {
-
-        if (sourceLocation.isFile()) {
-            return createDocumentFromFile(sourceLocation);
-        }
-
-        // put this document in workspace/docs by default
-        String name = sourceLocation.getName();
-        String directory = Parameters.DOC_DIRECTORY + "/" + name;
-        File dirFile = new File(directory);
-        if (!dirFile.mkdir()) {
-            throw new IOException("Import aborted: problem making new document directory!");
-        }
-        String pathname = directory + "/" + "doc.xml";
-        Document newDoc = new Document(name, pathname);
-
-        File targetLocation = new File(Parameters.RAW_DIRECTORY);
-        importPages(sourceLocation, targetLocation, newDoc, 1);
-
-        // add the new document to the list of documents
-        _allDocuments.add(newDoc);
-
-        // update data for the new document on the disk
-        newDoc.serialize();
-        writeStartupFile();
-        return newDoc;
-    }
-
+	// document object, if the user imports an entire folder
+	public Document createDocumentFromFolder(File sourceLocation) throws IOException {
+		
+		if (sourceLocation.isFile()) {
+			return createDocumentFromFile(sourceLocation);
+		}
+		
+		// put this document in workspace/docs by default
+		String name = sourceLocation.getName();
+		String directory = Parameters.DOC_DIRECTORY + "/" + name;
+		File dirFile = new File(directory);
+		if (!dirFile.mkdir()) throw new IOException("Import aborted: problem making new document directory!");
+		String pathname = directory + "/" + "doc.xml";
+		Document newDoc = new Document(name, pathname);
+		
+		File targetLocation = new File(Parameters.RAW_DIRECTORY);
+		importPages(sourceLocation, targetLocation, newDoc, 1);
+		
+		// add the new document to the list of documents
+		_allDocuments.add(newDoc);
+		
+		_workingDocument = newDoc;
+		
+		// update data for the new document on the disk
+		newDoc.serialize();
+		writeStartupFile();
+		return newDoc;
+	}
+	
     // recursively copies all image files to the workspace/
      private void importPages(File sourceLocation, File targetLocation, Document d, int order)
 
@@ -363,6 +374,8 @@ public class CoreManager {
 
         // add the document to the global list of documents
         _allDocuments.add(newDoc);
+        
+    	_workingDocument = newDoc;
 
         // write the XML for the new document to disk
         newDoc.serialize();
@@ -460,15 +473,23 @@ public class CoreManager {
 
     // called when changing from edit mode to view mode
     // uses changes made in edit mode and rerenders the image
-    public void rerenderImage() {
-        Page curr = Parameters.getWorkingPage();
-        BufferedImage newImage = VisionManager.rerenderImage(Parameters.getCurrPageImg(), curr.corners(), curr.config());
-        Parameters.setCurrPageImg(newImage);
+    public void updateWorkingImage() {
+        Page curr = Parameters.getCoreManager().getWorkingPage();
+        if (curr != null) {
+        	BufferedImage newImage = VisionManager.rerenderImage(Parameters.getCurrPageImg(), curr.corners(), curr.config());
+        	Parameters.setCurrPageImg(newImage);
+        }
     }
 
+
+    public Page getWorkingPage() {
+		return _workingPage;
+	}
+
+	// called when user tries to place corner; tries to make a better point given the user's guess
     // writes the current process image to workspace/processed (as Tiff file)
     public void writeProcessedTiff() {
-        String[] s = Parameters.getWorkingPage().metafile().split("/");
+        String[] s = Parameters.getCoreManager().getWorkingPage().metafile().split("/");
         String path = "workspace/processed/" + s[s.length - 1] + ".tiff";
 
         VisionManager.writeTIFF(Parameters.getCurrPageImg(), path);
@@ -476,16 +497,17 @@ public class CoreManager {
 
     // writes the current process image to workspace/processed (as PNG file)?
     public void writeProcessedFile() throws IOException {
-        String[] s = Parameters.getWorkingPage().metafile().split("/");
+        String[] s = Parameters.getCoreManager().getWorkingPage().metafile().split("/");
         String path = "workspace/processed/" + s[s.length - 1] + ".png";
 
-        Page curr = Parameters.getWorkingPage();
+        Page curr = Parameters.getCoreManager().getWorkingPage();
         VisionManager.outputToFile(Parameters.getCurrPageImg(), path, curr.corners(), curr.config());
     }
 
     // Called every time entering Edit Mode or Configuration Dictionary is changed
     public void getEditImageTransform() {
-        Parameters.setCurrPageImg(VisionManager.imageGlobalTransforms(Parameters.getCurrPageImg(), Parameters.getWorkingPage().config()));
+        Parameters.setCurrPageImg(VisionManager.imageGlobalTransforms(Parameters.getCurrPageImg(),
+        		Parameters.getCoreManager().getWorkingPage().config()));
     }
 
     // sets corners and config file for the initial guesses of an imported document

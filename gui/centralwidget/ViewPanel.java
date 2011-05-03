@@ -72,7 +72,7 @@ public class ViewPanel extends JPanel implements MouseWheelListener {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
-		//Parameters.getCoreManager().rerenderImage();
+		Parameters.getCoreManager().updateWorkingImage();
 		
 		if (this.img != Parameters.getCurrPageImg()) {
 			this.scaleFactor = 1;

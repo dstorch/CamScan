@@ -128,7 +128,7 @@ public class EditPanel extends JPanel implements MouseMotionListener {
 	 */
 	public void updateCornersOnPanel() {
 		
-		Corners corners = Parameters.getWorkingPage().corners();
+		Corners corners = Parameters.getCoreManager().getWorkingPage().corners();
 		
 		this.moveCornerTo(cornerUL, corners.upleft().getX(), corners.upleft().getY());
 		this.moveCornerTo(cornerUR, corners.upright().getX(), corners.upright().getY());
@@ -235,22 +235,22 @@ public class EditPanel extends JPanel implements MouseMotionListener {
 			this.moveCornerTo(cornerUL, arg0.getX() - this.cornerUL.getWidth()/2, arg0.getY() - this.cornerUL.getHeight()/2);
 			this.moveLine(this.lineDLUL, this.cornerDL, this.cornerUL);
 			this.moveLine(this.lineULUR, this.cornerUL, this.cornerUR);
-			Parameters.getWorkingPage().corners().setUpLeft(p);
+			Parameters.getCoreManager().getWorkingPage().corners().setUpLeft(p);
 		} else if (this.isWithinCornerEllipse(this.cornerUR, arg0.getX(), arg0.getY())) {
 			this.moveCornerTo(cornerUR, arg0.getX() - this.cornerUR.getWidth()/2, arg0.getY() - this.cornerUR.getHeight()/2);
 			this.moveLine(this.lineULUR, this.cornerUL, this.cornerUR);
 			this.moveLine(this.lineURDR, this.cornerUR, this.cornerDR);
-			Parameters.getWorkingPage().corners().setUpRight(p);
+			Parameters.getCoreManager().getWorkingPage().corners().setUpRight(p);
 		} else if (this.isWithinCornerEllipse(this.cornerDL, arg0.getX(), arg0.getY())) {
 			this.moveCornerTo(cornerDL, arg0.getX() - this.cornerDL.getWidth()/2, arg0.getY() - this.cornerDL.getHeight()/2);
 			this.moveLine(this.lineDLUL, this.cornerDL, this.cornerUL);
 			this.moveLine(this.lineDRDL, this.cornerDR, this.cornerDL);
-			Parameters.getWorkingPage().corners().setDownLeft(p);
+			Parameters.getCoreManager().getWorkingPage().corners().setDownLeft(p);
 		} else if (this.isWithinCornerEllipse(this.cornerDR, arg0.getX(), arg0.getY())) {
 			this.moveCornerTo(cornerDR, arg0.getX() - this.cornerDR.getWidth()/2, arg0.getY() - this.cornerDR.getHeight()/2);
 			this.moveLine(this.lineDRDL, this.cornerDR, this.cornerDL);
 			this.moveLine(this.lineURDR, this.cornerUR, this.cornerDR);
-			Parameters.getWorkingPage().corners().setDownRight(p);
+			Parameters.getCoreManager().getWorkingPage().corners().setDownRight(p);
 		}
 
 		this.repaint();
