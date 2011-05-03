@@ -37,6 +37,10 @@ public class ToolbarPanel extends JPanel {
 	 * The mode button group.
 	 */
 	private ButtonGroup modeButtonGroup;
+
+        private JButton zoomInButton;
+
+        private JButton zoomOutButton;
 	
 	/****************************************
 	 * 
@@ -63,13 +67,21 @@ public class ToolbarPanel extends JPanel {
 		c.gridx = 1;
 		JButton nextButton = new JButton("Next");
 		this.add(nextButton, c);
-		
+
+                c.gridx = 2;
+		zoomInButton = new JButton("Zoom In");
+		this.add(zoomInButton, c);
+
+		c.gridx = 3;
+		zoomOutButton = new JButton("Zoom Out");
+		this.add(zoomOutButton, c);
+
 		// Setup the mode listener for the radio buttons
 		// for switching between the view and edit modes.
 		ModeListener modeListener = new ModeListener();
 		
 		// Setup the view mode radio button.
-		c.gridx = 2;
+		c.gridx = 4;
 		c.insets = new Insets(0,250,0,0);
 		JRadioButton viewRButton = new JRadioButton("View Mode");
 		viewRButton.setActionCommand("VIEW");
@@ -78,7 +90,7 @@ public class ToolbarPanel extends JPanel {
 		this.add(viewRButton, c);
 		
 		// Setup the edit mode radio button.
-		c.gridx = 3;
+		c.gridx = 5;
 		c.insets = new Insets(0,0,0,0);
 		JRadioButton editRButton = new JRadioButton("Edit Mode");
 		editRButton.setActionCommand("EDIT");
@@ -104,6 +116,17 @@ public class ToolbarPanel extends JPanel {
 	public void unselectModeButtons() {
 		//this.modeButtonGroup.clearSelection();
 	}
+
+        public void showZoomButtons(){
+            zoomInButton.setVisible(true);
+            zoomOutButton.setVisible(true);
+        }
+
+        public void hideZoomButtons(){
+             zoomInButton.setVisible(false);
+             zoomOutButton.setVisible(false);
+            
+        }
 	
 	/****************************************
 	 * 
