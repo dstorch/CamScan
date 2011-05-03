@@ -70,7 +70,7 @@ public class ConfigurationDictionary {
 			
 			Element e;
 			if (elementNames.containsKey(currentValue.type)){
-				e = DocumentHelper.createElement( elementNames.get(key) );
+				e = DocumentHelper.createElement( elementNames.get(currentValue.type) );
 			}else{
 				e = DocumentHelper.createElement(key);
 				System.err.println("Not sure how to serialize a Config/"+key + " element!");

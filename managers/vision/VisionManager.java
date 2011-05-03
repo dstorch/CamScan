@@ -272,28 +272,45 @@ public class VisionManager {
 		System.out.println("Loaded");
         if (image != null) {
         	
-        	/*
-        	IplImage gray = cvCreateImage(cvSize(image.width(), image.height()), IPL_DEPTH_8U, 1);
-        	cvCvtColor(image, gray, CV_RGB2GRAY);
-        	IplImage edges = cvCreateImage(cvSize(image.width(), image.height()), IPL_DEPTH_32F, 1);
+        	int nw = 0;
+        	int nh = 0;
+        	if (image.width() > image.height()){
+        		nw = 640;
+        		nh = (int) ((image.height()*1.0/image.width())*nw);
+        	}else{
+        		nh = 640;
+        		nw = (int) ((image.width()*1.0/image.height())*nh);
+        	}
+        	
+        	IplImage bgray = cvCreateImage(cvSize(image.width(), image.height()), IPL_DEPTH_8U, 1);
+        	cvCvtColor(image, bgray, CV_RGB2GRAY);
+        	cvSmooth(bgray, bgray, CV_GAUSSIAN, 5);
+        	
+        	IplImage gray = cvCreateImage(cvSize(nw, nh), IPL_DEPTH_8U, 1);
+        	cvResize(bgray, gray);
+        	
+        	IplImage edges = cvCreateImage(cvSize(nw, nh), IPL_DEPTH_32F, 1);
         	
         	//cvSmooth(gray, gray, CV_GAUSSIAN, 3);
             //cvCanny(gray, edges, 100, 3, 5);
         	//cvLaplace(gray, edges, 3);
-        	cvCornerHarris(gray, edges, 10, 3, 0.04); // (int) (Math.max(image.width(), image.height())*0.10)
+        	cvCornerMinEigenVal(gray, edges, 80, 3); // (int) (Math.max(image.width(), image.height())*0.10)
         	
-        	CvMat harris_response = cvCreateMat(edges);
-        	System.out.println(edges.get(5,5));
+        	//cvShowImage("egdes", edges);
+        	//cvWaitKey();
         	
-        	IplImage output = cvCreateImage(cvSize(image.width(), image.height()), IPL_DEPTH_8U, 1);
+        	//CvMat harris_response = cvGetMat(edges);
+        	//System.out.println(edges.get(5,5));
+        	
+        	IplImage output = cvCreateImage(cvSize(nw, nh), IPL_DEPTH_8U, 1);
         	cvConvertScale(edges, output, 1, 0);
         	
             cvSaveImage("output.png", output);
-            */
+            
         	
         	
-        	Corners corners = new Corners(new Point(961, 531), new Point(2338, 182), new Point(1411, 2393), new Point(2874, 1986));        	
-        	outputToFile(IplImageToBufferedImage(image), "output.png", corners, estimateConfigurationValues(IplImageToBufferedImage(image)));
+        	//Corners corners = new Corners(new Point(961, 531), new Point(2338, 182), new Point(1411, 2393), new Point(2874, 1986));        	
+        	//outputToFile(IplImageToBufferedImage(image), "output.png", corners, estimateConfigurationValues(IplImageToBufferedImage(image)));
         	
         }else{
         	System.out.println("Error loading image");
