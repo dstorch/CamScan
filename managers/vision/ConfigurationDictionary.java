@@ -12,7 +12,9 @@ public class ConfigurationDictionary {
 	public ConfigurationDictionary(){
 		this.map = new HashMap<String, ConfigurationValue>();
 	}
-	public ConfigurationDictionary(Element config){		
+	public ConfigurationDictionary(Element config){
+		this.map = new HashMap<String, ConfigurationValue>();
+		
 		HashMap<String, ConfigurationValue.ValueType> elementNames = new HashMap<String, ConfigurationValue.ValueType>();
 		elementNames.put("COLORTEMP", ConfigurationValue.ValueType.ColorTemperature);
 		elementNames.put("CONTRASTBOOST", ConfigurationValue.ValueType.ContrastBoost);
@@ -25,18 +27,27 @@ public class ConfigurationDictionary {
 			for (Iterator i = config.elementIterator(key); i.hasNext();) {
 				Element element = (Element) i.next();
 				String value = element.attribute("value").getStringValue();
-				ConfigurationValue.ValueType currentType;
+				ConfigurationValue.ValueType currentType = elementNames.get(element.getName());
 				
-				//add it to me!
-				
+				try{
+					if (currentType == ConfigurationValue.ValueType.FlipHorizontal || currentType == ConfigurationValue.ValueType.FlipVertical || currentType == ConfigurationValue.ValueType.BilateralFilter || currentType == ConfigurationValue.ValueType.ContrastBoost){
+						this.setKey(new ConfigurationValue(currentType, value.equals("true")? true:false));
+					}else if (currentType == ConfigurationValue.ValueType.ColorTemperature){
+						this.setKey(new ConfigurationValue(currentType, Integer.parseInt(value)));
+					}else{
+						System.err.println("Not sure how to process a type!");
+					}
+				}catch(InvalidTypingException e){
+					System.err.println("Couldn't create configuration value for element valued: " + value + " (type " + element.getName() + ").");
+				}
 			}
 		}
 	}
 	public ConfigurationValue getKey(String key){
 		return this.map.get(key);
 	}
-	public void setKey(String key, ConfigurationValue value){
-		this.map.put(key, value);
+	public void setKey(ConfigurationValue value){
+		this.map.put(ConfigurationValue.type2name(value.type), value);
 	}
 	public Set getAllKeys(){
 		return this.map.keySet();

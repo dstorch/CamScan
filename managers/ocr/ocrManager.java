@@ -17,30 +17,31 @@ public class ocrManager {
 	
 	// pathnames used for tesseract temp file and config file
 	private final static String CONFIG_FILE = "libraries/tesseract/config.txt";
-	private final static String OUT_PATH = "libraries/tesseract/temp/out";
+	private final static String OUT_PATH = "workspace/temp";
 	
 	
 	/**
 	 * 
 	 * @param imageFile
 	 * @return
-            */
-	public static PageText getPageText(String imageFile) throws IOException{
-		
+	 * @throws IOException 
+	 * @throws DocumentException 
+	 */
+	public static PageText getPageText(String imageFile, String outname) throws IOException{
 		
 		// delete the outfile if it exists
-		File outFile = new File(OUT_PATH+".html");
+		File outFile = new File(OUT_PATH+"/"+outname+".html");
 		if (outFile.exists()) outFile.delete();
 		
 		// run tesseract
-		String arguments = TESS_PATH+" "+imageFile+" "+OUT_PATH + " " + CONFIG_FILE;
+		String arguments = TESS_PATH+" "+imageFile+" "+OUT_PATH+"/"+outname+" " + CONFIG_FILE;
 		Runtime.getRuntime().exec(arguments);
 		
 		// block until the file is created
 		while (!outFile.canRead()) {System.err.println();}
 
 		// now run python script for extracting data
-		String command = "python "+EXTRACTBB_PATH+" "+OUT_PATH + ".html";
+		String command = "python "+EXTRACTBB_PATH+" "+OUT_PATH+"/"+outname+".html";
 		Process process = Runtime.getRuntime().exec(command);
 		
 		// use a reader to read text from the standard output stream of the processs
@@ -64,13 +65,19 @@ public class ocrManager {
 				
 				// add the position to the PageText object
 				Position position = new Position(min, max, fields[0]);
-				pt.addPosition(position);
+				
+				synchronized (pt) {
+					pt.addPosition(position);
+				}
 			}
 			
 		}
 		
-		// set the full text attribute of the PageText
-		pt.setFullText(fullText.trim());
+		// set the full text attribute of the PageText,
+		// making sure that it is thread safe
+		synchronized (pt) {
+			pt.setFullText(fullText.trim());
+		}
 		
 		return pt;
 	}
@@ -86,8 +93,8 @@ public class ocrManager {
 	public static void main(String[] args) throws IOException{
                 System.out.println("Starting Test...");
 
-		PageText pt = ocrManager.getPageText("../tests/1col-300.tiff");
-
+		PageText pt = ocrManager.getPageText("../sample_page.tiff", "sample_page");
+		
 		System.out.println(pt.fullText());
 
 		for (Position p : pt.positions()) {

@@ -2,6 +2,8 @@ package core;
 
 import java.io.*;
 import java.util.*;
+
+import ocr.OCRThread;
 import ocr.ocrManager;
 import org.dom4j.*;
 import org.dom4j.io.*;
@@ -158,7 +160,6 @@ public class CoreManager {
     public void deleteDocument(Document d) throws IOException {
         d.delete();
         _allDocuments.remove(d);
-        System.out.println(_allDocuments.contains(d));
         d = null;
 
         // make sure that all references to the document are
@@ -168,12 +169,8 @@ public class CoreManager {
             if (_workingDocument.equals(d)) {
                 _workingDocument = null;
             }
-            System.out.println(_workingDocument.name());
         }
 
-
-
-        System.out.println(d);
         writeStartupFile();
     }
 
@@ -185,7 +182,7 @@ public class CoreManager {
         // path of files in d1; need this to update paths for pages in d2
         String path = "";
         for (int i = 0; i < fields.length - 1; i++) {
-            path += fields[i]+"/";
+            path += fields[i] + "/";
         }
 
         // update metadata file path of pages in d2
@@ -193,12 +190,14 @@ public class CoreManager {
             // extract name of file and append to path of document 1 to get new path
             String[] s = p.metafile().split("/");
             String newMetaPath = path + "/" + s[s.length - 1];
-            
+
             File oldFile = new File(p.metafile());
             File newFile = new File(newMetaPath);
-            
+
             boolean success = oldFile.renameTo(newFile);
-            if(!success) System.err.println(oldFile + " not moved to "+ newFile);
+            if (!success) {
+                System.err.println(oldFile + " not moved to " + newFile);
+            }
 
             // delete directory of second Document
             d2.delete();
@@ -218,6 +217,10 @@ public class CoreManager {
     // document object, if the user imports an entire folder
     public Document createDocumentFromFolder(File sourceLocation) throws IOException {
 
+        if (sourceLocation.isFile()) {
+            return createDocumentFromFile(sourceLocation);
+        }
+
         // put this document in workspace/docs by default
         String name = sourceLocation.getName();
         String directory = Parameters.DOC_DIRECTORY + "/" + name;
@@ -229,7 +232,7 @@ public class CoreManager {
         Document newDoc = new Document(name, pathname);
 
         File targetLocation = new File(Parameters.RAW_DIRECTORY);
-        recursiveImageCopy(sourceLocation, targetLocation, newDoc);
+        recursiveImageCopy(sourceLocation, targetLocation, newDoc, 1);
 
         // add the new document to the list of documents
         _allDocuments.add(newDoc);
@@ -241,7 +244,8 @@ public class CoreManager {
     }
 
     // recursively copies all image files to the workspace/
-    private void recursiveImageCopy(File sourceLocation, File targetLocation, Document d) throws IOException {
+    private void recursiveImageCopy(File sourceLocation, File targetLocation, Document d, int order)
+            throws IOException {
 
         if (sourceLocation.isDirectory()) {
 
@@ -252,9 +256,11 @@ public class CoreManager {
             String[] children = sourceLocation.list();
             for (int i = 0; i < children.length; i++) {
                 recursiveImageCopy(new File(sourceLocation, children[i]),
-                        new File(targetLocation, children[i]), d);
+                        new File(targetLocation, children[i]), d, ++order);
             }
         } else {
+
+
 
             // get the file extension
             String filename = sourceLocation.getName();
@@ -296,16 +302,18 @@ public class CoreManager {
                 p.setMetafile(Parameters.DOC_DIRECTORY + "/" + d.name() + "/" + noExt + ".xml");
                 d.addPage(p);
 
-                // comment this to run OCR! (see below also)
-                //p.setPageText(new PageText(""));
 
-                // uncomment this to run OCR! (see above also)
-                p.setOcrResults();
+                // do OCR!
+                launchOcrThread(p);
 
             }
 
         }
+    }
 
+    private void launchOcrThread(Page page) {
+        OCRThread t = new OCRThread(page);
+        t.start();
     }
 
     // called when the user imports a single photograph
@@ -325,7 +333,7 @@ public class CoreManager {
         Document newDoc = new Document(noExt, pathname);
 
         File targetLocation = new File(Parameters.RAW_DIRECTORY + "/" + sourceLocation.getName());
-        recursiveImageCopy(sourceLocation, targetLocation, newDoc);
+        recursiveImageCopy(sourceLocation, targetLocation, newDoc, 1);
 
         // add the document to the global list of documents
         _allDocuments.add(newDoc);
@@ -338,8 +346,29 @@ public class CoreManager {
     }
 
     // write a document out as a multipage pdf
-    public void exportToPdf(String docpath, String outfile) throws IOException {
-        _exporter.exportToPdf(docpath, outfile);
+    public void exportToPdf(String pathname, String outfile) throws IOException {
+
+        // get the document based on name
+        Document doc = null;
+        for (Document d : _allDocuments) {
+            if (pathname.equals(d.pathname())) {
+                doc = d;
+            }
+        }
+
+        if (doc == null) {
+            throw new IOException("Problem exporting document!");
+        }
+
+        // run OCR on each page---the bottleneck for pdf export!
+        for (Page p : doc.pages()) {
+            p.setOcrResults();
+        }
+
+        // serialize the document, to commit the ocr results to disk
+        doc.serialize();
+
+        _exporter.exportToPdf(pathname, outfile);
     }
 
     // write a directory of image files
@@ -403,26 +432,25 @@ public class CoreManager {
         return null;
     }
 
-
     // called when changing from edit mode to view mode
     // uses changes made in edit mode and rerenders the image
-    public void rerenderImage(){
+    public void rerenderImage() {
         Page curr = Parameters.getWorkingPage();
         BufferedImage newImage = _vision.rerenderImage(Parameters.getCurrPageImg(), curr.corners(), curr.config());
         Parameters.setCurrPageImg(newImage);
     }
 
     // writes the current process image to workspace/processed
-    public void writeProcessedImage(){
+    public void writeProcessedImage() {
         String[] s = Parameters.getWorkingPage().metafile().split("/");
-        String path = "workspace/processed/"+s[s.length-1]+".tiff";
+        String path = "workspace/processed/" + s[s.length - 1] + ".tiff";
 
         _vision.writeTIFF(Parameters.getCurrPageImg(), path);
     }
 
     // sets corners and config file for the initial guesses of an imported document
-    public void initGuesses(Document d) throws IOException{
-        for (Page p : d.pages()){
+    public void initGuesses(Document d) throws IOException {
+        for (Page p : d.pages()) {
             BufferedImage buff = ImageIO.read(new File(p.raw()));
             // guess and set corners and configuration values of Page
             p.setCorners(_vision.findCorners(buff));
@@ -431,29 +459,25 @@ public class CoreManager {
     }
 
     // called when user tries to place corner; tries to make a better point given the user's guess
-    public Point snapCorner(Point pt){
+    public Point snapCorner(Point pt) {
         return _vision.snapCorner(Parameters.getCurrPageImg(), pt);
     }
-
 
     // not the main method for the application,
     // just used for testing the core and integrating
     // components independent of the GUI
     public static void main(String[] args) throws DocumentException, IOException {
         CoreManager core = new CoreManager();
-        Document d1 = core.createDocumentFromFile(new File("../tests/1col-300.tiff"));
-        Document d2 = core.createDocumentFromFile(new File("../tests/2col-300.tiff"));
-
-        core.mergeDocuments(d1, d2);
-
+        //core.createDocumentFromFile(new File("tests/xml/testDocument/hamlet_1.tiff"));
+        core.createDocumentFromFile(new File("../sample2.tiff"));
         //core.setWorkingDocumentFromName("sample_page");
-        //core.exportToPdf("workspace/docs/sample2/doc.xml", "../foo.pdf");
+        core.exportToPdf("workspace/docs/sample2/doc.xml", "../foo.pdf");
         //core.exportText(core.workingDocument(), "../document.txt");
         //core.exportImages(core.workingDocument(), "../copiedDoc");
         //core.search("political situation");
         //core.renameDocument("sample2", "sample_page_2");
         //core.deleteDocument("sample_page_2");
-        //core.closeWorkingDocument();
-        //core.shutdown();
+        core.closeWorkingDocument();
+        core.shutdown();
     }
 }

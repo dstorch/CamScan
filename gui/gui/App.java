@@ -263,7 +263,7 @@ public class App extends JFrame {
 	 */
 	private class ExportTextListener implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
-	File folder = getUserDirectory();
+			File folder = getUserDirectory();
 			
 			Document workingDocument = Parameters.getCoreManager().workingDocument();
 			String outpath = folder.getPath() + "/" + workingDocument.name() + ".txt";
