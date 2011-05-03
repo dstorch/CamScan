@@ -81,6 +81,9 @@ public class CoreManager {
 			}
 		}
 		
+		// if a problem has occurred, throw a file not found exception
+		// so that the GUI can display a warning message
+		if (throwWarning) throw new FileNotFoundException("Some of your files could not be located!");
 
 	}
 	

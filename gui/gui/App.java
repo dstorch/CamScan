@@ -138,7 +138,7 @@ public class App extends JFrame {
 		try {
 			mainPanel = new MainPanel();
 		} catch (FileNotFoundException e) {
-			JOptionPane.showMessageDialog(app, "Some of your documents could not be located.",
+			JOptionPane.showMessageDialog(app, e.getMessage(),
 					"Startup Warning", JOptionPane.WARNING_MESSAGE);
 		}
 
