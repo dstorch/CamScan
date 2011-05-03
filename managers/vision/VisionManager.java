@@ -97,7 +97,11 @@ public class VisionManager {
 		return img;
 	}
 	private static IplImage applyFlipCorrection(IplImage img, ConfigurationValue flip){
-		//TODO!
+		int flipmode = 0;
+		if (flip.type == ConfigurationValue.ValueType.FlipVertical){
+			flipmode = 1;
+		}
+		cvFlip(img, img, flipmode);
 		return img;
 	}
 	private static IplImage applyContrastBoost(IplImage img, ConfigurationValue boost){
@@ -125,8 +129,7 @@ public class VisionManager {
 		
 		cvCvtColor(hsl, img, CV_HLS2RGB);
 		
-		//cvMerge(gray, gray, gray, null, img);
-		
+		//alternate algorithm balancing each channel seperately. leads to weird chroma artifacts.
 		/*IplImage ch1 = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
 		IplImage ch2 = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
 		IplImage ch3 = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
