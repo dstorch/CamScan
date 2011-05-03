@@ -37,7 +37,7 @@ public class ocrManager {
 		Runtime.getRuntime().exec(arguments);
 		
 		// block until the file is created
-		while (!outFile.canRead()) {}
+		while (!outFile.canRead()) {System.err.println();}
 
 		// now run python script for extracting data
 		String command = "python "+EXTRACTBB_PATH+" "+OUT_PATH + ".html";
@@ -84,8 +84,9 @@ public class ocrManager {
 	 */
 
 	public static void main(String[] args) throws IOException{
+                System.out.println("Starting Test...");
 
-		PageText pt = ocrManager.getPageText("../sample_page.tiff");
+		PageText pt = ocrManager.getPageText("../tests/1col-300.tiff");
 
 		System.out.println(pt.fullText());
 

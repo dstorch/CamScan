@@ -8,6 +8,7 @@ import org.dom4j.io.*;
 import search.*;
 import vision.*;
 import export.*;
+import java.awt.image.BufferedImage;
 
 @SuppressWarnings("rawtypes")
 public class CoreManager {
@@ -174,19 +175,15 @@ public class CoreManager {
         writeStartupFile();
     }
 
-    /**
-     * Merges two inputted documents (appends pages of d2 to end of d1)
-     * @param d1 Document that is being dragged onto
-     * @param d2 Document that is being dragged
-     */
-    public void mergeDocuments(Document d1, Document d2) {
+    // Merges two inputted documents (appends pages of d2 to end of d1)
+    public void mergeDocuments(Document d1, Document d2) throws IOException {
 
         String[] fields = d1.pathname().split("/");
 
         // path of files in d1; need this to update paths for pages in d2
         String path = "";
         for (int i = 0; i < fields.length - 1; i++) {
-            path += "/" + fields[i];
+            path += fields[i]+"/";
         }
 
         // update metadata file path of pages in d2
@@ -201,11 +198,17 @@ public class CoreManager {
             boolean success = oldFile.renameTo(newFile);
             if(!success) System.err.println(oldFile + " not moved to "+ newFile);
 
+            // delete directory of second Document
+            d2.delete();
+
             p.setMetafile(newMetaPath);
         }
 
         // update list of Pages in d1
         d1.pages().addAll(d2.pages());
+
+        // remove second Document from global list
+        _allDocuments.remove(d2);
 
     }
 
@@ -398,11 +401,25 @@ public class CoreManager {
         return null;
     }
 
+
+    // called when changing from edit mode to view mode
+    // uses changes made in edit mode and rerenders the image
+    public void rerenderImage(){
+        Page curr = Parameters.getWorkingPage();
+        BufferedImage newImage = _vision.rerenderImage(Parameters.getCurrPageImg(), curr.corners(), curr.config());
+        Parameters.setCurrPageImg(newImage);
+    }
+
+    // writes the current process image to workspace/processed
+    public void writeProcessedImage(){
+        
+    }
+
+
     // not the main method for the application,
     // just used for testing the core and integrating
     // components independent of the GUI
     public static void main(String[] args) throws DocumentException, IOException {
-        System.out.println("IN MAIN");
         CoreManager core = new CoreManager();
         Document d1 = core.createDocumentFromFile(new File("../tests/1col-300.tiff"));
         Document d2 = core.createDocumentFromFile(new File("../tests/2col-300.tiff"));

@@ -166,6 +166,14 @@ public class Parameters {
 			e.printStackTrace();
 		}
 	}
+
+        /**
+         * 
+         * @param img
+         */
+        public static void setCurrPageImg(BufferedImage img){
+            currPageImg = img;
+        }
 	
 	/**
 	 * Sets the search results from the latest search.
