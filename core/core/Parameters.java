@@ -95,10 +95,10 @@ public class Parameters {
 	 */
 	private static SearchResults searchResults;
 	
-	/**
-	 * The working page.
-	 */
-	private static Page workingPage;
+//	/**
+//	 * The working page.
+//	 */
+//	private static Page workingPage;
 	
 	/****************************************
 	 * 
@@ -142,14 +142,14 @@ public class Parameters {
 		return searchResults;
 	}
 	
-	/**
-	 * Returns the working page.
-	 * 
-	 * @return The working page
-	 */
-	public static Page getWorkingPage() {
-		return workingPage;
-	}
+//	/**
+//	 * Returns the working page.
+//	 * 
+//	 * @return The working page
+//	 */
+//	public static Page getWorkingPage() {
+//		return coreManager.getWorkingPage();
+//	}
 	
 	/****************************************
 	 * 
@@ -211,14 +211,14 @@ public class Parameters {
 		searchResults = sr;
 	}
 	
-	/**
-	 * Sets the working page.
-	 * 
-	 * @param p The working page to set
-	 */
-	public static void setWorkingPage(Page p) {
-		workingPage = p;
-	}
+//	/**
+//	 * Sets the working page.
+//	 * 
+//workingPage	 * @param p The working page to set
+//	 */
+//	public static void setWorkingPage(Page p) {
+//		 = p;
+//	}
 	
 	/****************************************
 	 * 

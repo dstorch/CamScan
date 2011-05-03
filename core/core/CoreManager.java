@@ -19,9 +19,11 @@ public class CoreManager {
 
     private Exporter _exporter;
     private Searcher _searcher;
-    private Document _workingDocument;
     private XMLReader _xmlReader;
     private List<Document> _allDocuments;
+    
+    private Document _workingDocument;
+    private Page _workingPage;
 
     public CoreManager() throws DocumentException, IOException {
         _xmlReader = new XMLReader();
@@ -54,7 +56,8 @@ public class CoreManager {
 		for (Iterator i = root.elementIterator("WORKINGPAGE"); i.hasNext();) {
 			Element workingPage = (Element) i.next();
 			String workingStr = workingPage.attribute("value").getStringValue();
-			setWorkingPage(workingStr);
+			String order = workingPage.attribute("order").getStringValue();
+			setWorkingPage(workingStr, Integer.parseInt(order));
 		}
 		
 		for (Iterator i = root.elementIterator("TESSERACT"); i.hasNext();) {
@@ -120,6 +123,12 @@ public class CoreManager {
 				root.add(workingdoc);
 			}
 			
+			if (_workingPage != null) {
+				Element workingdoc = DocumentHelper.createElement("WORKINGPAGE");
+				workingdoc.addAttribute("value", _workingPage.metafile());
+				workingdoc.addAttribute("order", new Integer(_workingPage.order()).toString());
+				root.add(workingdoc);
+			}
 			
 			Element docList = DocumentHelper.createElement("DOCLIST");
 			root.add(docList);
@@ -136,8 +145,12 @@ public class CoreManager {
 		}
 	}
 	
-	public void setWorkingPage(String path) {
-		// TODO: implement this method!
+	public void setWorkingPage(String path, int order) throws FileNotFoundException, DocumentException {
+		_workingPage = _xmlReader.parsePage(path, order, _workingDocument);
+	}
+	
+	public void setWorkingPage(Page page) {
+		_workingPage = page;
 	}
 	
 	// when a working document is "closed" it is serialized
@@ -249,6 +262,8 @@ public class CoreManager {
 		// add the new document to the list of documents
 		_allDocuments.add(newDoc);
 		
+		_workingDocument = newDoc;
+		
 		// update data for the new document on the disk
 		newDoc.serialize();
 		writeStartupFile();
@@ -352,6 +367,8 @@ public class CoreManager {
 
         // add the document to the global list of documents
         _allDocuments.add(newDoc);
+        
+    	_workingDocument = newDoc;
 
         // write the XML for the new document to disk
         newDoc.serialize();
@@ -449,13 +466,19 @@ public class CoreManager {
 
     // called when changing from edit mode to view mode
     // uses changes made in edit mode and rerenders the image
-    public void rerenderImage() {
-        Page curr = Parameters.getWorkingPage();
-        BufferedImage newImage = VisionManager.rerenderImage(Parameters.getCurrPageImg(), curr.corners(), curr.config());
-        Parameters.setCurrPageImg(newImage);
+    public void updateWorkingImage() {
+        Page curr = Parameters.getCoreManager().getWorkingPage();
+        if (curr != null) {
+        	BufferedImage newImage = VisionManager.rerenderImage(Parameters.getCurrPageImg(), curr.corners(), curr.config());
+        	Parameters.setCurrPageImg(newImage);
+        }
     }
 
-    // called when user tries to place corner; tries to make a better point given the user's guess
+    public Page getWorkingPage() {
+		return _workingPage;
+	}
+
+	// called when user tries to place corner; tries to make a better point given the user's guess
     public Point snapCorner(Point pt) {
         return VisionManager.snapCorner(Parameters.getCurrPageImg(), pt);
     }

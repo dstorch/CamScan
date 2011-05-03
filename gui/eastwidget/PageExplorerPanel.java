@@ -132,9 +132,9 @@ public class PageExplorerPanel extends JPanel {
 		    if (e.getValueIsAdjusting() == false) {
 		    	
 		    	// Serialize the previous page
-		    	if (Parameters.getWorkingPage() != null) {
+		    	if (Parameters.getCoreManager().getWorkingPage() != null) {
 		    		try {
-						Parameters.getWorkingPage().serialize();
+						Parameters.getCoreManager().getWorkingPage().serialize();
 					} catch (IOException e1) {
 						e1.printStackTrace();
 					}
@@ -145,7 +145,7 @@ public class PageExplorerPanel extends JPanel {
 		        if (currPageName != null) {
 		        	Page currPage = Parameters.getCoreManager().getWorkingDocPageFromOrder(Integer.parseInt(currPageName));
 		        	Parameters.setCurrPageImg(currPage.raw());
-		        	Parameters.setWorkingPage(currPage);
+		        	Parameters.getCoreManager().setWorkingPage(currPage);
 		        	mainPanel.updateCentralPanels();
 		        }
 		    }

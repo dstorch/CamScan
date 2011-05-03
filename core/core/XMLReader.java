@@ -49,7 +49,7 @@ public class XMLReader {
 		return d;
 	}
 	
-	private Page parsePage(String path, int order, Document parent) throws FileNotFoundException, DocumentException {
+	public Page parsePage(String path, int order, Document parent) throws FileNotFoundException, DocumentException {
 		Page p = new Page(parent, order);
 		p.setMetafile(path);
 		

@@ -157,7 +157,7 @@ public class DocExplorerPanel extends JPanel {
 				// central panel.
 				Page currPage = Parameters.getCoreManager().workingDocument().pages().get(0);
 				Parameters.setCurrPageImg(currPage.raw());
-				Parameters.setWorkingPage(currPage);
+				Parameters.getCoreManager().setWorkingPage(currPage);
 				centralPanel.updatePanels();
 			}
 		}
