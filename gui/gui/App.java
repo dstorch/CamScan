@@ -1,6 +1,8 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -60,6 +62,7 @@ public class App extends JFrame {
 		super("CamScan");
 		this.setLayout(new BorderLayout());
 		this.app = this;
+		Parameters.setApp(this.app);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 		// Setup the menu bar
@@ -134,14 +137,12 @@ public class App extends JFrame {
 		this.setJMenuBar(menuBar);
 
 		// Instantiate the main panel
-		MainPanel mainPanel = null;
-		try {
-			mainPanel = new MainPanel();
-		} catch (FileNotFoundException e) {
-			JOptionPane.showMessageDialog(app, e.getMessage(),
-					"Startup Warning", JOptionPane.WARNING_MESSAGE);
-		}
-
+		MainPanel mainPanel = new MainPanel();
+		
+		//java.net.URL url = ClassLoader.getSystemResource("/Users/davidstorch/Desktop/glyphish-icons/icons/96-book.png");
+		Image i = Toolkit.getDefaultToolkit().getImage(Parameters.LOGO);
+		this.setIconImage(i);
+		
 		// Add the panel to the frame
 		this.add(mainPanel, BorderLayout.CENTER);
 		this.pack();

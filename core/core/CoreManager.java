@@ -12,14 +12,13 @@ import vision.*;
 import export.*;
 import java.awt.image.BufferedImage;
 import java.awt.Point;
-import javax.imageio.ImageIO;
+import javax.swing.JOptionPane;
 
 @SuppressWarnings("rawtypes")
 public class CoreManager {
 
     private Exporter _exporter;
     private Searcher _searcher;
-    private VisionManager _vision;
     private Document _workingDocument;
     private XMLReader _xmlReader;
     private List<Document> _allDocuments;
@@ -28,7 +27,6 @@ public class CoreManager {
         _xmlReader = new XMLReader();
         _exporter = Exporter.Factory.create();
         _searcher = Searcher.Factory.create();
-        _vision = new VisionManager();
         _allDocuments = new LinkedList<Document>();
         startup();
     }
@@ -85,7 +83,10 @@ public class CoreManager {
 		
 		// if a problem has occurred, throw a file not found exception
 		// so that the GUI can display a warning message
-		if (throwWarning) throw new FileNotFoundException("Some of your files could not be located!");
+		if (throwWarning) {
+			JOptionPane.showMessageDialog(Parameters.getFrame(), "Some of your files could not be located!",
+					"Startup Warning", JOptionPane.WARNING_MESSAGE);
+		}
 
 	}
 
@@ -243,7 +244,7 @@ public class CoreManager {
 		Document newDoc = new Document(name, pathname);
 		
 		File targetLocation = new File(Parameters.RAW_DIRECTORY);
-		recursiveImageCopy(sourceLocation, targetLocation, newDoc, 1);
+		importPages(sourceLocation, targetLocation, newDoc, 1);
 		
 		// add the new document to the list of documents
 		_allDocuments.add(newDoc);
@@ -256,7 +257,7 @@ public class CoreManager {
 	
 	
     // recursively copies all image files to the workspace/
-    private void recursiveImageCopy(File sourceLocation, File targetLocation, Document d, int order)
+    private void importPages(File sourceLocation, File targetLocation, Document d, int order)
             throws IOException {
 
         if (sourceLocation.isDirectory()) {
@@ -267,7 +268,7 @@ public class CoreManager {
 
             String[] children = sourceLocation.list();
             for (int i = 0; i < children.length; i++) {
-                recursiveImageCopy(new File(sourceLocation, children[i]),
+            	importPages(new File(sourceLocation, children[i]),
                         new File(targetLocation, children[i]), d, ++order);
             }
         } else {
@@ -306,12 +307,16 @@ public class CoreManager {
                 String noExt = imageFile.substring(0, imageFile.length() - 5);
 
                 // construct the page and add it to the document
-                Page p = new Page(d, -1);
+                Page p = new Page(d, order);
+                
+                // set pathname attributes of the page
                 p.setRawFile(targetLocation.getPath());
                 p.setProcessedFile(Parameters.PROCESSED_DIRECTORY + "/" + sourceLocation.getName());
                 p.setMetafile(Parameters.DOC_DIRECTORY + "/" + d.name() + "/" + noExt + ".xml");
+                
+                // guess initial configuration values
+                p.initGuesses();
                 d.addPage(p);
-
 
                 // do OCR!
                 launchOcrThread(p);
@@ -343,7 +348,7 @@ public class CoreManager {
         Document newDoc = new Document(noExt, pathname);
 
         File targetLocation = new File(Parameters.RAW_DIRECTORY + "/" + sourceLocation.getName());
-        recursiveImageCopy(sourceLocation, targetLocation, newDoc, 1);
+        importPages(sourceLocation, targetLocation, newDoc, 1);
 
         // add the document to the global list of documents
         _allDocuments.add(newDoc);
@@ -446,31 +451,13 @@ public class CoreManager {
     // uses changes made in edit mode and rerenders the image
     public void rerenderImage() {
         Page curr = Parameters.getWorkingPage();
-        BufferedImage newImage = _vision.rerenderImage(Parameters.getCurrPageImg(), curr.corners(), curr.config());
+        BufferedImage newImage = VisionManager.rerenderImage(Parameters.getCurrPageImg(), curr.corners(), curr.config());
         Parameters.setCurrPageImg(newImage);
-    }
-
-    // writes the current process image to workspace/processed
-    public void writeProcessedImage() {
-        String[] s = Parameters.getWorkingPage().metafile().split("/");
-        String path = "workspace/processed/" + s[s.length - 1] + ".tiff";
-
-        _vision.writeTIFF(Parameters.getCurrPageImg(), path);
-    }
-
-    // sets corners and config file for the initial guesses of an imported document
-    public void initGuesses(Document d) throws IOException {
-        for (Page p : d.pages()) {
-            BufferedImage buff = ImageIO.read(new File(p.raw()));
-            // guess and set corners and configuration values of Page
-            p.setCorners(_vision.findCorners(buff));
-            p.setConfig(_vision.estimateConfigurationValues(buff));
-        }
     }
 
     // called when user tries to place corner; tries to make a better point given the user's guess
     public Point snapCorner(Point pt) {
-        return _vision.snapCorner(Parameters.getCurrPageImg(), pt);
+        return VisionManager.snapCorner(Parameters.getCurrPageImg(), pt);
     }
 
     // not the main method for the application,

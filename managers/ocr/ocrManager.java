@@ -8,10 +8,8 @@ import core.Position;
 public class ocrManager {
 
 	// absolute path to the tesseract executable
-	public static String TESS_PATH = "/opt/local/bin/tesseract";
-        //public static String TESS_PATH = "tesseract";
+	public static String TESS_PATH = "/usr/local/bin/tesseract";
 
-	
 	// path to the python script for processing the tesseract output
 	private final static String EXTRACTBB_PATH = "managers/ocr/extractbb.py";
 	
@@ -38,7 +36,7 @@ public class ocrManager {
 		Runtime.getRuntime().exec(arguments);
 		
 		// block until the file is created
-		while (!outFile.canRead()) {System.err.println();}
+		while (!outFile.canRead()) {}
 
 		// now run python script for extracting data
 		String command = "python "+EXTRACTBB_PATH+" "+OUT_PATH+"/"+outname+".html";
@@ -66,6 +64,7 @@ public class ocrManager {
 				// add the position to the PageText object
 				Position position = new Position(min, max, fields[0]);
 				
+				// hold the mutex when the PageText object is updated
 				synchronized (pt) {
 					pt.addPosition(position);
 				}

@@ -1,7 +1,10 @@
 package core;
 
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
+
+import javax.imageio.ImageIO;
 
 import ocr.OCRThread;
 import ocr.ocrManager;
@@ -9,6 +12,7 @@ import org.dom4j.*;
 import org.dom4j.io.*;
 import search.*;
 import vision.ConfigurationDictionary;
+import vision.VisionManager;
 
 public class Page {
 	
@@ -88,6 +92,27 @@ public class Page {
 	public void setContainingDocument(Document parent) {
 		_parentDoc = parent;
 	}
+	
+    // sets corners and config file for the initial guesses of an imported document
+    public void initGuesses() throws IOException {
+    	
+    	// read a buffered image from the disk
+    	BufferedImage buff = ImageIO.read(new File(raw()));
+    	
+    	// guess and set corners and configuration values of Page
+    	setCorners(VisionManager.findCorners(buff));
+    	setConfig(VisionManager.estimateConfigurationValues(buff));
+    }
+    
+    // writes the current process image to workspace/processed
+    public void writeProcessedImage() throws IOException {
+  
+        // read a buffered image from the disk
+    	BufferedImage buff = ImageIO.read(new File(raw()));
+    	
+    	// write out image as a TIFF file
+        VisionManager.writeTIFF(buff, processed());
+    }
 	
 	public void setOcrResults() throws IOException {
 		String[] fields = metafile().split("/");
