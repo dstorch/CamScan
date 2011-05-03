@@ -8,7 +8,9 @@ import core.Position;
 public class ocrManager {
 
 	// absolute path to the tesseract executable
-	public static String TESS_PATH = "/usr/local/bin/tesseract";
+	public static String TESS_PATH = "/opt/local/bin/tesseract";
+        //public static String TESS_PATH = "tesseract";
+
 	
 	// path to the python script for processing the tesseract output
 	private final static String EXTRACTBB_PATH = "managers/ocr/extractbb.py";
@@ -36,7 +38,7 @@ public class ocrManager {
 		Runtime.getRuntime().exec(arguments);
 		
 		// block until the file is created
-		while (!outFile.canRead()) {}
+		while (!outFile.canRead()) {System.err.println();}
 
 		// now run python script for extracting data
 		String command = "python "+EXTRACTBB_PATH+" "+OUT_PATH+"/"+outname+".html";
@@ -87,7 +89,9 @@ public class ocrManager {
 	 * @param args
 	 * @throws IOException
 	 */
-	public static void main(String[] args) throws IOException {
+
+	public static void main(String[] args) throws IOException{
+                System.out.println("Starting Test...");
 
 		PageText pt = ocrManager.getPageText("../sample_page.tiff", "sample_page");
 		
