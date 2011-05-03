@@ -3,6 +3,7 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
@@ -57,8 +58,9 @@ public class MainPanel extends JPanel {
 		super();
 		this.setLayout(new BorderLayout());
 		
+		
 		Parameters.setCoreManager(new CoreManager());
-
+	
 		// Setup the central panel
 		this.centralPanel = new CentralPanel();
 		this.add(this.centralPanel, BorderLayout.CENTER);

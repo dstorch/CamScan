@@ -18,7 +18,6 @@ public class OCRThread extends Thread {
 	}
 	
 	public void run() {
-		System.out.println("running OCR thread");
 		try {
                     String[] oldPath = _page.raw().split("/");
                     String name = oldPath[oldPath.length-1];
@@ -44,11 +43,14 @@ public class OCRThread extends Thread {
                             in.close();
                             out.close();
                     }
-
+			System.out.println("writing processed image");
+			//_page.writeProcessedImage();
+			System.out.println("doing OCR");
 			_page.setOcrResults();
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 		}
+		System.out.println("OCR thread exiting");
 	}
 
 

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.swing.JFrame;
 
 import search.SearchResults;
 
@@ -52,12 +53,6 @@ public class Parameters {
 	public static final String DOC_DIRECTORY = "workspace/docs";
 	
 	/**
-	 * The regular expression used to find image files
-	 */
-	//public static final String IMAGE_REGEX = ".png$|.jpg$|.tiff$|.jpeg$";
-	public static final String IMAGE_REGEX = ".tiff$";
-	
-	/**
 	 * Max number of search hits to report in the working document
 	 */
 	public static final int RESULTS_INDOC = 4;
@@ -66,6 +61,13 @@ public class Parameters {
 	 * Max number of search hits to report in all other documents
 	 */
 	public static final int RESULTS_ELSEWHERE = 10;
+	
+	/**
+	 * Arrays defining file extension filters
+	 */
+	public static final String[] imgExtensions = {".jpeg", ".jpg", ".tiff", ".tif", ".png"};
+	public static final String[] txtExtensions = {".txt", ".text"};
+	public static final String[] pdfExtensions = {".pdf"};
 	
 	/****************************************
 	 * 
@@ -77,6 +79,11 @@ public class Parameters {
 	 * Reference to the global Core Manager instance.
 	 */
 	private static CoreManager coreManager;
+	
+	/**
+	 * Reference to the global JFrame
+	 */
+	private static JFrame app;
 	
 	/**
 	 * The current page as a buffered image.
@@ -106,6 +113,15 @@ public class Parameters {
 	 */
 	public static CoreManager getCoreManager() {
 		return coreManager;
+	}
+	
+	/**
+	 * Use for access to the outermost Frame of the GUI
+	 * 
+	 * @return the global app frame
+	 */
+	public static JFrame getFrame() {
+		return app;
 	}
 	
 	/**
@@ -153,6 +169,17 @@ public class Parameters {
 	}
 	
 	/**
+	 * Sets the global JFrame instance.
+	 * Should only be called once.
+	 * 
+	 * @param frame The JFrame instance to set
+	 */
+	public static void setApp(JFrame frame) {
+		if (app == null)
+			app = frame;
+	}
+	
+	/**
 	 * Given the path to the raw page image, it
 	 * sets the current page image as a buffered
 	 * image.
@@ -192,4 +219,12 @@ public class Parameters {
 	public static void setWorkingPage(Page p) {
 		workingPage = p;
 	}
+	
+	/****************************************
+	 * 
+	 * CamScan appearance
+	 * 
+	 ****************************************/
+	
+	public static final String LOGO = "libraries/icons/CamscanLogo.png";
 }
