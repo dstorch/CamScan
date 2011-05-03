@@ -186,6 +186,11 @@ public class VisionManager {
 		File output = new File(path);;
 		ImageIO.write(img, "png", output);
 	}
+	
+	public static void writeTIFF(BufferedImage img, String path){
+		cvSaveImage(path, BufferedImageToIplImage(img));
+	}
+	
 	public static void outputToFile(BufferedImage img, String path, Corners points, ConfigurationDictionary config) throws IOException{
 		writeImageToFile(rerenderImage(img, points, config), path);
 	}
