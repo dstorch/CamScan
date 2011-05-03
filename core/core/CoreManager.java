@@ -10,36 +10,40 @@ import org.dom4j.io.*;
 import search.*;
 import vision.*;
 import export.*;
+import java.awt.image.BufferedImage;
+import java.awt.Point;
+import javax.swing.JOptionPane;
 
 @SuppressWarnings("rawtypes")
 public class CoreManager {
 
-	private Exporter _exporter;
-	private Searcher _searcher;
-	private VisionManager _vision;
-	
-	private Document _workingDocument;
-	private XMLReader _xmlReader;
-	private List<Document> _allDocuments;
-	
-	public CoreManager() throws DocumentException, IOException {
-		_xmlReader = new XMLReader();
-		_exporter = Exporter.Factory.create();
-		_searcher = Searcher.Factory.create();
-		_vision = new VisionManager();
-		_allDocuments = new LinkedList<Document>();
-		startup();
-	}
-	
-	public List<Document> getDocuments() {
-		return _allDocuments;
-	}
-	
-	// called from the constructor when the application launches
+    private Exporter _exporter;
+    private Searcher _searcher;
+    private Document _workingDocument;
+    private XMLReader _xmlReader;
+    private List<Document> _allDocuments;
+
+    public CoreManager() throws DocumentException, IOException {
+        _xmlReader = new XMLReader();
+        _exporter = Exporter.Factory.create();
+        _searcher = Searcher.Factory.create();
+        _allDocuments = new LinkedList<Document>();
+        startup();
+    }
+
+    public List<Document> getDocuments() {
+        return _allDocuments;
+    }
+
+ // called from the constructor when the application launches
 	public void startup() throws FileNotFoundException, DocumentException {
 		SAXReader reader = new SAXReader();
 		org.dom4j.Document document = reader.read(new FileReader(Parameters.STARTUP_FILE));
 		Element root = document.getRootElement();
+		
+		// keep track of whether something went wrong, and throw a warning
+		// if necessary
+		boolean throwWarning = false;
 		
 		for (Iterator i = root.elementIterator("WORKINGDOC"); i.hasNext();) {
 			Element workingdoc = (Element) i.next();
@@ -65,23 +69,37 @@ public class CoreManager {
 			for (Iterator j = docList.elementIterator("DOC"); j.hasNext();) {
 				Element singleDoc = (Element) j.next();
 				String docStr = singleDoc.attribute("value").getStringValue();
-				_allDocuments.add(_xmlReader.parseDocument(docStr));
+				
+				// get the new document by parsing XML
+				Document newDoc = _xmlReader.parseDocument(docStr);
+				
+				if (newDoc != null) {
+					_allDocuments.add(newDoc);
+				} else {
+					throwWarning = true;
+				}
 			}
 		}
 		
+		// if a problem has occurred, throw a file not found exception
+		// so that the GUI can display a warning message
+		if (throwWarning) {
+			JOptionPane.showMessageDialog(Parameters.getFrame(), "Some of your files could not be located!",
+					"Startup Warning", JOptionPane.WARNING_MESSAGE);
+		}
 
 	}
-	
-	public Document workingDocument() {
-		return _workingDocument;
-	}
-	
-	// called before the application exits
-	public void shutdown() throws IOException {
-		writeStartupFile();
-	}
-	
-	// writes the startup file to disk based on the list of all documents
+
+    public Document workingDocument() {
+        return _workingDocument;
+    }
+
+    // called before the application exits
+    public void shutdown() throws IOException {
+        writeStartupFile();
+    }
+
+ // writes the startup file to disk based on the list of all documents
 	public void writeStartupFile() throws IOException {
 		OutputFormat pretty = OutputFormat.createPrettyPrint();
 		XMLWriter filewriter = new XMLWriter(new FileWriter(Parameters.STARTUP_FILE), pretty);
@@ -165,13 +183,51 @@ public class CoreManager {
 		// not get serialized)
 		if (_workingDocument != null) {
 			if (_workingDocument.equals(d)) _workingDocument = null;
-			System.out.println(_workingDocument.name());
 		}
 		
 		writeStartupFile();
 	}
 	
-	// Called after an import in order to establish a new
+    // Merges two inputted documents (appends pages of d2 to end of d1)
+    public void mergeDocuments(Document d1, Document d2) throws IOException {
+
+        String[] fields = d1.pathname().split("/");
+
+        // path of files in d1; need this to update paths for pages in d2
+        String path = "";
+        for (int i = 0; i < fields.length - 1; i++) {
+            path += fields[i] + "/";
+        }
+
+        // update metadata file path of pages in d2
+        for (Page p : d2.pages()) {
+            // extract name of file and append to path of document 1 to get new path
+            String[] s = p.metafile().split("/");
+            String newMetaPath = path + "/" + s[s.length - 1];
+
+            File oldFile = new File(p.metafile());
+            File newFile = new File(newMetaPath);
+
+            boolean success = oldFile.renameTo(newFile);
+            if (!success) {
+                System.err.println(oldFile + " not moved to " + newFile);
+            }
+
+            // delete directory of second Document
+            d2.delete();
+
+            p.setMetafile(newMetaPath);
+        }
+
+        // update list of Pages in d1
+        d1.pages().addAll(d2.pages());
+
+        // remove second Document from global list
+        _allDocuments.remove(d2);
+
+    }
+
+ // Called after an import in order to establish a new
 	// document object, if the user imports an entire folder
 	public Document createDocumentFromFolder(File sourceLocation) throws IOException {
 		
@@ -188,7 +244,7 @@ public class CoreManager {
 		Document newDoc = new Document(name, pathname);
 		
 		File targetLocation = new File(Parameters.RAW_DIRECTORY);
-		recursiveImageCopy(sourceLocation, targetLocation, newDoc);
+		importPages(sourceLocation, targetLocation, newDoc, 1);
 		
 		// add the new document to the list of documents
 		_allDocuments.add(newDoc);
@@ -199,206 +255,226 @@ public class CoreManager {
 		return newDoc;
 	}
 	
-	// recursively copies all image files to the workspace/
-	private void recursiveImageCopy(File sourceLocation, File targetLocation, Document d) throws IOException {
-		
-		if (sourceLocation.isDirectory()) {
+	
+    // recursively copies all image files to the workspace/
+    private void importPages(File sourceLocation, File targetLocation, Document d, int order)
+            throws IOException {
+
+        if (sourceLocation.isDirectory()) {
 
             if (!targetLocation.exists()) {
                 targetLocation.mkdir();
             }
 
             String[] children = sourceLocation.list();
-            for (int i=0; i<children.length; i++) {
-                recursiveImageCopy(new File(sourceLocation, children[i]),
-                        new File(targetLocation, children[i]), d);
+            for (int i = 0; i < children.length; i++) {
+            	importPages(new File(sourceLocation, children[i]),
+                        new File(targetLocation, children[i]), d, ++order);
             }
         } else {
-            
-        	// get the file extension
-        	String filename = sourceLocation.getName();
-        	String[] extensionArr = filename.split("[.]");
-        	String extension = "";
-        	if (extensionArr.length > 0) {
-        		extension = extensionArr[extensionArr.length-1];
-        	}
         	
-        	if (extension.equals("tiff")) {
-        		
-        		// copy the image into the workspace
-	            InputStream in = new FileInputStream(sourceLocation);
-	            try {
-	            	OutputStream out = new FileOutputStream(targetLocation);
-	            	try {
-			         
-			            // Copy the bits from instream to outstream
-			            byte[] buf = new byte[1024];
-			            int len;
-			            while ((len = in.read(buf)) > 0) {
-			                out.write(buf, 0, len);
-			            }
-	            	} finally {
-	            		out.close();
-	            	}
-	            } finally {
-	            	 in.close();
-	            }
-	           
-	            // get the image file name without a ".tiff" extension
-	            String imageFile = sourceLocation.getName();
-	            String noExt = imageFile.substring(0,imageFile.length()-5);
-	            
-	            // construct the page and add it to the document
-	            Page p = new Page(d, -1);
-	            p.setRawFile(targetLocation.getPath());
-	            p.setProcessedFile(Parameters.PROCESSED_DIRECTORY+"/"+sourceLocation.getName());
-	            p.setMetafile(Parameters.DOC_DIRECTORY+"/"+d.name()+"/" + noExt+".xml");
-	            d.addPage(p); 
-	            
-	            
-	            // do OCR!
-	            launchOcrThread(p);
-	            
-        	}
+            // get the file extension
+            String filename = sourceLocation.getName();
+            String[] extensionArr = filename.split("[.]");
+            String extension = "";
+            if (extensionArr.length > 0) {
+                extension = extensionArr[extensionArr.length - 1];
+            }
+
+            if (extension.equals("tiff")) {
+
+                // copy the image into the workspace
+                InputStream in = new FileInputStream(sourceLocation);
+                try {
+                    OutputStream out = new FileOutputStream(targetLocation);
+                    try {
+
+                        // Copy the bits from instream to outstream
+                        byte[] buf = new byte[1024];
+                        int len;
+                        while ((len = in.read(buf)) > 0) {
+                            out.write(buf, 0, len);
+                        }
+                    } finally {
+                        out.close();
+                    }
+                } finally {
+                    in.close();
+                }
+
+                // get the image file name without a ".tiff" extension
+                String imageFile = sourceLocation.getName();
+                String noExt = imageFile.substring(0, imageFile.length() - 5);
+
+                // construct the page and add it to the document
+                Page p = new Page(d, order);
+                
+                // set pathname attributes of the page
+                p.setRawFile(targetLocation.getPath());
+                p.setProcessedFile(Parameters.PROCESSED_DIRECTORY + "/" + sourceLocation.getName());
+                p.setMetafile(Parameters.DOC_DIRECTORY + "/" + d.name() + "/" + noExt + ".xml");
+                
+                // guess initial configuration values
+                p.initGuesses();
+                d.addPage(p);
+
+                // do OCR!
+                launchOcrThread(p);
+
+            }
 
         }
-	}
-	
-	private void launchOcrThread(Page page) {
-		OCRThread t = new OCRThread(page);
-		t.start();
-	}
-	
-	// called when the user imports a single photograph
-	// as a document
-	public Document createDocumentFromFile(File sourceLocation) throws IOException {
-		
-		// put this document in workspace/docs by default
+    }
+
+    private void launchOcrThread(Page page) {
+        OCRThread t = new OCRThread(page);
+        t.start();
+    }
+
+    // called when the user imports a single photograph
+    // as a document
+    public Document createDocumentFromFile(File sourceLocation) throws IOException {
+
+        // put this document in workspace/docs by default
         // get the image file name without a ".tiff" extension
         String imageFile = sourceLocation.getName();
-        String noExt = imageFile.substring(0,imageFile.length()-5);
-		String directory = Parameters.DOC_DIRECTORY + "/" + noExt;
-		File dirFile = new File(directory);
-		if (!dirFile.mkdir()) throw new IOException("Import aborted: problem making new document directory!");
-		String pathname = directory + "/" + "doc.xml";
-		Document newDoc = new Document(noExt, pathname);
-	
-		File targetLocation = new File(Parameters.RAW_DIRECTORY + "/" + sourceLocation.getName());
-		recursiveImageCopy(sourceLocation, targetLocation, newDoc);
-		
-		// add the document to the global list of documents
-		System.out.println(newDoc.name());
-		_allDocuments.add(newDoc);
-		
-		// write the XML for the new document to disk
-		newDoc.serialize();
-		writeStartupFile();
-		
-		return newDoc;
-	}
-	
-	// write a document out as a multipage pdf
-	public void exportToPdf(String pathname, String outfile) throws IOException {
-		
-		// get the document based on name
-		Document doc = null;
-		for (Document d : _allDocuments) {
-			if (pathname.equals(d.pathname())) {
-				System.out.println(d.pathname());
-				doc = d;
-			}
-		}
-		
-		if (doc == null) throw new IOException("Problem exporting document!");
-		
-		// run OCR on each page---the bottleneck for pdf export!
-		for (Page p : doc.pages()) {
-			p.setOcrResults();
-		}
-		
-		// serialize the document, to commit the ocr results to disk
-		doc.serialize();
-		
-		_exporter.exportToPdf(pathname, outfile);
-	}
-	
-	// write a directory of image files
-	public void exportImages(Document document, String outdirectory) throws IOException {
-		_exporter.exportImages(document, outdirectory);
-	}
-	
-	// write a text file containing the document text
-	public void exportText(Document document, String outfile) throws IOException {
-		_exporter.exportText(document, outfile);
-	}
-	
-	public SearchResults search(String query) {
-		SearchResults results = _searcher.getSearchResults(query, _workingDocument, _allDocuments);
-		
-		// REMOVE WHEN READY
-		System.out.println("In the working page: ");
-		for (SearchHit hit : results.inWorkingDoc()) {
-			System.out.println(hit.snippet()+" "+hit.score());
-		}
-		System.out.println("In all other pages: ");
-		for (SearchHit hit : results.elsewhere()) {
-			System.out.println(hit.snippet()+" "+hit.score());
-		}
-		
-		return results;
-	}
-	
-	/**
-	 * Given the name of a document, it sets its
-	 * instance of Document as the working
-	 * document.
-	 * 
-	 * @param docName The name of the document
-	 */
-	public void setWorkingDocumentFromName(String docName) {
-		
-		for (Document doc : _allDocuments) {
-			if (docName.equals(doc.name())) {
-				_workingDocument = doc;
-			}
-		}
-	}
-	
-	/**
-	 * Given an order, it returns the page of the given 
-	 * order from the working document.
-	 * 
-	 * @param order The order of the page to fetch
-	 * @return The page with the given order of the
-	 * working document.
-	 */
-	public Page getWorkingDocPageFromOrder(int order) {
-		
-		for (Page page : _workingDocument.pages()) {
-			if (order == page.order()) {
-				return page;
-			}
-		}
-		
-		return null;
-	}
-	
-	// not the main method for the application,
-	// just used for testing the core and integrating
-	// components independent of the GUI
-	public static void main(String[] args) throws DocumentException, IOException {
-		CoreManager core = new CoreManager();
-		//core.createDocumentFromFile(new File("tests/xml/testDocument/hamlet_1.tiff"));
-		core.createDocumentFromFile(new File("../sample2.tiff"));
-		//core.setWorkingDocumentFromName("sample_page");
-		core.exportToPdf("workspace/docs/sample2/doc.xml", "../foo.pdf");
-		//core.exportText(core.workingDocument(), "../document.txt");
-		//core.exportImages(core.workingDocument(), "../copiedDoc");
-		//core.search("political situation");
-		//core.renameDocument("sample2", "sample_page_2");
-		//core.deleteDocument("sample_page_2");
-		core.closeWorkingDocument();
-		core.shutdown();
-	}
-	
+        String noExt = imageFile.substring(0, imageFile.length() - 5);
+        String directory = Parameters.DOC_DIRECTORY + "/" + noExt;
+        File dirFile = new File(directory);
+        if (!dirFile.mkdir()) {
+            throw new IOException("Import aborted: problem making new document directory!");
+        }
+        String pathname = directory + "/" + "doc.xml";
+        Document newDoc = new Document(noExt, pathname);
+
+        File targetLocation = new File(Parameters.RAW_DIRECTORY + "/" + sourceLocation.getName());
+        importPages(sourceLocation, targetLocation, newDoc, 1);
+
+        // add the document to the global list of documents
+        _allDocuments.add(newDoc);
+
+        // write the XML for the new document to disk
+        newDoc.serialize();
+        writeStartupFile();
+
+        return newDoc;
+    }
+
+    // write a document out as a multipage pdf
+    public void exportToPdf(String pathname, String outfile) throws IOException {
+
+        // get the document based on name
+        Document doc = null;
+        for (Document d : _allDocuments) {
+            if (pathname.equals(d.pathname())) {
+                doc = d;
+            }
+        }
+
+        if (doc == null) {
+            throw new IOException("Problem exporting document!");
+        }
+
+        // run OCR on each page---the bottleneck for pdf export!
+        for (Page p : doc.pages()) {
+            p.setOcrResults();
+        }
+
+        // serialize the document, to commit the ocr results to disk
+        doc.serialize();
+
+        _exporter.exportToPdf(pathname, outfile);
+    }
+
+    // write a directory of image files
+    public void exportImages(Document document, String outdirectory) throws IOException {
+        _exporter.exportImages(document, outdirectory);
+    }
+
+    // write a text file containing the document text
+    public void exportText(Document document, String outfile) throws IOException {
+        _exporter.exportText(document, outfile);
+    }
+
+    public SearchResults search(String query) {
+        SearchResults results = _searcher.getSearchResults(query, _workingDocument, _allDocuments);
+
+        // REMOVE WHEN READY
+        System.out.println("In the working page: ");
+        for (SearchHit hit : results.inWorkingDoc()) {
+            System.out.println(hit.snippet() + " " + hit.score());
+        }
+        System.out.println("In all other pages: ");
+        for (SearchHit hit : results.elsewhere()) {
+            System.out.println(hit.snippet() + " " + hit.score());
+        }
+
+        return results;
+    }
+
+    /**
+     * Given the name of a document, it sets its
+     * instance of Document as the working
+     * document.
+     *
+     * @param docName The name of the document
+     */
+    public void setWorkingDocumentFromName(String docName) {
+
+        for (Document doc : _allDocuments) {
+            if (docName.equals(doc.name())) {
+                _workingDocument = doc;
+            }
+        }
+    }
+
+    /**
+     * Given an order, it returns the page of the given
+     * order from the working document.
+     *
+     * @param order The order of the page to fetch
+     * @return The page with the given order of the
+     * working document.
+     */
+    public Page getWorkingDocPageFromOrder(int order) {
+
+        for (Page page : _workingDocument.pages()) {
+            if (order == page.order()) {
+                return page;
+            }
+        }
+
+        return null;
+    }
+
+    // called when changing from edit mode to view mode
+    // uses changes made in edit mode and rerenders the image
+    public void rerenderImage() {
+        Page curr = Parameters.getWorkingPage();
+        BufferedImage newImage = VisionManager.rerenderImage(Parameters.getCurrPageImg(), curr.corners(), curr.config());
+        Parameters.setCurrPageImg(newImage);
+    }
+
+    // called when user tries to place corner; tries to make a better point given the user's guess
+    public Point snapCorner(Point pt) {
+        return VisionManager.snapCorner(Parameters.getCurrPageImg(), pt);
+    }
+
+    // not the main method for the application,
+    // just used for testing the core and integrating
+    // components independent of the GUI
+    public static void main(String[] args) throws DocumentException, IOException {
+        CoreManager core = new CoreManager();
+        //core.createDocumentFromFile(new File("tests/xml/testDocument/hamlet_1.tiff"));
+        core.createDocumentFromFile(new File("../sample2.tiff"));
+        //core.setWorkingDocumentFromName("sample_page");
+        core.exportToPdf("workspace/docs/sample2/doc.xml", "../foo.pdf");
+        //core.exportText(core.workingDocument(), "../document.txt");
+        //core.exportImages(core.workingDocument(), "../copiedDoc");
+        //core.search("political situation");
+        //core.renameDocument("sample2", "sample_page_2");
+        //core.deleteDocument("sample_page_2");
+        core.closeWorkingDocument();
+        core.shutdown();
+    }
 }

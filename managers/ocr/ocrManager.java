@@ -9,7 +9,7 @@ public class ocrManager {
 
 	// absolute path to the tesseract executable
 	public static String TESS_PATH = "/usr/local/bin/tesseract";
-	
+
 	// path to the python script for processing the tesseract output
 	private final static String EXTRACTBB_PATH = "managers/ocr/extractbb.py";
 	
@@ -64,6 +64,7 @@ public class ocrManager {
 				// add the position to the PageText object
 				Position position = new Position(min, max, fields[0]);
 				
+				// hold the mutex when the PageText object is updated
 				synchronized (pt) {
 					pt.addPosition(position);
 				}
@@ -87,7 +88,9 @@ public class ocrManager {
 	 * @param args
 	 * @throws IOException
 	 */
-	public static void main(String[] args) throws IOException {
+
+	public static void main(String[] args) throws IOException{
+                System.out.println("Starting Test...");
 
 		PageText pt = ocrManager.getPageText("../sample_page.tiff", "sample_page");
 		

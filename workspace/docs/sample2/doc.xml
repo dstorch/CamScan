@@ -2,6 +2,6 @@
 
 <DOCUMENT name="sample2">
   <PAGES>
-    <PAGE order="-1" metafile="workspace/docs/sample2/sample2.xml"/>
+    <PAGE order="1" metafile="workspace/docs/sample2/sample2.xml"/>
   </PAGES>
 </DOCUMENT>

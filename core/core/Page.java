@@ -1,12 +1,18 @@
 package core;
 
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
+
+import javax.imageio.ImageIO;
+
+import ocr.OCRThread;
 import ocr.ocrManager;
 import org.dom4j.*;
 import org.dom4j.io.*;
 import search.*;
 import vision.ConfigurationDictionary;
+import vision.VisionManager;
 
 public class Page {
 	
@@ -87,13 +93,41 @@ public class Page {
 		_parentDoc = parent;
 	}
 	
+    // sets corners and config file for the initial guesses of an imported document
+    public void initGuesses() throws IOException {
+    	
+    	// read a buffered image from the disk
+    	BufferedImage buff = ImageIO.read(new File(raw()));
+    	
+    	// guess and set corners and configuration values of Page
+    	setCorners(VisionManager.findCorners(buff));
+    	setConfig(VisionManager.estimateConfigurationValues(buff));
+    }
+    
+    // writes the current process image to workspace/processed
+    public void writeProcessedImage() throws IOException {
+  
+        // read a buffered image from the disk
+    	BufferedImage buff = ImageIO.read(new File(raw()));
+    	
+    	// write out image as a TIFF file
+        VisionManager.writeTIFF(buff, processed());
+    }
+	
 	public void setOcrResults() throws IOException {
 		String[] fields = metafile().split("/");
 		PageText text = ocrManager.getPageText(_raw, fields[fields.length-1]);
 		synchronized (this) {
 			_text = text;
+			serialize();
 		}
 	}
+	
+	public void launchOcrThread() {
+		OCRThread t = new OCRThread(this);
+		t.start();
+	}
+	
 	
 	public void serialize() throws IOException {
 		OutputFormat pretty = OutputFormat.createPrettyPrint();
@@ -129,7 +163,9 @@ public class Page {
 		// build the initial "grepping window"
 		HashSet<Term> windowSet = new HashSet<Term>();
 		for (int i = 0; i < GREP_WINDOW; i++) {
-			windowSet.add(fullTextTerms.get(i));
+			if (i < fullTextTerms.size()) {
+				windowSet.add(fullTextTerms.get(i));
+			}
 		}
 		
 		boolean resultInWindow = false;
