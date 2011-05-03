@@ -12,6 +12,7 @@ import vision.*;
 import export.*;
 import java.awt.image.BufferedImage;
 import java.awt.Point;
+import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
 @SuppressWarnings("rawtypes")
@@ -37,7 +38,7 @@ public class CoreManager {
         return _allDocuments;
     }
 
- // called from the constructor when the application launches
+    // called from the constructor when the application launches
 	public void startup() throws FileNotFoundException, DocumentException {
 		SAXReader reader = new SAXReader();
 		org.dom4j.Document document = reader.read(new FileReader(Parameters.STARTUP_FILE));
@@ -102,7 +103,7 @@ public class CoreManager {
         writeStartupFile();
     }
 
- // writes the startup file to disk based on the list of all documents
+    // writes the startup file to disk based on the list of all documents
 	public void writeStartupFile() throws IOException {
 		OutputFormat pretty = OutputFormat.createPrettyPrint();
 		XMLWriter filewriter = new XMLWriter(new FileWriter(Parameters.STARTUP_FILE), pretty);
@@ -200,7 +201,7 @@ public class CoreManager {
 		
 		writeStartupFile();
 	}
-	
+
     // Merges two inputted documents (appends pages of d2 to end of d1)
     public void mergeDocuments(Document d1, Document d2) throws IOException {
 
@@ -240,7 +241,7 @@ public class CoreManager {
 
     }
 
- // Called after an import in order to establish a new
+    // Called after an import in order to establish a new
 	// document object, if the user imports an entire folder
 	public Document createDocumentFromFolder(File sourceLocation) throws IOException {
 		
@@ -270,9 +271,9 @@ public class CoreManager {
 		return newDoc;
 	}
 	
-	
     // recursively copies all image files to the workspace/
-    private void importPages(File sourceLocation, File targetLocation, Document d, int order)
+     private void importPages(File sourceLocation, File targetLocation, Document d, int order)
+
             throws IOException {
 
         if (sourceLocation.isDirectory()) {
@@ -283,30 +284,35 @@ public class CoreManager {
 
             String[] children = sourceLocation.list();
             for (int i = 0; i < children.length; i++) {
-            	importPages(new File(sourceLocation, children[i]),
+            importPages(new File(sourceLocation, children[i]),
                         new File(targetLocation, children[i]), d, ++order);
             }
         } else {
-        	
+
             // get the file extension
             String filename = sourceLocation.getName();
             String[] extensionArr = filename.split("[.]");
             String extension = "";
+
             if (extensionArr.length > 0) {
                 extension = extensionArr[extensionArr.length - 1];
             }
+            boolean validExt = false;
+            for(int i = 0; i<Parameters.imgExtensions.length;i++) validExt = validExt || (extension.equals(Parameters.imgExtensions[i]));
 
-            if (extension.equals("tiff")) {
-
+            if (validExt) {
                 // copy the image into the workspace
                 InputStream in = new FileInputStream(sourceLocation);
+
                 try {
                     OutputStream out = new FileOutputStream(targetLocation);
-                    try {
 
+                    try {
                         // Copy the bits from instream to outstream
                         byte[] buf = new byte[1024];
+
                         int len;
+
                         while ((len = in.read(buf)) > 0) {
                             out.write(buf, 0, len);
                         }
@@ -323,22 +329,23 @@ public class CoreManager {
 
                 // construct the page and add it to the document
                 Page p = new Page(d, order);
-                
+
                 // set pathname attributes of the page
                 p.setRawFile(targetLocation.getPath());
                 p.setProcessedFile(Parameters.PROCESSED_DIRECTORY + "/" + sourceLocation.getName());
                 p.setMetafile(Parameters.DOC_DIRECTORY + "/" + d.name() + "/" + noExt + ".xml");
-                
+
+
                 // guess initial configuration values
                 p.initGuesses();
                 d.addPage(p);
 
                 // do OCR!
                 launchOcrThread(p);
-
             }
 
         }
+
     }
 
     private void launchOcrThread(Page page) {
@@ -474,11 +481,46 @@ public class CoreManager {
         }
     }
 
+
     public Page getWorkingPage() {
 		return _workingPage;
 	}
 
 	// called when user tries to place corner; tries to make a better point given the user's guess
+    // writes the current process image to workspace/processed (as Tiff file)
+    public void writeProcessedTiff() {
+        String[] s = Parameters.getCoreManager().getWorkingPage().metafile().split("/");
+        String path = "workspace/processed/" + s[s.length - 1] + ".tiff";
+
+        VisionManager.writeTIFF(Parameters.getCurrPageImg(), path);
+    }
+
+    // writes the current process image to workspace/processed (as PNG file)?
+    public void writeProcessedFile() throws IOException {
+        String[] s = Parameters.getCoreManager().getWorkingPage().metafile().split("/");
+        String path = "workspace/processed/" + s[s.length - 1] + ".png";
+
+        Page curr = Parameters.getCoreManager().getWorkingPage();
+        VisionManager.outputToFile(Parameters.getCurrPageImg(), path, curr.corners(), curr.config());
+    }
+
+    // Called every time entering Edit Mode or Configuration Dictionary is changed
+    public void getEditImageTransform() {
+        Parameters.setCurrPageImg(VisionManager.imageGlobalTransforms(Parameters.getCurrPageImg(),
+        		Parameters.getCoreManager().getWorkingPage().config()));
+    }
+
+    // sets corners and config file for the initial guesses of an imported document
+    private void initGuesses(Document d) throws IOException {
+        for (Page p : d.pages()) {
+            BufferedImage buff = ImageIO.read(new File(p.raw()));
+            // guess and set corners and configuration values of Page
+            p.setCorners(VisionManager.findCorners(buff));
+            p.setConfig(VisionManager.estimateConfigurationValues(buff));
+        }
+    }
+
+    // called when user tries to place corner; tries to make a better point given the user's guess
     public Point snapCorner(Point pt) {
         return VisionManager.snapCorner(Parameters.getCurrPageImg(), pt);
     }
@@ -488,16 +530,17 @@ public class CoreManager {
     // components independent of the GUI
     public static void main(String[] args) throws DocumentException, IOException {
         CoreManager core = new CoreManager();
-        //core.createDocumentFromFile(new File("tests/xml/testDocument/hamlet_1.tiff"));
-        core.createDocumentFromFile(new File("../sample2.tiff"));
+        core.createDocumentFromFile(new File("tests/images/1col-300.tiff"));
+        //core.createDocumentFromFile(new File("tests/images/mexican_war_text.jpg"));
+        //core.createDocumentFromFile(new File("../sample2.tiff"));
         //core.setWorkingDocumentFromName("sample_page");
-        core.exportToPdf("workspace/docs/sample2/doc.xml", "../foo.pdf");
+        //core.exportToPdf("workspace/docs/sample2/doc.xml", "../foo.pdf");
         //core.exportText(core.workingDocument(), "../document.txt");
         //core.exportImages(core.workingDocument(), "../copiedDoc");
         //core.search("political situation");
         //core.renameDocument("sample2", "sample_page_2");
         //core.deleteDocument("sample_page_2");
-        core.closeWorkingDocument();
-        core.shutdown();
+        //core.closeWorkingDocument();
+        //core.shutdown();
     }
 }

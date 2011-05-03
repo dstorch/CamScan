@@ -4,6 +4,5 @@
   <TESSERACT path="/usr/local/bin/tesseract"/>
   <WORKINGDOC value="workspace/docs/sample2/doc.xml"/>
   <DOCLIST>
-    <DOC value="workspace/docs/sample2/doc.xml"/>
   </DOCLIST>
 </STARTUP>

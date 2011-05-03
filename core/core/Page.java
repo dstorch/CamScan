@@ -95,7 +95,8 @@ public class Page {
 	
     // sets corners and config file for the initial guesses of an imported document
     public void initGuesses() throws IOException {
-    	
+    	System.out.println("Raw file: "+raw());
+
     	// read a buffered image from the disk
     	BufferedImage buff = ImageIO.read(new File(raw()));
     	
