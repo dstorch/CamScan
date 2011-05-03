@@ -29,9 +29,9 @@ public class ConfigurationDictionary {
 				
 				try{
 					if (currentType == ConfigurationValue.ValueType.FlipHorizontal || currentType == ConfigurationValue.ValueType.FlipVertical || currentType == ConfigurationValue.ValueType.BilateralFilter || currentType == ConfigurationValue.ValueType.ContrastBoost){
-						this.setKey(ConfigurationValue.type2name(currentType), new ConfigurationValue(currentType, value.equals("true")? true:false));
+						this.setKey(new ConfigurationValue(currentType, value.equals("true")? true:false));
 					}else if (currentType == ConfigurationValue.ValueType.ColorTemperature){
-						this.setKey("temperature", new ConfigurationValue(currentType, Integer.parseInt(value)));
+						this.setKey(new ConfigurationValue(currentType, Integer.parseInt(value)));
 					}else{
 						System.err.println("Not sure how to process a type!");
 					}
@@ -44,8 +44,8 @@ public class ConfigurationDictionary {
 	public ConfigurationValue getKey(String key){
 		return this.map.get(key);
 	}
-	public void setKey(String key, ConfigurationValue value){
-		this.map.put(key, value);
+	public void setKey(ConfigurationValue value){
+		this.map.put(ConfigurationValue.type2name(value.type), value);
 	}
 	public Set getAllKeys(){
 		return this.map.keySet();
