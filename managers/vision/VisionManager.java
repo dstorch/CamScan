@@ -19,10 +19,11 @@ import static com.googlecode.javacv.cpp.opencv_calib3d.*;
 
 public class VisionManager {
 	public static ConfigurationDictionary estimateConfigurationValues(BufferedImage img){
+		//TODO: color temp., flippedness, pick the right other defaults
 		ConfigurationDictionary cd = new ConfigurationDictionary();
 		
 		try {
-			cd.setKey("contrast", new ConfigurationValue(ConfigurationValue.ValueType.ContrastBoost, true));
+			cd.setKey("contrast", new ConfigurationValue(ConfigurationValue.ValueType.ContrastBoost, false));
 			cd.setKey("bilateral", new ConfigurationValue(ConfigurationValue.ValueType.BilateralFilter, false));
 		} catch (InvalidTypingException e) {
 			System.err.println("InvalidTypingException while setting up ConfigurationDictionary.");
@@ -32,6 +33,7 @@ public class VisionManager {
 	}
 	
 	public static Point snapCorner(BufferedImage img, Point point){
+		//TODO!
 		return point;
 	}
 	
@@ -77,9 +79,11 @@ public class VisionManager {
 	}
 	
 	private static IplImage applyTemperatureCorrection(IplImage img, ConfigurationValue temp){
+		//TODO!
 		return img;
 	}
 	private static IplImage applyFlipCorrection(IplImage img, ConfigurationValue flip){
+		//TODO!
 		return img;
 	}
 	private static IplImage applyContrastBoost(IplImage img, ConfigurationValue boost){
@@ -123,6 +127,7 @@ public class VisionManager {
 		return img;
 	}
 	private static IplImage applyBilateralFilter(IplImage img, ConfigurationValue filter){
+		//TODO: this returns a black image
 		if (!(Boolean)filter.value()){return img;}
 		IplImage nimg = cvCloneImage(img);
 		cvSmooth(img, nimg, CV_BILATERAL, 5);
@@ -158,6 +163,8 @@ public class VisionManager {
 	}
 	
 	public static Corners findCorners(BufferedImage img){
+		//TODO
+		
 		
 		//take the magnitude of the differential
 		

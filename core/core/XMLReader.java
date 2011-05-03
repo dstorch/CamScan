@@ -6,6 +6,8 @@ import java.io.*;
 import org.dom4j.* ;
 import org.dom4j.io.* ;
 
+import vision.ConfigurationDictionary;
+
 @SuppressWarnings("rawtypes")
 public class XMLReader {
 
@@ -153,39 +155,8 @@ public class XMLReader {
 		return new Position(min, max, word);
 	}
 	
-	private Config parseConfig(Element config) {
-		
-		Config cf = new Config();
-		
-		for (Iterator i = config.elementIterator("COLORTEMP"); i.hasNext();) {
-			Element element = (Element) i.next();
-			float colortemp = Float.parseFloat(element.attribute("value").getStringValue());
-			cf.setColorTemp(colortemp);
-		}
-		
-		for (Iterator i = config.elementIterator("CONTRASTBOOST"); i.hasNext();) {
-			Element element = (Element) i.next();
-			String boostStr = element.attribute("value").getStringValue();
-			boolean boost = (boostStr.equals("yes"));
-			cf.setContrastBoost(boost);
-		}
-		
-		for (Iterator i = config.elementIterator("FLIPH"); i.hasNext();) {
-			Element element = (Element) i.next();
-			String fliph = element.attribute("value").getStringValue();
-			boolean flipped = (fliph.equals("yes"));
-			cf.setFlipH(flipped);
-		}
-		
-		for (Iterator i = config.elementIterator("FLIPV"); i.hasNext();) {
-			Element element = (Element) i.next();
-			String flipv = element.attribute("value").getStringValue();
-			boolean flipped = (flipv.equals("yes"));
-			cf.setFlipV(flipped);
-		}
-		
-		
-		return cf;
+	private ConfigurationDictionary parseConfig(Element config) {
+		return new ConfigurationDictionary(config);
 	}
 	
 }
