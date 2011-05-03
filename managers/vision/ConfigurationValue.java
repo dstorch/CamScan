@@ -1,5 +1,7 @@
 package vision;
 
+import java.util.HashMap;
+
 
 
 public class ConfigurationValue {
@@ -37,7 +39,13 @@ public class ConfigurationValue {
 	
 	
 	public static String type2name(ValueType type){
-		return null;
+		HashMap<ValueType, String> names = new HashMap<ValueType, String>();
+		names.put(ValueType.FlipHorizontal, "fliph");
+		names.put(ValueType.FlipVertical, "flipv");
+		names.put(ValueType.ColorTemperature, "colortemperature");
+		names.put(ValueType.ContrastBoost, "contrastboost");
+		names.put(ValueType.BilateralFilter, "bilateral");
+		return names.get(type);
 	}
 	
 	public Object value(){

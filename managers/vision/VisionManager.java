@@ -23,8 +23,8 @@ public class VisionManager {
 		ConfigurationDictionary cd = new ConfigurationDictionary();
 		
 		try {
-			cd.setKey("contrast", new ConfigurationValue(ConfigurationValue.ValueType.ContrastBoost, false));
-			cd.setKey("bilateral", new ConfigurationValue(ConfigurationValue.ValueType.BilateralFilter, false));
+			cd.setKey(new ConfigurationValue(ConfigurationValue.ValueType.ContrastBoost, false));
+			cd.setKey(new ConfigurationValue(ConfigurationValue.ValueType.BilateralFilter, false));
 		} catch (InvalidTypingException e) {
 			System.err.println("InvalidTypingException while setting up ConfigurationDictionary.");
 		}
