@@ -440,16 +440,30 @@ public class CoreManager {
         Parameters.setCurrPageImg(newImage);
     }
 
-    // writes the current process image to workspace/processed
-    public void writeProcessedImage() {
+    // writes the current process image to workspace/processed (as Tiff file)
+    public void writeProcessedTiff() {
         String[] s = Parameters.getWorkingPage().metafile().split("/");
         String path = "workspace/processed/" + s[s.length - 1] + ".tiff";
 
         _vision.writeTIFF(Parameters.getCurrPageImg(), path);
     }
 
+   // writes the current process image to workspace/processed (as PNG file)?
+    public void writeProcessedFile() throws IOException {
+        String[] s = Parameters.getWorkingPage().metafile().split("/");
+        String path = "workspace/processed/" + s[s.length - 1] + ".png";
+
+        Page curr = Parameters.getWorkingPage();
+        _vision.outputToFile(Parameters.getCurrPageImg(), path, curr.corners(), curr.config());
+    }
+
+    // Called every time entering Edit Mode or Configuration Dictionary is changed
+    public void getEditImageTransform(){
+        Parameters.setCurrPageImg(_vision.imageGlobalTransforms(Parameters.getCurrPageImg(), Parameters.getWorkingPage().config()));
+    }
+
     // sets corners and config file for the initial guesses of an imported document
-    public void initGuesses(Document d) throws IOException {
+    private void initGuesses(Document d) throws IOException {
         for (Page p : d.pages()) {
             BufferedImage buff = ImageIO.read(new File(p.raw()));
             // guess and set corners and configuration values of Page
