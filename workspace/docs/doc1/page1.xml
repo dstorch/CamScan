@@ -15,7 +15,7 @@
     </POSITIONS>
   </TEXT>
   <CONFIG>
-    <COLORTEMP value="0.0"/>
+    <COLORTEMP value="0"/>
     <CONTRASTBOOST value="no"/>
     <FLIPH value="no"/>
     <FLIPV value="yes"/>

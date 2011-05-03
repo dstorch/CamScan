@@ -165,7 +165,6 @@ public class CoreManager {
 		// not get serialized)
 		if (_workingDocument != null) {
 			if (_workingDocument.equals(d)) _workingDocument = null;
-			System.out.println(_workingDocument.name());
 		}
 		
 		writeStartupFile();
@@ -188,7 +187,7 @@ public class CoreManager {
 		Document newDoc = new Document(name, pathname);
 		
 		File targetLocation = new File(Parameters.RAW_DIRECTORY);
-		recursiveImageCopy(sourceLocation, targetLocation, newDoc);
+		recursiveImageCopy(sourceLocation, targetLocation, newDoc, 1);
 		
 		// add the new document to the list of documents
 		_allDocuments.add(newDoc);
@@ -200,7 +199,8 @@ public class CoreManager {
 	}
 	
 	// recursively copies all image files to the workspace/
-	private void recursiveImageCopy(File sourceLocation, File targetLocation, Document d) throws IOException {
+	private void recursiveImageCopy(File sourceLocation, File targetLocation, Document d, int order)
+		throws IOException {
 		
 		if (sourceLocation.isDirectory()) {
 
@@ -211,7 +211,7 @@ public class CoreManager {
             String[] children = sourceLocation.list();
             for (int i=0; i<children.length; i++) {
                 recursiveImageCopy(new File(sourceLocation, children[i]),
-                        new File(targetLocation, children[i]), d);
+                        new File(targetLocation, children[i]), d, ++order);
             }
         } else {
             
@@ -284,10 +284,9 @@ public class CoreManager {
 		Document newDoc = new Document(noExt, pathname);
 	
 		File targetLocation = new File(Parameters.RAW_DIRECTORY + "/" + sourceLocation.getName());
-		recursiveImageCopy(sourceLocation, targetLocation, newDoc);
+		recursiveImageCopy(sourceLocation, targetLocation, newDoc, 1);
 		
 		// add the document to the global list of documents
-		System.out.println(newDoc.name());
 		_allDocuments.add(newDoc);
 		
 		// write the XML for the new document to disk
@@ -304,7 +303,6 @@ public class CoreManager {
 		Document doc = null;
 		for (Document d : _allDocuments) {
 			if (pathname.equals(d.pathname())) {
-				System.out.println(d.pathname());
 				doc = d;
 			}
 		}

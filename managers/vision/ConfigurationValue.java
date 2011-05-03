@@ -37,7 +37,7 @@ public class ConfigurationValue {
 	
 	
 	public static String type2name(ValueType type){
-		
+		return null;
 	}
 	
 	public Object value(){

@@ -13,6 +13,7 @@ public class OCRThread extends Thread {
 	}
 	
 	public void run() {
+		System.out.println("running OCR thread");
 		try {
 			_page.setOcrResults();
 		} catch (IOException e) {
