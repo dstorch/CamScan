@@ -23,9 +23,9 @@ public class VisionManager {
 	 * Estimate good values for the configuration dictionary for a raw image.
 	 * Only call once on import.
 	 * ConfigurationDictionary specifies the transformations done by imageGlobalTransform.
+	 * TODO: guesses for the temperature, flippedness, decide which other things to enable by default
 	 */
 	public static ConfigurationDictionary estimateConfigurationValues(BufferedImage img){
-		//TODO: color temp., flippedness, pick the right other defaults
 		ConfigurationDictionary cd = new ConfigurationDictionary();
 		
 		try {
@@ -42,15 +42,21 @@ public class VisionManager {
 	
 	/*
 	 * Given a user point in the raw image snap it to a close, but slightly more accurate point.
+	 * TODO: implement!
 	 */
 	public static Point snapCorner(BufferedImage img, Point point){
-		//TODO!
 		return point;
 	}
 	
 	private static double distance(Point a, Point b){
 		return Math.sqrt( (a.x-b.x)*(a.x-b.x) + (a.y-b.y)*(a.y-b.y) );
 	}
+	
+	/*
+	 * Make some educated guesses about the aspect ratio of the image and
+	 * its appropriate size. This works increasingly poorly as angle increases.
+	 * TODO: maybe incorporate info about common aspect ratios?
+	 */
 	private static Corners idealizedReprojection(Corners corners){
 		double averageWidth = distance(corners.upleft(), corners.upright()) + distance(corners.downright(), corners.downleft());
 		averageWidth /= 2;
@@ -94,10 +100,17 @@ public class VisionManager {
 		return IplImageToBufferedImage(transformed);
 	}
 	
+	/*
+	 * Applies temperature correction to an image.
+	 * TODO: implement this! (how is this done?)
+	 */
 	private static IplImage applyTemperatureCorrection(IplImage img, ConfigurationValue temp){
-		//TODO!
 		return img;
 	}
+	
+	/*
+	 * Flips an image.
+	 */
 	private static IplImage applyFlipCorrection(IplImage img, ConfigurationValue flip){
 		if (!(Boolean)flip.value()){return img;}
 		int flipmode = 0;
@@ -107,6 +120,12 @@ public class VisionManager {
 		cvFlip(img, img, flipmode);
 		return img;
 	}
+	
+	/*
+	 * Apply a contrast boost by equalizing the image in grayscale & reapplying that
+	 * relative difference in the luma channel. Also see alternative algorithm (faster,
+	 * but has chroma artifacts.)
+	 */
 	private static IplImage applyContrastBoost(IplImage img, ConfigurationValue boost){
 		if (!(Boolean)boost.value()){return img;}
 		
@@ -146,14 +165,21 @@ public class VisionManager {
 		
 		return img;
 	}
+	
+	/*
+	 * Applies a bilateral filter to the image
+	 * TODO: returns a black image!, prohibitively slow.
+	 */
 	private static IplImage applyBilateralFilter(IplImage img, ConfigurationValue filter){
-		//TODO: this returns a black image
 		if (!(Boolean)filter.value()){return img;}
 		IplImage nimg = cvCloneImage(img);
 		cvSmooth(img, nimg, CV_BILATERAL, 5);
 		return nimg;
 	}
 	
+	/*
+	 * Internal implementation of global transforms using IplImage (to avoid the transformation)
+	 */
 	private static IplImage _imageGlobalTransforms(IplImage img, ConfigurationDictionary config){
 		if (config == null){return img;}
 		
