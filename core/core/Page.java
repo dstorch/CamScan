@@ -2,6 +2,8 @@ package core;
 
 import java.io.*;
 import java.util.*;
+
+import ocr.OCRThread;
 import ocr.ocrManager;
 import org.dom4j.*;
 import org.dom4j.io.*;
@@ -92,8 +94,15 @@ public class Page {
 		PageText text = ocrManager.getPageText(_raw, fields[fields.length-1]);
 		synchronized (this) {
 			_text = text;
+			serialize();
 		}
 	}
+	
+	public void launchOcrThread() {
+		OCRThread t = new OCRThread(this);
+		t.start();
+	}
+	
 	
 	public void serialize() throws IOException {
 		OutputFormat pretty = OutputFormat.createPrettyPrint();
@@ -129,7 +138,9 @@ public class Page {
 		// build the initial "grepping window"
 		HashSet<Term> windowSet = new HashSet<Term>();
 		for (int i = 0; i < GREP_WINDOW; i++) {
-			windowSet.add(fullTextTerms.get(i));
+			if (i < fullTextTerms.size()) {
+				windowSet.add(fullTextTerms.get(i));
+			}
 		}
 		
 		boolean resultInWindow = false;

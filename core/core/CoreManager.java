@@ -41,6 +41,10 @@ public class CoreManager {
 		org.dom4j.Document document = reader.read(new FileReader(Parameters.STARTUP_FILE));
 		Element root = document.getRootElement();
 		
+		// keep track of whether something went wrong, and throw a warning
+		// if necessary
+		boolean throwWarning = false;
+		
 		for (Iterator i = root.elementIterator("WORKINGDOC"); i.hasNext();) {
 			Element workingdoc = (Element) i.next();
 			String workingStr = workingdoc.attribute("value").getStringValue();
@@ -65,7 +69,15 @@ public class CoreManager {
 			for (Iterator j = docList.elementIterator("DOC"); j.hasNext();) {
 				Element singleDoc = (Element) j.next();
 				String docStr = singleDoc.attribute("value").getStringValue();
-				_allDocuments.add(_xmlReader.parseDocument(docStr));
+				
+				// get the new document by parsing XML
+				Document newDoc = _xmlReader.parseDocument(docStr);
+				
+				if (newDoc != null) {
+					_allDocuments.add(newDoc);
+				} else {
+					throwWarning = true;
+				}
 			}
 		}
 		
@@ -202,6 +214,8 @@ public class CoreManager {
 	private void recursiveImageCopy(File sourceLocation, File targetLocation, Document d, int order)
 		throws IOException {
 		
+		System.out.println("recurring");
+		
 		if (sourceLocation.isDirectory()) {
 
             if (!targetLocation.exists()) {
@@ -249,26 +263,21 @@ public class CoreManager {
 	            String noExt = imageFile.substring(0,imageFile.length()-5);
 	            
 	            // construct the page and add it to the document
-	            Page p = new Page(d, -1);
+	            Page p = new Page(d, order);
 	            p.setRawFile(targetLocation.getPath());
 	            p.setProcessedFile(Parameters.PROCESSED_DIRECTORY+"/"+sourceLocation.getName());
 	            p.setMetafile(Parameters.DOC_DIRECTORY+"/"+d.name()+"/" + noExt+".xml");
 	            d.addPage(p); 
 	            
-	            
 	            // do OCR!
-	            launchOcrThread(p);
+	            p.launchOcrThread();
 	            
         	}
 
         }
 	}
 	
-	private void launchOcrThread(Page page) {
-		OCRThread t = new OCRThread(page);
-		t.start();
-	}
-	
+
 	// called when the user imports a single photograph
 	// as a document
 	public Document createDocumentFromFile(File sourceLocation) throws IOException {

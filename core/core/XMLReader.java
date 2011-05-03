@@ -17,7 +17,15 @@ public class XMLReader {
 		d.setPathName(path);
 		
 		SAXReader reader = new SAXReader();
-		org.dom4j.Document document = reader.read(new FileReader(path));
+		org.dom4j.Document document = null;
+		
+		// return null if the document does not exist
+		try {
+			document = reader.read(new FileReader(path));
+		} catch (FileNotFoundException e) {
+			return null;
+		}
+		
 		Element root = document.getRootElement();
 		
 		Attribute nameAttr = root.attribute("name");
@@ -72,6 +80,8 @@ public class XMLReader {
 			Element element = (Element) i.next();
 			p.setConfig(parseConfig(element));
 		}
+		
+		if (p.fullText().equals("")) p.launchOcrThread();
 		
 		return p;
 	}

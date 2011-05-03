@@ -19,6 +19,7 @@ public class OCRThread extends Thread {
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 		}
+		System.out.println("OCR thread exiting");
 	}
 
 

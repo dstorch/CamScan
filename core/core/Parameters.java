@@ -67,6 +67,13 @@ public class Parameters {
 	 */
 	public static final int RESULTS_ELSEWHERE = 10;
 	
+	/**
+	 * Arrays defining file extension filters
+	 */
+	public static final String[] imgExtensions = {".jpeg", ".jpg", ".tiff", ".tif", ".png"};
+	public static final String[] txtExtensions = {".txt", ".text"};
+	public static final String[] pdfExtensions = {".pdf"};
+	
 	/****************************************
 	 * 
 	 * Mutable Parameters
