@@ -6,6 +6,7 @@ import ocr.ocrManager;
 import org.dom4j.*;
 import org.dom4j.io.*;
 import search.*;
+import vision.ConfigurationDictionary;
 
 public class Page {
 	
@@ -13,7 +14,7 @@ public class Page {
 	
 	// major attributes
 	private PageText _text;
-	private Config _config;
+	private ConfigurationDictionary _config;
 	private Corners _corners;
 	
 	// pathnames of files on disk
@@ -29,7 +30,7 @@ public class Page {
 	public Page(Document parent, int order) {
 		_parentDoc = parent;
 		_order = order;
-		_config = new Config();
+		_config = new ConfigurationDictionary();
 		_corners = new Corners();
 	}
 	
@@ -54,7 +55,7 @@ public class Page {
 	public String fullText() {
 		return _text.fullText();
 	}
-	public Config config() {
+	public ConfigurationDictionary config() {
 		return _config;
 	}
 	public Document getContainingDocument() {
@@ -78,7 +79,7 @@ public class Page {
 	public void setPageText(PageText pt) {
 		_text = pt;
 	}
-	public void setConfig(Config c) {
+	public void setConfig(ConfigurationDictionary c) {
 		_config = c;
 	}
 	public void setContainingDocument(Document parent) {
