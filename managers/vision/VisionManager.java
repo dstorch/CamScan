@@ -18,6 +18,12 @@ import static com.googlecode.javacv.cpp.opencv_highgui.*;
 import static com.googlecode.javacv.cpp.opencv_calib3d.*;
 
 public class VisionManager {
+	
+	/*
+	 * Estimate good values for the configuration dictionary for a raw image.
+	 * Only call once on import.
+	 * ConfigurationDictionary specifies the transformations done by imageGlobalTransform.
+	 */
 	public static ConfigurationDictionary estimateConfigurationValues(BufferedImage img){
 		//TODO: color temp., flippedness, pick the right other defaults
 		ConfigurationDictionary cd = new ConfigurationDictionary();
@@ -32,6 +38,9 @@ public class VisionManager {
 		return cd;
 	}
 	
+	/*
+	 * Given a user point in the raw image snap it to a close, but slightly more accurate point.
+	 */
 	public static Point snapCorner(BufferedImage img, Point point){
 		//TODO!
 		return point;
@@ -60,6 +69,11 @@ public class VisionManager {
 		
 		return new Corners(new Point(0,0), new Point(width,0), new Point(0,height), new Point(width,height));
 	}
+	
+	/*
+	 * Return the image after applying global transformations and the homography implicit in the four corners.
+	 * The result will be a flat, pretty page.
+	 */
 	public static BufferedImage rerenderImage(BufferedImage img, Corners corners, ConfigurationDictionary config){		
 		IplImage image = BufferedImageToIplImage(img);
 		image = _imageGlobalTransforms(image, config);
@@ -158,10 +172,18 @@ public class VisionManager {
 		return img;
 	}
 	
+	/*
+	 * Apply global transformations to an image as specified by the ConfigurationDictionary.
+	 * This image is the one which should be shown in edit mode. It does not need to be applied before
+	 * calling rerenderImage (as rerender does it interally.)
+	 */
 	public static BufferedImage imageGlobalTransforms(BufferedImage img, ConfigurationDictionary config){
 		return IplImageToBufferedImage( _imageGlobalTransforms(BufferedImageToIplImage(img), config) );
 	}
 	
+	/*
+	 * Return the best estimate of the four corners of a piece of paper in the image.
+	 */
 	public static Corners findCorners(BufferedImage img){
 		//TODO
 		
@@ -181,16 +203,23 @@ public class VisionManager {
 		return new Corners(new Point(0,0), new Point(img.getWidth(),0), new Point(0,img.getHeight()), new Point(img.getWidth(),img.getHeight()));
 	}
 	
+	
 	private static void writeImageToFile(BufferedImage img, String path) throws IOException{
 		//ImageIO is slow and clunky, switch to cvSave?
 		File output = new File(path);;
 		ImageIO.write(img, "png", output);
 	}
 	
+	/*
+	 * Write an image out to a path as a TIFF
+	 */
 	public static void writeTIFF(BufferedImage img, String path){
 		cvSaveImage(path, BufferedImageToIplImage(img));
 	}
 	
+	/*
+	 * Write a rendered image out to a path. Like calling rerenderImage, but instead of returning it writes the image to a file.
+	 */
 	public static void outputToFile(BufferedImage img, String path, Corners points, ConfigurationDictionary config) throws IOException{
 		writeImageToFile(rerenderImage(img, points, config), path);
 	}
