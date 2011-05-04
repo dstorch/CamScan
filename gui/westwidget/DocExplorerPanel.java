@@ -72,6 +72,7 @@ public class DocExplorerPanel extends JPanel {
 	 */
 	public DocExplorerPanel(PageExplorerPanel pageExpPanel, CentralPanel centralPanel) {
 		super();
+		Parameters.setDocExplorerPanel(this);
 		this.centralPanel = centralPanel;
 		
 		this.pageExpPanel = pageExpPanel;

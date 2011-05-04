@@ -8,22 +8,10 @@ import core.Parameters;
 
 public class ExportManager implements Exporter {
 
-	public void exportToPdf(String document, String outfile) throws IOException {
-		System.out.println("python "+Parameters.EXPORT_PATH+" "+document+" "+outfile);
-		Process process = Runtime.getRuntime().exec("python "+Parameters.EXPORT_PATH+" "+document+" "+outfile);
-		BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-		
-		String status = reader.readLine();
-		status = status.trim();
-		
-		if (status.equals("ERROR")) {
-			String message = reader.readLine();
-			throw new IOException(message);
-		} else if (!status.equals("OK")) {
-			throw new IOException("Unknown export problem!");
-		}
-		
-		reader.close();
+	// have a thread do the exporting
+	public void exportToPdf(Document document, String outfile) throws IOException {
+		ExportThread exportThread = new ExportThread(document, outfile);
+		exportThread.start();
 	}
 
 	public void exportImages(Document document, String outdirectory) throws IOException {

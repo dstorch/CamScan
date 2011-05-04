@@ -6,6 +6,8 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
@@ -24,7 +26,7 @@ import core.Parameters;
  * @author Stelios
  *
  */
-public class EditPanel extends JPanel implements MouseMotionListener {
+public class EditPanel extends JPanel implements MouseMotionListener, MouseWheelListener {
 
 	/****************************************
 	 * 
@@ -87,6 +89,16 @@ public class EditPanel extends JPanel implements MouseMotionListener {
 	 * and the upper left corner.
 	 */
 	private Line2D lineDLUL;
+	
+	/**
+	 * The scale factor.
+	 */
+	private double scaleFactor;
+	
+	/**
+	 * The buffered image representing the page.
+	 */
+	private BufferedImage img;
 
 	/****************************************
 	 * 
@@ -99,8 +111,10 @@ public class EditPanel extends JPanel implements MouseMotionListener {
 	 */
 	public EditPanel() {
 		super();
+		this.scaleFactor = 1;
 
 		this.addMouseMotionListener(this);
+		this.addMouseWheelListener(this);
 		this.setBackground(Color.LIGHT_GRAY);
 		this.setBorder(new LineBorder(Color.GRAY));
 
@@ -146,11 +160,27 @@ public class EditPanel extends JPanel implements MouseMotionListener {
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D brush = (Graphics2D) g;
-
-		BufferedImage img = Parameters.getCoreManager().getWorkingImage();
 		
-		if (img != null)
-			g.drawImage(img, (this.getWidth() - img.getWidth())/2, (this.getHeight() - img.getHeight())/2, null);
+		if (this.img != Parameters.getCoreManager().getWorkingImage()) {
+			this.scaleFactor = 1;
+			this.img = Parameters.getCoreManager().getWorkingImage();
+			
+			double xSideRatio = ((double) this.getWidth())/((double) this.img.getWidth());
+			double ySideRatio = ((double) this.getHeight())/((double) this.img.getHeight());
+			
+			if (ySideRatio > xSideRatio)
+				this.scaleFactor = xSideRatio;
+			else
+				this.scaleFactor = ySideRatio;
+			
+			this.scaleFactor *= 0.95;
+		}
+		
+		if (this.img != null) {
+			int newW = (int) (this.img.getWidth() * this.scaleFactor);
+			int newH = (int) (this.img.getHeight() * this.scaleFactor);
+			g.drawImage(this.img, (this.getWidth() - newW)/2, (this.getHeight() - newH)/2, newW, newH, null);
+		}
 		
 		brush.setColor(Color.BLACK);
 		brush.draw(this.lineULUR);
@@ -257,4 +287,19 @@ public class EditPanel extends JPanel implements MouseMotionListener {
 	}
 
 	public void mouseMoved(MouseEvent arg0) {}
+
+	public void mouseWheelMoved(MouseWheelEvent e) {
+
+		int notches = e.getWheelRotation();
+
+		if (notches < 0) {
+			if (this.scaleFactor > 0.2)
+				this.scaleFactor -= 0.1;
+		} else {
+			this.scaleFactor += 0.1;
+		}
+		
+		this.repaint();
+		
+	}
 }

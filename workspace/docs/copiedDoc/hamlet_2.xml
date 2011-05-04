@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<PAGE>
+  <IMG path="workspace/raw/hamlet_2.tiff" processed="workspace/processed/hamlet_2.tiff"/>
+  <CORNERS>
+    <UPRIGHT x="553" y="0"/>
+    <DOWNRIGHT x="553" y="703"/>
+    <UPLEFT x="0" y="0"/>
+    <DOWNLEFT x="0" y="703"/>
+  </CORNERS>
+  <TEXT>
+    <FULLTEXT></FULLTEXT>
+    <POSITIONS/>
+  </TEXT>
+  <CONFIG>
+    <FLIPH value="false"/>
+    <FLIPV value="false"/>
+    <BILATERAL value="false"/>
+    <CONTRASTBOOST value="false"/>
+  </CONFIG>
+</PAGE>

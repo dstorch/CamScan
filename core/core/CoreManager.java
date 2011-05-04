@@ -149,7 +149,17 @@ public class CoreManager {
 	}
 	
 	public void setWorkingPage(String path, int order) throws FileNotFoundException, DocumentException {
-		_workingPage = _xmlReader.parsePage(path, order, _workingDocument);
+		try {
+			_workingPage = _xmlReader.parsePage(path, order, _workingDocument);
+		} catch (FileNotFoundException e) {
+			JOptionPane.showMessageDialog(Parameters.getFrame(),
+					"Some of your data might be lost. Did CamScan shut down correctly?",
+					"Startup Warning", JOptionPane.WARNING_MESSAGE);
+		} catch (DocumentException e) {
+			JOptionPane.showMessageDialog(Parameters.getFrame(),
+					"Your CamScan data may have been corrupted.",
+					"Startup Warning", JOptionPane.WARNING_MESSAGE);
+		}
 	}
 	
 	public void setWorkingPageAndImage(Page page) throws IOException {
@@ -264,6 +274,12 @@ public class CoreManager {
 		importPages(sourceLocation, targetLocation, newDoc, 0);
 		
 		// add the new document to the list of documents
+		if (newDoc.pages().isEmpty()) {
+			JOptionPane.showMessageDialog(Parameters.getFrame(), "There are no image files in that folder!",
+					"Import Error", JOptionPane.ERROR_MESSAGE);
+			return null;
+		}
+		
 		_allDocuments.add(newDoc);
 		
 		_workingDocument = newDoc;
@@ -399,15 +415,7 @@ public class CoreManager {
             throw new IOException("Problem exporting document!");
         }
 
-        // run OCR on each page---the bottleneck for pdf export!
-        for (Page p : doc.pages()) {
-            p.setOcrResults();
-        }
-
-        // serialize the document, to commit the ocr results to disk
-        doc.serialize();
-
-        _exporter.exportToPdf(pathname, outfile);
+        _exporter.exportToPdf(doc, outfile);
     }
 
     // write a directory of image files

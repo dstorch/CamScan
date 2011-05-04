@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<PAGE>
+  <IMG path="workspace/raw/hamlet_1.tiff" processed="workspace/processed/hamlet_1.tiff"/>
+  <CORNERS>
+    <UPRIGHT x="564" y="0"/>
+    <DOWNRIGHT x="564" y="846"/>
+    <UPLEFT x="0" y="0"/>
+    <DOWNLEFT x="0" y="846"/>
+  </CORNERS>
+  <TEXT>
+    <FULLTEXT>KKlMKl!K!l»!KHHHHHIHWWHKW”</FULLTEXT>
+    <POSITIONS/>
+  </TEXT>
+  <CONFIG>
+    <FLIPH value="false"/>
+    <FLIPV value="false"/>
+    <BILATERAL value="false"/>
+    <CONTRASTBOOST value="false"/>
+  </CONFIG>
+</PAGE>
