@@ -295,9 +295,9 @@
     </POSITIONS>
   </TEXT>
   <CONFIG>
-    <FLIPH value="false"/>
-    <FLIPV value="false"/>
-    <BILATERAL value="false"/>
     <CONTRASTBOOST value="false"/>
+    <FLIPV value="false"/>
+    <FLIPH value="false"/>
+    <BILATERAL value="false"/>
   </CONFIG>
 </PAGE>
