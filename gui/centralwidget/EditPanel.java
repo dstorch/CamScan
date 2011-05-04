@@ -1,10 +1,12 @@
 package centralwidget;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
@@ -26,7 +28,7 @@ import core.Parameters;
  * @author Stelios
  *
  */
-public class EditPanel extends JPanel implements MouseMotionListener, MouseWheelListener {
+public class EditPanel extends JPanel implements MouseMotionListener, MouseWheelListener, MouseListener {
 
 	/****************************************
 	 * 
@@ -65,6 +67,16 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	 * The down-left corner.
 	 */
 	private Ellipse2D cornerDL;
+	
+	/**
+	 * The original corner locations; we will scale
+	 * with respect to this original location
+	 */
+	private Ellipse2D cornerULorig;
+	private Ellipse2D cornerURorig;
+	private Ellipse2D cornerDRorig;
+	private Ellipse2D cornerDLorig;
+
 
 	/**
 	 * The line connecting the upper left
@@ -115,6 +127,7 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 
 		this.addMouseMotionListener(this);
 		this.addMouseWheelListener(this);
+		this.addMouseListener(this);
 		this.setBackground(Color.LIGHT_GRAY);
 		this.setBorder(new LineBorder(Color.GRAY));
 
@@ -122,6 +135,11 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 		this.cornerUR = new Ellipse2D.Double();
 		this.cornerDR = new Ellipse2D.Double();
 		this.cornerDL = new Ellipse2D.Double();
+		
+		this.cornerULorig = new Ellipse2D.Double();
+		this.cornerURorig = new Ellipse2D.Double();
+		this.cornerDRorig = new Ellipse2D.Double();
+		this.cornerDLorig = new Ellipse2D.Double();
 
 		this.lineULUR = new Line2D.Double();
 		this.lineURDR = new Line2D.Double();
@@ -148,6 +166,11 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 		this.moveCornerTo(cornerUR, corners.upright().getX(), corners.upright().getY());
 		this.moveCornerTo(cornerDR, corners.downright().getX(), corners.downright().getY());
 		this.moveCornerTo(cornerDL, corners.downleft().getX(), corners.downleft().getY());
+		
+		this.moveCornerTo(cornerULorig, corners.upleft().getX(), corners.upleft().getY());
+		this.moveCornerTo(cornerURorig, corners.upright().getX(), corners.upright().getY());
+		this.moveCornerTo(cornerDRorig, corners.downright().getX(), corners.downright().getY());
+		this.moveCornerTo(cornerDLorig, corners.downleft().getX(), corners.downleft().getY());
 		
 		this.updateConnectingLines();
 		this.repaint();
@@ -243,7 +266,7 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	 */
 	private boolean isWithinCornerEllipse(Ellipse2D ellipse, double mX, double mY) {
 
-		int limit = 25;
+		int limit = 100;
 		return (ellipse.getCenterX() - limit <= mX && mX <= ellipse.getCenterX() + limit &&
 				ellipse.getCenterY() - limit <= mY && mY <= ellipse.getCenterY() + limit);
 	}
@@ -260,23 +283,42 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	 */
 	public void mouseDragged(MouseEvent arg0) {
 		
+		this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		
+		// move the ellipses on screen
 		Point p = new Point(arg0.getX(), arg0.getY());
+		
+		// 1. move upper left ellipse during click and drag
 		if (this.isWithinCornerEllipse(this.cornerUL, arg0.getX(), arg0.getY())) {
+			this.moveCornerTo(cornerULorig, this.scaleFactor * (arg0.getX() - this.cornerUL.getWidth()/2),
+											this.scaleFactor * (arg0.getY() - this.cornerUL.getHeight()/2));
 			this.moveCornerTo(cornerUL, arg0.getX() - this.cornerUL.getWidth()/2, arg0.getY() - this.cornerUL.getHeight()/2);
 			this.moveLine(this.lineDLUL, this.cornerDL, this.cornerUL);
 			this.moveLine(this.lineULUR, this.cornerUL, this.cornerUR);
 			Parameters.getCoreManager().getWorkingPage().corners().setUpLeft(p);
-		} else if (this.isWithinCornerEllipse(this.cornerUR, arg0.getX(), arg0.getY())) {
+		}
+
+		// 2. move upper right ellipse
+		else if (this.isWithinCornerEllipse(this.cornerUR, arg0.getX(), arg0.getY())) {
+			this.moveCornerTo(cornerURorig, arg0.getX() - this.cornerUR.getWidth()/2, arg0.getY() - this.cornerUR.getHeight()/2);
 			this.moveCornerTo(cornerUR, arg0.getX() - this.cornerUR.getWidth()/2, arg0.getY() - this.cornerUR.getHeight()/2);
 			this.moveLine(this.lineULUR, this.cornerUL, this.cornerUR);
 			this.moveLine(this.lineURDR, this.cornerUR, this.cornerDR);
 			Parameters.getCoreManager().getWorkingPage().corners().setUpRight(p);
-		} else if (this.isWithinCornerEllipse(this.cornerDL, arg0.getX(), arg0.getY())) {
+		}
+		
+		// 3. move lower left ellipse
+		else if (this.isWithinCornerEllipse(this.cornerDL, arg0.getX(), arg0.getY())) {
+			this.moveCornerTo(cornerDLorig, arg0.getX() - this.cornerDL.getWidth()/2, arg0.getY() - this.cornerDL.getHeight()/2);
 			this.moveCornerTo(cornerDL, arg0.getX() - this.cornerDL.getWidth()/2, arg0.getY() - this.cornerDL.getHeight()/2);
 			this.moveLine(this.lineDLUL, this.cornerDL, this.cornerUL);
 			this.moveLine(this.lineDRDL, this.cornerDR, this.cornerDL);
 			Parameters.getCoreManager().getWorkingPage().corners().setDownLeft(p);
-		} else if (this.isWithinCornerEllipse(this.cornerDR, arg0.getX(), arg0.getY())) {
+		}
+		
+		// 4. move lower right ellipse
+		else if (this.isWithinCornerEllipse(this.cornerDR, arg0.getX(), arg0.getY())) {
+			this.moveCornerTo(cornerDRorig, arg0.getX() - this.cornerDR.getWidth()/2, arg0.getY() - this.cornerDR.getHeight()/2);
 			this.moveCornerTo(cornerDR, arg0.getX() - this.cornerDR.getWidth()/2, arg0.getY() - this.cornerDR.getHeight()/2);
 			this.moveLine(this.lineDRDL, this.cornerDR, this.cornerDL);
 			this.moveLine(this.lineURDR, this.cornerUR, this.cornerDR);
@@ -299,7 +341,56 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 			this.scaleFactor += 0.1;
 		}
 		
+		// scale the points with respect to the center
+		// 1. upper left
+		double newX = this.scaleFactor * (cornerULorig.getCenterX() - this.getWidth()/2) + this.getWidth()/2;
+		double newY = this.scaleFactor * (cornerULorig.getCenterY() - this.getHeight()/2) + this.getHeight()/2;
+		this.moveCornerTo(cornerUL, (int) newX, (int) newY);
+		Point p = new Point((int) newX, (int) newY);
+		Parameters.getCoreManager().getWorkingPage().corners().setUpLeft(p);
+		
+		// 2. lower left
+		newX = this.scaleFactor * (cornerDLorig.getCenterX() - this.getWidth()/2) + this.getWidth()/2;
+		newY = this.scaleFactor * (cornerDLorig.getCenterY() - this.getHeight()/2) + this.getHeight()/2;
+		this.moveCornerTo(cornerDL, (int) newX, (int) newY);
+		p = new Point((int) newX, (int) newY);
+		Parameters.getCoreManager().getWorkingPage().corners().setUpLeft(p);
+		
+		// 3. upper right
+		newX = this.scaleFactor * (cornerURorig.getCenterX() - this.getWidth()/2) + this.getWidth()/2;
+		newY = this.scaleFactor * (cornerURorig.getCenterY() - this.getHeight()/2) + this.getHeight()/2;
+		this.moveCornerTo(cornerUR, (int) newX, (int) newY);
+		p = new Point((int) newX, (int) newY);
+		Parameters.getCoreManager().getWorkingPage().corners().setUpLeft(p);
+		
+		// 4. lower right
+		newX = this.scaleFactor * (cornerDRorig.getCenterX() - this.getWidth()/2) + this.getWidth()/2;
+		newY = this.scaleFactor * (cornerDRorig.getCenterY() - this.getHeight()/2) + this.getHeight()/2;
+		this.moveCornerTo(cornerDR, (int) newX, (int) newY);
+		p = new Point((int) newX, (int) newY);
+		Parameters.getCoreManager().getWorkingPage().corners().setUpLeft(p);
+		
+		// rescale connecting lines
+		this.moveLine(this.lineDRDL, this.cornerDR, this.cornerDL);
+		this.moveLine(this.lineURDR, this.cornerUR, this.cornerDR);
+		this.moveLine(this.lineDLUL, this.cornerDL, this.cornerUL);
+		this.moveLine(this.lineULUR, this.cornerUL, this.cornerUR);
+		
 		this.repaint();
 		
 	}
+
+	
+	public void mouseReleased(MouseEvent e) {
+		this.setCursor(Cursor.getDefaultCursor());
+	}
+	
+	/**
+	 * Un-implemented mouse listener methods
+	 */
+	public void mouseClicked(MouseEvent e) {}
+	public void mousePressed(MouseEvent e) {}
+	public void mouseEntered(MouseEvent e) {}
+	public void mouseExited(MouseEvent e) {}
+	
 }
