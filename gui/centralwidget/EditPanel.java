@@ -104,6 +104,11 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	private Ellipse2D drawableDR;
 	private Ellipse2D drawableDL;
 	
+	/**
+	 * These point transform objects represent the affine
+	 * transform that must be applied to a point based on
+	 * the user dragging and dropping the point.
+	 */
 	private PointTransform transUR = new PointTransform();
 	private PointTransform transUL = new PointTransform();
 	private PointTransform transDR = new PointTransform();
@@ -118,6 +123,18 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	 * The buffered image representing the page.
 	 */
 	private BufferedImage img;
+	
+	/**
+	 * the color to display points when they are
+	 * being dragged.
+	 */
+	private static Color draggingColor = Color.RED;
+	
+	/**
+	 * the color in which to draw the points when
+	 * they are not being dragged
+	 */
+	private static Color staticColor = Color.BLUE;
 
 	/****************************************
 	 * 
@@ -256,15 +273,31 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 		brush.draw(this.lineDLUL);
 
 		// draw points
-		brush.setColor(Color.BLUE);
+		setCornerColor(this.transUR, brush);
 		brush.draw(this.drawableUR);
-		brush.draw(this.drawableUL);
-		brush.draw(this.drawableDR);
-		brush.draw(this.drawableDL);
 		brush.fill(this.drawableUR);
+		
+		setCornerColor(this.transUL, brush);
+		brush.draw(this.drawableUL);
 		brush.fill(this.drawableUL);
+		
+		setCornerColor(this.transDR, brush);
+		brush.draw(this.drawableDR);
 		brush.fill(this.drawableDR);
+		
+		setCornerColor(this.transDL, brush);
+		brush.draw(this.drawableDL);
 		brush.fill(this.drawableDL);
+
+	}
+	
+	
+	private void setCornerColor(PointTransform pt, Graphics2D g) {
+		if (pt.dragging) {
+			g.setColor(draggingColor);
+		} else {
+			g.setColor(staticColor);
+		}
 	}
 
 	/****************************************
@@ -430,30 +463,42 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 		// upper left corner
 		if (this.isWithinCornerEllipse(this.drawableUL, e.getX(), e.getY())) {
 			transUL.dragX = e.getX(); transUL.dragY = e.getY();
+			transUL.dragging = true;
 		}
 		
 		// upper right corner
 		else if (this.isWithinCornerEllipse(this.drawableUR, e.getX(), e.getY())) {
 			transUR.dragX = e.getX(); transUR.dragY = e.getY();
+			transUR.dragging = true;
 		}
 		
 		// lower left corner
 		else if (this.isWithinCornerEllipse(this.drawableDL, e.getX(), e.getY())) {
 			transDL.dragX = e.getX(); transDL.dragY = e.getY();
+			transDL.dragging = true;
 		}
 
 		// lower right corner
 		else if (this.isWithinCornerEllipse(this.drawableDR, e.getX(), e.getY())) {
 			transDR.dragX = e.getX(); transDR.dragY = e.getY();
+			transDR.dragging = true;
 		}
 		
 	}
 	
 	/**
-	 * Restore the default cursor upon mouse release
+	 * Restore the default cursor upon mouse release.
+	 * Also reset each corner point to a non-dragging state.
 	 */
 	public void mouseReleased(MouseEvent e) {
 		this.setCursor(Cursor.getDefaultCursor());
+		
+		this.transUR.dragging = false;
+		this.transUL.dragging = false;
+		this.transDR.dragging = false;
+		this.transDL.dragging = false;
+		
+		this.repaint();
 	}
 
 	/**
