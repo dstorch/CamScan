@@ -71,13 +71,21 @@ public class ViewPanel extends JPanel implements MouseWheelListener {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-
-		//Parameters.getCoreManager().updateWorkingImage();
 		
 		if (this.img != Parameters.getCoreManager().getWorkingImage()) {
 			this.scaleFactor = 1;
 			this.img = Parameters.getCoreManager().getWorkingImage();
-		}	
+			
+			double xSideRatio = ((double) this.getWidth())/((double) this.img.getWidth());
+			double ySideRatio = ((double) this.getHeight())/((double) this.img.getHeight());
+			
+			if (ySideRatio > xSideRatio)
+				this.scaleFactor = xSideRatio;
+			else
+				this.scaleFactor = ySideRatio;
+			
+			this.scaleFactor *= 0.95;
+		}
 		
 		if (this.img != null) {
 			int newW = (int) (this.img.getWidth() * this.scaleFactor);

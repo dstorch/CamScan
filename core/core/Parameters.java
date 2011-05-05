@@ -8,6 +8,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 import search.SearchResults;
+import westwidget.DocExplorerPanel;
 
 public class Parameters {
 
@@ -90,6 +91,10 @@ public class Parameters {
 	 */
 	private static SearchResults searchResults;
 
+	/**
+	 * Reference to the document explorer panel
+	 */
+	private static DocExplorerPanel docExpPanel;
 	
 	/****************************************
 	 * 
@@ -124,6 +129,14 @@ public class Parameters {
 		return searchResults;
 	}
 	
+	/**
+	 * Returns the reference to the doc explorer panel.
+	 * 
+	 * @return The reference to the doc explorer panel
+	 */
+	public static DocExplorerPanel getDocExpPanel() {
+		return docExpPanel;
+	}
 	
 	/****************************************
 	 * 
@@ -160,6 +173,17 @@ public class Parameters {
 	 */
 	public static void setSearchResults(SearchResults sr) {
 		searchResults = sr;
+	}
+	
+	/**
+	 * Sets the document explorer panel reference.
+	 * 
+	 * @param p The doc explorer panel references
+	 */
+	public static void setDocExplorerPanel(DocExplorerPanel p) {
+		
+		if (docExpPanel == null) 
+			docExpPanel = p;
 	}
 	
 	

@@ -6,7 +6,7 @@ import core.Document;
 
 public interface Exporter {
 	
-	public void exportToPdf(String pathname, String outfile) throws IOException;
+	public void exportToPdf(Document document, String outfile) throws IOException;
 	
 	public void exportImages(Document document, String outdirectory) throws IOException;
 	

@@ -212,8 +212,7 @@ public class App extends JFrame {
 				JOptionPane.showMessageDialog(app, e.getMessage(), "Import Error", JOptionPane.ERROR_MESSAGE);
 			}
 			
-			// TODO
-			//Parameters.updateGUI();
+			Parameters.getDocExpPanel().update();
 		}
 	}
 	
@@ -266,9 +265,6 @@ public class App extends JFrame {
 			
 			// get the path for the output file
 			String outpath = folder.getPath();
-			String lowerpath = outpath.toLowerCase();
-			if (!lowerpath.endsWith(".txt") && !lowerpath.endsWith(".text") )
-				outpath += ".txt";
 			
 			try {
 				Parameters.getCoreManager().exportImages(workingDocument, outpath);
@@ -284,12 +280,15 @@ public class App extends JFrame {
 	 */
 	private class ExportTextListener implements ActionListener {
 		public void actionPerformed(ActionEvent arg0) {
-			File folder = getUserFileForExport(Parameters.txtExtensions);
+			File file = getUserFileForExport(Parameters.txtExtensions);
 			
 			Document workingDocument = Parameters.getCoreManager().workingDocument();
 			if (workingDocument == null) return;
 			
-			String outpath = folder.getPath();
+			String outpath = file.getPath();
+			String lowerpath = outpath.toLowerCase();
+			if (!lowerpath.endsWith(".txt") && !lowerpath.endsWith(".text") )
+				outpath += ".txt";
 			
 			try {
 				Parameters.getCoreManager().exportText(workingDocument, outpath);
