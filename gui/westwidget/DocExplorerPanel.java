@@ -104,6 +104,25 @@ public class DocExplorerPanel extends JPanel {
 		this.listScroller.revalidate();
 	}
 	
+	/**
+	 * Sets the page order.
+	 * 
+	 * @param order The page order to set
+	 */
+	public void setDocOrder(String docName) {
+		
+		int order = -1;
+		Vector<String> docNames = this.getDocumentNames();
+		
+		for (int i = 0; i < docNames.size(); i++) {
+			if (docNames.get(i).equals(docName))
+				order = i;
+		}
+		
+		this.docList.setSelectedIndex(order);
+		this.centralPanel.updatePanels(false);
+	}
+	
 	/****************************************
 	 * 
 	 * Private Methods
@@ -161,7 +180,7 @@ public class DocExplorerPanel extends JPanel {
 
 				// Get the very first page and display its image on the
 				// central panel.
-				centralPanel.updatePanels();
+				centralPanel.updatePanels(false);
 			}
 		}
 	}

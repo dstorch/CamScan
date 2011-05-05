@@ -91,6 +91,16 @@ public class PageExplorerPanel extends JPanel {
 		this.pageList.setSelectedIndex(0);
 	}
 	
+	/**
+	 * Sets the page order.
+	 * 
+	 * @param order The page order to set
+	 */
+	public void setPageOrder(int order) {
+		this.pageList.setSelectedIndex(order);
+		this.mainPanel.updateCentralPanels(false);
+	}
+	
 	/****************************************
 	 * 
 	 * Private Methods
@@ -151,7 +161,7 @@ public class PageExplorerPanel extends JPanel {
 						e1.printStackTrace();
 					}
 					
-		        	mainPanel.updateCentralPanels();
+		        	mainPanel.updateCentralPanels(false);
 		        }
 		    }
 		}

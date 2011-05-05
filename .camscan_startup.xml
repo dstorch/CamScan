@@ -3,5 +3,7 @@
 <STARTUP>
   <TESSERACT path="/usr/local/bin/tesseract"/>
   <DOCLIST>
+	<DOC value="workspace/docs/doc1/doc1.xml" />
+	<DOC value="workspace/docs/myDoc/myDoc.xml" />
   </DOCLIST>
 </STARTUP>
