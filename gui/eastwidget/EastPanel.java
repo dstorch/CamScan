@@ -39,7 +39,6 @@ public class EastPanel extends JPanel {
 	 */
 	public EastPanel(MainPanel mainPanel) {
 		super();
-		
 		this.pageExpPanel = new PageExplorerPanel(mainPanel);
 		this.add(pageExpPanel);
 	}

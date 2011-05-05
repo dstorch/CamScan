@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -41,6 +42,11 @@ public class ToolbarPanel extends JPanel {
         private JButton zoomInButton;
 
         private JButton zoomOutButton;
+	
+	/**
+	 * The view radio button.
+	 */
+	private JRadioButton viewRButton;
 	
 	/****************************************
 	 * 
@@ -80,14 +86,26 @@ public class ToolbarPanel extends JPanel {
 		// for switching between the view and edit modes.
 		ModeListener modeListener = new ModeListener();
 		
-		// Setup the view mode radio button.
-		c.gridx = 4;
+		// the view mode magnifying glass icon
+		c.gridx = 2;
 		c.insets = new Insets(0,250,0,0);
-		JRadioButton viewRButton = new JRadioButton("View Mode");
-		viewRButton.setActionCommand("VIEW");
-		viewRButton.setSelected(true);
-		viewRButton.addActionListener(modeListener);
-		this.add(viewRButton, c);
+		JRadioButton viewIcon = new JRadioButton(new ImageIcon("libraries/icons/magnify.png"));
+		this.add(viewIcon, c);
+		
+		// Setup the view mode radio button.
+		c.gridx = 3;
+		c.insets = new Insets(0,0,0,0);
+		this.viewRButton = new JRadioButton("View Mode");
+		this.viewRButton.setActionCommand("VIEW");
+		this.viewRButton.setSelected(true);
+		this.viewRButton.addActionListener(modeListener);
+		this.add(this.viewRButton, c);
+		
+		// the edit mode pencil icon
+		c.gridx = 4;
+		c.insets = new Insets(0,10,0,0);
+		JRadioButton editIcon = new JRadioButton(new ImageIcon("libraries/icons/pencil.png"));
+		this.add(editIcon, c);
 		
 		// Setup the edit mode radio button.
 		c.gridx = 5;
@@ -100,7 +118,7 @@ public class ToolbarPanel extends JPanel {
 		// Group the view mode and edit mode radio buttons
 		// together.
 		this.modeButtonGroup = new ButtonGroup();
-		this.modeButtonGroup.add(viewRButton);
+		this.modeButtonGroup.add(this.viewRButton);
 		this.modeButtonGroup.add(editRButton);
 	}
 	
@@ -127,6 +145,13 @@ public class ToolbarPanel extends JPanel {
              zoomOutButton.setVisible(false);
             
         }
+	
+	/**
+	 * Selects the view radio button.
+	 */
+	public void selectViewRButton() {
+		this.viewRButton.setSelected(true);
+	}
 	
 	/****************************************
 	 * 

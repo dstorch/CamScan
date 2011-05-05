@@ -7,6 +7,10 @@ import java.awt.event.AdjustmentListener;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import westwidget.WestPanel;
+
+import eastwidget.EastPanel;
+
 /**
  * The Central Panel of this application.
  * The pages and the search results are displayed here.
@@ -47,6 +51,16 @@ public class CentralPanel extends JPanel {
 	 */
 	private ToolbarPanel toolbarPanel;
 	
+	/**
+	 * Reference to the east panel.
+	 */
+	private EastPanel eastPanel;
+	
+	/**
+	 * Reference to the west panel.
+	 */
+	private WestPanel westPanel;
+	
 	/****************************************
 	 * 
 	 * Constructors.
@@ -56,9 +70,10 @@ public class CentralPanel extends JPanel {
 	/**
 	 * Constructor.
 	 */
-	public CentralPanel() {
+	public CentralPanel(EastPanel eastPanel) {
 		super();
 		this.setLayout(new BorderLayout());
+		this.eastPanel = eastPanel;
 		
 		// Add the toolbar panel.
 		this.toolbarPanel = new ToolbarPanel(this);
@@ -74,13 +89,14 @@ public class CentralPanel extends JPanel {
 //		viewScrollPane.getHorizontalScrollBar().addAdjustmentListener(new HorizontalScrollBarListener());
 //		viewScrollPane.getVerticalScrollBar().setUnitIncrement(10);
 //		this.add(viewScrollPane);
-		this.add(this.viewPanel, BorderLayout.CENTER);
+		this.add(viewPanel, BorderLayout.CENTER);
 		
 		// Setup the edit panel.
 		this.editPanel = new EditPanel();
 		
 		// Setup the search results panel.
-		this.searchResultsPanel = new SearchResultsPanel();
+		this.searchResultsPanel = new SearchResultsPanel(this);
+		this.searchResultsPanel.setSize(this.getSize());
 		
 		// Add the button panel.
 		this.buttonPanel = new ButtonPanel();
@@ -99,6 +115,21 @@ public class CentralPanel extends JPanel {
 	
 	/****************************************
 	 * 
+	 * Setters
+	 * 
+	 ****************************************/
+	
+	/**
+	 * Sets the west panel.
+	 * 
+	 * @param westPanel The west panel to set
+	 */
+	public void setWestPanel(WestPanel westPanel) {
+		this.westPanel = westPanel;
+	}
+	
+	/****************************************
+	 * 
 	 * Public Methods
 	 * 
 	 ****************************************/
@@ -107,6 +138,8 @@ public class CentralPanel extends JPanel {
 	 * Switches to the view panel.
 	 */
 	public void switchToViewPanel() {
+		
+		this.toolbarPanel.selectViewRButton();
 		
 		if (this.editPanel.getParent() != null) {
 			this.editPanel.setVisible(false);
@@ -173,11 +206,27 @@ public class CentralPanel extends JPanel {
 	 * edit panels to draw the image once
 	 * a new current image has been selected.
 	 */
-	public void updatePanels() {
+	public void updatePanels(boolean updateSearchPanel) {
 		this.viewPanel.repaint();
 		this.editPanel.updateCornersOnPanel();
 		this.editPanel.repaint();
-		this.searchResultsPanel.updateSearchResults();
-		this.searchResultsPanel.repaint();
+		
+		if (updateSearchPanel) {
+			this.searchResultsPanel.updateSearchResults();
+			this.searchResultsPanel.repaint();
+		}
+	}
+	
+	/**
+	 * Sets the order in the page explorer panel.
+	 * 
+	 * @param order The given order
+	 */
+	public void setPageOrderInPageExpPanel(int order) {
+		this.eastPanel.getPageExpPanel().setPageOrder(order);
+	}
+	
+	public void setSelectedDocInDocExpPanel(String docName) {
+		this.westPanel.getDocExpPanel().setDocOrder(docName);
 	}
 }

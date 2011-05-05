@@ -19,6 +19,17 @@ import eastwidget.PageExplorerPanel;
  *
  */
 public class WestPanel extends JPanel {
+	
+	/****************************************
+	 * 
+	 * Private Instance Variables
+	 * 
+	 ****************************************/
+	
+	/**
+	 * The document explorer panel.
+	 */
+	private DocExplorerPanel docExpPanel;
 
 	/****************************************
 	 * 
@@ -41,11 +52,20 @@ public class WestPanel extends JPanel {
 		this.add(searchPanel, BorderLayout.NORTH);
 		
 		// Setup the document explorer panel
-		DocExplorerPanel docExpPanel = new DocExplorerPanel(pageExpPanel, centralPanel);
-		this.add(docExpPanel, BorderLayout.CENTER);
+		this.docExpPanel = new DocExplorerPanel(pageExpPanel, centralPanel);
+		this.add(this.docExpPanel, BorderLayout.CENTER);
 	
 		// Setup the drag'n'drop panel
 		DDPanel ddPanel = new DDPanel(docExpPanel);
 		this.add(ddPanel, BorderLayout.SOUTH);
+	}
+	
+	/**
+	 * Returns the document explorer panel.
+	 * 
+	 * @return The document explorer panel
+	 */
+	public DocExplorerPanel getDocExpPanel() {
+		return this.docExpPanel;
 	}
 }
