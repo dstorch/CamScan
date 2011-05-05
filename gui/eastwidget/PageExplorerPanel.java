@@ -143,9 +143,14 @@ public class PageExplorerPanel extends JPanel {
 		    	// Get the current page and draw it on the panel.
 		        String currPageName = (String) pageList.getSelectedValue();
 		        if (currPageName != null) {
-		        	Page currPage = Parameters.getCoreManager().getWorkingDocPageFromOrder(Integer.parseInt(currPageName));
-		        	Parameters.setCurrPageImg(currPage.raw());
-		        	Parameters.getCoreManager().setWorkingPage(currPage);
+		        	Page currPage = Parameters.getCoreManager().getWorkingDocPageFromName(Integer.parseInt(currPageName));
+		        	
+		        	try {
+						Parameters.getCoreManager().setWorkingPageAndImage(currPage);
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+					
 		        	mainPanel.updateCentralPanels();
 		        }
 		    }

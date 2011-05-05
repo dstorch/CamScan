@@ -86,19 +86,10 @@ public class Parameters {
 	private static JFrame app;
 	
 	/**
-	 * The current page as a buffered image.
-	 */
-	private static BufferedImage currPageImg;
-	
-	/**
 	 * The Search Results from the latest search.
 	 */
 	private static SearchResults searchResults;
-	
-//	/**
-//	 * The working page.
-//	 */
-//	private static Page workingPage;
+
 	
 	/****************************************
 	 * 
@@ -125,15 +116,6 @@ public class Parameters {
 	}
 	
 	/**
-	 * Returns the current page buffered image.
-	 * 
-	 * @return The current page buffered image
-	 */
-	public static BufferedImage getCurrPageImg() {
-		return currPageImg;
-	}
-	
-	/**
 	 * Returns the search results from the latest search.
 	 * 
 	 * @return The search results from the latest search
@@ -142,14 +124,6 @@ public class Parameters {
 		return searchResults;
 	}
 	
-//	/**
-//	 * Returns the working page.
-//	 * 
-//	 * @return The working page
-//	 */
-//	public static Page getWorkingPage() {
-//		return coreManager.getWorkingPage();
-//	}
 	
 	/****************************************
 	 * 
@@ -180,29 +154,6 @@ public class Parameters {
 	}
 	
 	/**
-	 * Given the path to the raw page image, it
-	 * sets the current page image as a buffered
-	 * image.
-	 * 
-	 * @param raw The path to the raw image.
-	 */
-	public static void setCurrPageImg(String raw) {
-		try {
-			currPageImg = ImageIO.read(new File(raw));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-        /**
-         * 
-         * @param img
-         */
-        public static void setCurrPageImg(BufferedImage img){
-            currPageImg = img;
-        }
-	
-	/**
 	 * Sets the search results from the latest search.
 	 * 
 	 * @param sr The search results to set
@@ -211,14 +162,6 @@ public class Parameters {
 		searchResults = sr;
 	}
 	
-//	/**
-//	 * Sets the working page.
-//	 * 
-//workingPage	 * @param p The working page to set
-//	 */
-//	public static void setWorkingPage(Page p) {
-//		 = p;
-//	}
 	
 	/****************************************
 	 * 

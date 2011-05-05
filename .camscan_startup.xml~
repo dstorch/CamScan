@@ -1,11 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?>
+l<?xml version="1.0" encoding="UTF-8"?>
 
 <STARTUP>
 <<<<<<< HEAD
 =======
   <TESSERACT path="/usr/local/bin/tesseract"/>
-  <WORKINGDOC value="workspace/docs/sample2/doc.xml"/>
+  <WORKINGDOC value="workspace/docs/testDocument/doc.xml"/>
+  <WORKINGPAGE value="workspace/docs/copiedDoc/hamlet_1.xml" order="1"/>
   <DOCLIST>
+    <DOC value="workspace/docs/copiedDoc/doc.xml"/>
+    <DOC value="workspace/docs/testDocument/doc.xml"/>
   </DOCLIST>
->>>>>>> 32a0abe07106e4522306ac333ecc1f31407df65b
+>>>>>>> 7290ea370df14026450ebbc462ce4e013b3b214c
 </STARTUP>

@@ -16,6 +16,7 @@ import vision.VisionManager;
 
 public class Page {
 	
+	// used for searching the text of the page
 	private static final int GREP_WINDOW = 10;
 	
 	// major attributes
@@ -31,6 +32,8 @@ public class Page {
 	// reference to the containing document
 	private Document _parentDoc;
 	
+	// the placement of the page relative to other
+	// pages in the document
 	private int _order;
 	
 	public Page(Document parent, int order) {
@@ -93,6 +96,14 @@ public class Page {
 		_parentDoc = parent;
 	}
 	
+	public BufferedImage getRawImgFromDisk() throws IOException {
+		return ImageIO.read(new File(raw()));
+	}
+	
+	public BufferedImage getProcessedImgFromDisk() throws IOException {
+		return ImageIO.read(new File(processed()));
+	}
+	
     // sets corners and config file for the initial guesses of an imported document
     public void initGuesses() throws IOException {
     	System.out.println("Raw file: "+raw());
@@ -107,12 +118,10 @@ public class Page {
     
     // writes the current process image to workspace/processed
     public void writeProcessedImage() throws IOException {
-  
-        // read a buffered image from the disk
-    	BufferedImage buff = ImageIO.read(new File(raw()));
-    	
+
     	// write out image as a TIFF file
-        VisionManager.writeTIFF(buff, processed());
+    	VisionManager.writeTIFF(getRawImgFromDisk(), processed());
+    	
     }
 	
 	public void setOcrResults() throws IOException {
