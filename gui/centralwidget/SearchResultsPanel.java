@@ -127,9 +127,18 @@ public class SearchResultsPanel extends JPanel implements ActionListener {
 		 * Add the button panel. 
 		 */
 		JPanel buttonPanel = new JPanel();
+		
+		// Add the GoToPage button
 		JButton goToPageButton = new JButton("Go to Result");
 		goToPageButton.addActionListener(this);
 		buttonPanel.add(goToPageButton);
+		
+		// Add the GoToViewMode button
+		JButton goToViewModeButton = new JButton("Go to View Mode");
+		goToViewModeButton.addActionListener(new ViewModeListener());
+		buttonPanel.add(goToViewModeButton);
+		
+		// The the button panel to the search results panel
 		this.add(buttonPanel);
 	}
 	
@@ -341,5 +350,19 @@ public class SearchResultsPanel extends JPanel implements ActionListener {
 				return null;
 			}
 		}
+	}
+	
+	/**
+	 * Action Listener implementation for the GoToViewMode
+	 * button.
+	 */
+	private class ViewModeListener implements ActionListener { 
+
+		/**
+		 * Called when the GoToViewMode button has been pressed.
+		 */
+		public void actionPerformed(ActionEvent arg0) {
+			centralPanel.switchToViewPanel();
+		} 
 	}
 }

@@ -139,6 +139,8 @@ public class CentralPanel extends JPanel {
 	 */
 	public void switchToViewPanel() {
 		
+		this.toolbarPanel.selectViewRButton();
+		
 		if (this.editPanel.getParent() != null) {
 			this.editPanel.setVisible(false);
 			this.remove(this.editPanel);

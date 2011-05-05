@@ -38,6 +38,11 @@ public class ToolbarPanel extends JPanel {
 	 */
 	private ButtonGroup modeButtonGroup;
 	
+	/**
+	 * The view radio button.
+	 */
+	private JRadioButton viewRButton;
+	
 	/****************************************
 	 * 
 	 * Constants
@@ -71,11 +76,11 @@ public class ToolbarPanel extends JPanel {
 		// Setup the view mode radio button.
 		c.gridx = 2;
 		c.insets = new Insets(0,250,0,0);
-		JRadioButton viewRButton = new JRadioButton("View Mode");
-		viewRButton.setActionCommand("VIEW");
-		viewRButton.setSelected(true);
-		viewRButton.addActionListener(modeListener);
-		this.add(viewRButton, c);
+		this.viewRButton = new JRadioButton("View Mode");
+		this.viewRButton.setActionCommand("VIEW");
+		this.viewRButton.setSelected(true);
+		this.viewRButton.addActionListener(modeListener);
+		this.add(this.viewRButton, c);
 		
 		// Setup the edit mode radio button.
 		c.gridx = 3;
@@ -88,7 +93,7 @@ public class ToolbarPanel extends JPanel {
 		// Group the view mode and edit mode radio buttons
 		// together.
 		this.modeButtonGroup = new ButtonGroup();
-		this.modeButtonGroup.add(viewRButton);
+		this.modeButtonGroup.add(this.viewRButton);
 		this.modeButtonGroup.add(editRButton);
 	}
 	
@@ -102,7 +107,14 @@ public class ToolbarPanel extends JPanel {
 	 * Unselects both mode radio buttons.
 	 */
 	public void unselectModeButtons() {
-		//this.modeButtonGroup.clearSelection();
+		this.modeButtonGroup.clearSelection();
+	}
+	
+	/**
+	 * Selects the view radio button.
+	 */
+	public void selectViewRButton() {
+		this.viewRButton.setSelected(true);
 	}
 	
 	/****************************************
