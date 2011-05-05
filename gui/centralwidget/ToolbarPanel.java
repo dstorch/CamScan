@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -73,17 +74,29 @@ public class ToolbarPanel extends JPanel {
 		// for switching between the view and edit modes.
 		ModeListener modeListener = new ModeListener();
 		
-		// Setup the view mode radio button.
+		// the view mode magnifying glass icon
 		c.gridx = 2;
 		c.insets = new Insets(0,250,0,0);
+		JRadioButton viewIcon = new JRadioButton(new ImageIcon("libraries/icons/magnify.png"));
+		this.add(viewIcon, c);
+		
+		// Setup the view mode radio button.
+		c.gridx = 3;
+		c.insets = new Insets(0,0,0,0);
 		this.viewRButton = new JRadioButton("View Mode");
 		this.viewRButton.setActionCommand("VIEW");
 		this.viewRButton.setSelected(true);
 		this.viewRButton.addActionListener(modeListener);
 		this.add(this.viewRButton, c);
 		
+		// the edit mode pencil icon
+		c.gridx = 4;
+		c.insets = new Insets(0,10,0,0);
+		JRadioButton editIcon = new JRadioButton(new ImageIcon("libraries/icons/pencil.png"));
+		this.add(editIcon, c);
+		
 		// Setup the edit mode radio button.
-		c.gridx = 3;
+		c.gridx = 5;
 		c.insets = new Insets(0,0,0,0);
 		JRadioButton editRButton = new JRadioButton("Edit Mode");
 		editRButton.setActionCommand("EDIT");
@@ -107,7 +120,7 @@ public class ToolbarPanel extends JPanel {
 	 * Unselects both mode radio buttons.
 	 */
 	public void unselectModeButtons() {
-		this.modeButtonGroup.clearSelection();
+		//this.modeButtonGroup.clearSelection();
 	}
 	
 	/**

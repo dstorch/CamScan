@@ -202,7 +202,6 @@ public class SearchResultsPanel extends JPanel implements ActionListener {
 	 * This actionPerformed method is called when the
 	 * user clicks on the "Go to Result" button.
 	 */
-	@Override
 	public void actionPerformed(ActionEvent e) {
 		
 		if (this.selectedOrder == -1) {

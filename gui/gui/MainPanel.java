@@ -2,6 +2,7 @@ package gui;
 
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.io.IOException;
 
 import javax.swing.JPanel;
@@ -51,7 +52,6 @@ public class MainPanel extends JPanel {
 	public MainPanel() throws DocumentException, IOException {
 		super();
 		this.setLayout(new BorderLayout());
-		
 		
 		Parameters.setCoreManager(new CoreManager());
 		

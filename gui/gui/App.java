@@ -1,6 +1,7 @@
 package gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -15,6 +16,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 
 import org.dom4j.DocumentException;
@@ -56,6 +58,8 @@ public class App extends JFrame {
 	 */
 	public App() throws DocumentException, IOException {
 
+
+		
 		/*
 		 *  Setup the JFrame
 		 */
