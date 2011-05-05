@@ -2,19 +2,13 @@ package gui;
 
 
 import java.awt.BorderLayout;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.List;
 
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.dom4j.DocumentException;
 
 import core.CoreManager;
-import core.Document;
 import core.Parameters;
 
 import westwidget.WestPanel;
@@ -60,25 +54,27 @@ public class MainPanel extends JPanel {
 		
 		
 		Parameters.setCoreManager(new CoreManager());
-	
-		// Setup the central panel
-		this.centralPanel = new CentralPanel();
-		this.add(this.centralPanel, BorderLayout.CENTER);
 		
 		// Setup the east panel
 		EastPanel eastPanel = new EastPanel(this);
 		this.add(eastPanel, BorderLayout.EAST);
+		
+		// Setup the central panel
+		this.centralPanel = new CentralPanel(eastPanel);
+		this.add(this.centralPanel, BorderLayout.CENTER);
 
 		// Setup the west panel
 		WestPanel westPanel = new WestPanel(eastPanel.getPageExpPanel(), this.centralPanel);
 		this.add(westPanel, BorderLayout.WEST);
+		
+		this.centralPanel.setWestPanel(westPanel);
 	}
 	
 	/**
 	 * To be called one the current page has changed.
 	 * It updates the UI to show that page.
 	 */
-	public void updateCentralPanels() {
-		this.centralPanel.updatePanels();
+	public void updateCentralPanels(boolean updateSearchPanel) {
+		this.centralPanel.updatePanels(updateSearchPanel);
 	}
 }

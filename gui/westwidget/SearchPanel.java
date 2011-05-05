@@ -3,11 +3,15 @@ package westwidget;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 
 import search.SearchResults;
 
@@ -68,6 +72,14 @@ public class SearchPanel extends JPanel implements ActionListener {
 		searchButton.addActionListener(this);
 		this.add(searchButton);
 		
+		// TODO: Binding enter to the search button. Dunno why it doesn't work
+		searchButton.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "search");
+		searchButton.getActionMap().put("search", new AbstractAction() {
+			public void actionPerformed(ActionEvent e) {
+		       System.out.println("OK");
+		    }
+		});
+		
 		// Setup a dummy label to leave some space below
 		// the search panel.
 		JLabel dummyLabel = new JLabel();
@@ -88,6 +100,6 @@ public class SearchPanel extends JPanel implements ActionListener {
 		this.centralPanel.switchToSearchResultsPanel();
 		SearchResults results = Parameters.getCoreManager().search(this.searchTextField.getText());
 		Parameters.setSearchResults(results);
-		this.centralPanel.updatePanels();
+		this.centralPanel.updatePanels(true);
 	}
 }

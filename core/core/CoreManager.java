@@ -461,6 +461,10 @@ public class CoreManager {
             }
         }
     }
+    
+    public void setWorkingDocument(Document doc) {
+    	_workingDocument = doc;
+    }
 
     public Page getWorkingPage() {
 		return _workingPage;
