@@ -1,10 +1,4 @@
 l<?xml version="1.0" encoding="UTF-8"?>
 
 <STARTUP>
-<<<<<<< HEAD
-=======
-  <TESSERACT path="/usr/local/bin/tesseract"/>
-  <DOCLIST>
-  </DOCLIST>
->>>>>>> b3ca2c617e18a83f08e6a033bc19ca3eb3b9e25d
 </STARTUP>
