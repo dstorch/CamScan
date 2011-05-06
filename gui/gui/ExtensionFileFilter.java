@@ -15,6 +15,7 @@ public class ExtensionFileFilter extends FileFilter {
 	@Override
 	public boolean accept(File f) {
 		String name = f.getAbsolutePath();
+		name = name.toLowerCase();
 		
 		if (f.isDirectory()) return true;
 		
