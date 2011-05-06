@@ -1,9 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <STARTUP>
-  <TESSERACT path="/usr/local/bin/tesseract"/>
-  <WORKINGDOC value="workspace/docs/phototest/doc.xml"/>
-  <DOCLIST>
-    <DOC value="workspace/docs/phototest/doc.xml"/>
-  </DOCLIST>
 </STARTUP>

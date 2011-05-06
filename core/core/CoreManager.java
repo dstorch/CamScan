@@ -369,7 +369,7 @@ public class CoreManager {
                 p.setMetafile(Parameters.DOC_DIRECTORY + "/" + d.name() + "/" + noExt + ".xml");
 
                 // guess initial configuration values
-                p.initGuesses();
+                //p.initGuesses();
                 d.addPage(p);
 
                 // do OCR!
