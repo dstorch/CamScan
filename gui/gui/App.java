@@ -44,6 +44,11 @@ public class App extends JFrame {
 	 */
 	private JFrame app;
 	
+	/**
+	 * Remember the last directory chosen for
+	 * JFileChooser.
+	 */
+	private File lastDirectory;
 
 	/****************************************
 	 * 
@@ -308,9 +313,21 @@ public class App extends JFrame {
 		JFileChooser fc = new JFileChooser();
 		int status = fc.showSaveDialog(app);
 		
+		if (this.lastDirectory != null) {
+			fc.setCurrentDirectory(this.lastDirectory);
+		}
+		
 		if (status == JFileChooser.APPROVE_OPTION) {
+			File selection = fc.getSelectedFile();
+			
+			// remember the last directory from
+			// which the user was selecting documents
+			this.lastDirectory = selection.getParentFile();
+			
 			return fc.getSelectedFile();
-		} else if (status == JFileChooser.CANCEL_OPTION) {
+		}
+		
+		else if (status == JFileChooser.CANCEL_OPTION) {
 			return null;
 		} else if (status == JFileChooser.ERROR_OPTION) {
 			return null;
@@ -332,9 +349,21 @@ public class App extends JFrame {
 		fc.setFileFilter(ff);
 		int status = fc.showSaveDialog(app);
 		
+		if (this.lastDirectory != null) {
+			fc.setCurrentDirectory(this.lastDirectory);
+		}
+		
 		if (status == JFileChooser.APPROVE_OPTION) {
+			File selection = fc.getSelectedFile();
+			
+			// remember the last directory from
+			// which the user was selecting documents
+			this.lastDirectory = selection.getParentFile();
+			
 			return fc.getSelectedFile();
-		} else if (status == JFileChooser.CANCEL_OPTION) {
+		}
+		
+		else if (status == JFileChooser.CANCEL_OPTION) {
 			return null;
 		} else if (status == JFileChooser.ERROR_OPTION) {
 			return null;
@@ -355,11 +384,25 @@ public class App extends JFrame {
 		JFileChooser fc = new JFileChooser();
 		fc.setFileFilter(ff);
 		fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+		
+		if (this.lastDirectory != null) {
+			fc.setCurrentDirectory(this.lastDirectory);
+		}
+		
 		int status = fc.showOpenDialog(app);
 		
+		// if a valid file for import is selected
 		if (status == JFileChooser.APPROVE_OPTION) {
-			return fc.getSelectedFile();
-		} else if (status == JFileChooser.CANCEL_OPTION) {
+			File selection = fc.getSelectedFile();
+			
+			// remember the last directory from
+			// which the user was selecting documents
+			this.lastDirectory = selection.getParentFile();
+			
+			return selection;
+		}
+		
+		else if (status == JFileChooser.CANCEL_OPTION) {
 			return null;
 		} else if (status == JFileChooser.ERROR_OPTION) {
 			return null;
