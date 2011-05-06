@@ -188,6 +188,7 @@ public class CoreManager {
 		d.rename(newName);
 		d.serialize();
 		writeStartupFile();
+                setWorkingDocumentFromName(newName);
 	}
 	
 	public void deleteDocument(String docName) throws IOException {

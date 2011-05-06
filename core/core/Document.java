@@ -73,7 +73,7 @@ public class Document {
 			// set path name variable for each page metafile
 			p.setMetafile(Parameters.DOC_DIRECTORY+"/"+newName+"/"+name);
 		}
-		
+
 		
 	}
 	
