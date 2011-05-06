@@ -11,6 +11,7 @@ import com.googlecode.javacv.cpp.opencv_core.CvMat;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 
 import static com.googlecode.javacv.cpp.opencv_core.*;
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
@@ -275,6 +276,10 @@ public class VisionManager {
 		return IplImage.createFrom(bufferedImage);
 	}
 	
+	public BufferedImage loadImage(String path){
+		return IplImageToBufferedImage(cvLoadImage(path));
+	}
+	
 	private static CvMat cornersToMat(Corners c){
 		CvMat points = cvCreateMat(4, 2, CV_64F);
 		points.put(0,0,c.upleft().x);
@@ -292,19 +297,29 @@ public class VisionManager {
 		return points;
 	}
 	
+	public CvPoint makePoint(float x, float y){
+		CvPoint pt = new CvPoint();
+		//pt.x = x;
+		//pt.y = y;
+		//pt.x();
+		return pt;
+	}
+	
 	public static void main(String[] args) throws IOException{
 		System.out.println("Vision library stub launcher");
-		IplImage image = cvLoadImage("tests/images/DSC_7384.JPG");
+		IplImage image = cvLoadImage("tests/images/DSC_7380.JPG");
 		System.out.println("Loaded");
         if (image != null) {
+        	
+        	int maxsize = 640;
         	
         	int nw = 0;
         	int nh = 0;
         	if (image.width() > image.height()){
-        		nw = 640;
+        		nw = maxsize;
         		nh = (int) ((image.height()*1.0/image.width())*nw);
         	}else{
-        		nh = 640;
+        		nh = maxsize;
         		nw = (int) ((image.width()*1.0/image.height())*nh);
         	}
         	
@@ -314,24 +329,51 @@ public class VisionManager {
         	
         	IplImage gray = cvCreateImage(cvSize(nw, nh), IPL_DEPTH_8U, 1);
         	cvResize(bgray, gray);
+        	cvEqualizeHist(gray, gray);
         	
         	IplImage edges = cvCreateImage(cvSize(nw, nh), IPL_DEPTH_32F, 1);
         	
         	//cvSmooth(gray, gray, CV_GAUSSIAN, 3);
             //cvCanny(gray, edges, 100, 3, 5);
-        	//cvLaplace(gray, edges, 3);
-        	cvCornerMinEigenVal(gray, edges, 80, 3); // (int) (Math.max(image.width(), image.height())*0.10)
+        	cvLaplace(gray, edges, 3);
+        	//cvCornerHarris(gray, edges, (int) (maxsize*0.1), 3, 0.04);
+        	//cvCornerMinEigenVal(gray, edges, 80, 3);
         	
-        	//cvShowImage("egdes", edges);
-        	//cvWaitKey();
         	
-        	//CvMat harris_response = cvGetMat(edges);
-        	//System.out.println(edges.get(5,5));
         	
         	IplImage output = cvCreateImage(cvSize(nw, nh), IPL_DEPTH_8U, 1);
+        	
+        	/*
+        	final FloatBuffer edgebuf = edges.getByteBuffer().asFloatBuffer();
+        	float v;
+        	float min = Float.MAX_VALUE;
+        	float max = 0;
+        	for(int i=0;i<edgebuf.capacity();i++){
+        		v = edgebuf.get(i);
+        		if (v < min){min=v;}
+        		if (v > max){max=v;}
+        	}
+        	System.out.println(min);
+        	System.out.println(max);
+        	cvConvertScale(edges, output, 255.0/(max-min), -min);
+        	*/
+        	
+        	
         	cvConvertScale(edges, output, 1, 0);
         	
-            cvSaveImage("output.png", output);
+        	CvMat lines_storage = cvCreateMat(4, 1, CV_32SC4);
+        	CvSeq results = cvHoughLines2(output, lines_storage, CV_HOUGH_PROBABILISTIC, 1, Math.PI/180, 100, 5, 3);
+        	/*for(int i=0;i<4;i++){
+        		float p1x = lines_storage.get(0, i, 0);
+        		float p1y = lines_storage.get(0, i, 1);
+        		float p2x = lines_storage.get(0, i, 2);
+        		float p2y = lines_storage.get(0, i, 3);
+        		cvLine(output, new CvPoint(p1x, p1y), new CvPoint(p2x, p2y), CV_RGB(255,0,0), 3, 8);
+        	}
+        	*/
+        	
+        	cvSaveImage("edges.png", output);
+            cvSaveImage("output.png", gray);
             
         	
         	
