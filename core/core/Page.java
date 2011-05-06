@@ -97,13 +97,13 @@ public class Page {
 	}
 	
 	public BufferedImage getRawImgFromDisk() throws IOException {
-		//return ImageIO.read(new File(raw()));
-		return VisionManager.loadImage(raw());
+		return ImageIO.read(new File(raw()));
+		//return VisionManager.loadImage(raw());
 	}
 	
 	public BufferedImage getProcessedImgFromDisk() throws IOException {
-		//return ImageIO.read(new File(processed()));
-		return VisionManager.loadImage(processed());
+		return ImageIO.read(new File(processed()));
+		//return VisionManager.loadImage(processed());
 	}
 	
     // sets corners and config file for the initial guesses of an imported document

@@ -464,9 +464,7 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 			this.transDR.dx += newX / this.scaleFactor;
 			this.transDR.dy += newY / this.scaleFactor;
 		}
-
 		
-
 		this.repaint();
 	}
 
