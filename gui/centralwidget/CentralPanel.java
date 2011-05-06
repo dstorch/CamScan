@@ -88,7 +88,7 @@ public class CentralPanel extends JPanel {
 //		viewScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 //		viewScrollPane.getHorizontalScrollBar().addAdjustmentListener(new HorizontalScrollBarListener());
 //		viewScrollPane.getVerticalScrollBar().setUnitIncrement(10);
-//		this.add(viewScrollPane);
+//		this.add(viewScrollPane, BorderLayout.CENTER);
 		this.add(viewPanel, BorderLayout.CENTER);
 		
 		// Setup the edit panel.

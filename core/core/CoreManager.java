@@ -27,6 +27,7 @@ public class CoreManager {
     private Document _workingDocument;
     private Page _workingPage;
     private BufferedImage _workingImage;
+    private BufferedImage _processedImage;
 
     public CoreManager() throws DocumentException, IOException {
         _xmlReader = new XMLReader();
@@ -187,6 +188,7 @@ public class CoreManager {
 		d.rename(newName);
 		d.serialize();
 		writeStartupFile();
+                setWorkingDocumentFromName(newName);
 	}
 	
 	public void deleteDocument(String docName) throws IOException {
@@ -235,12 +237,10 @@ public class CoreManager {
     private void mergeDocuments(Document d1, Document d2) throws IOException {
 
         String doc1 = d1.name();
-        String doc2 = d2.name();
+        int numPages = d1.pages().size();
 
         String docPath = Parameters.DOC_DIRECTORY+"/"+doc1+"/";
 
-
-        // update metadata file path of pages in d2
         for (Page p : d2.pages()) {
             // extract name of file and append to path of document 1 to get new path
             String[] s = p.metafile().split("/");
@@ -254,6 +254,9 @@ public class CoreManager {
                 System.err.println("***********"+oldFile + " not moved to " + newFile);
             }
 
+            // update order int of page
+            p.setOrder(numPages+p.order());
+            // update metafile path
             p.setMetafile(newMetaPath);
         }
 
@@ -368,7 +371,7 @@ public class CoreManager {
                 p.setMetafile(Parameters.DOC_DIRECTORY + "/" + d.name() + "/" + noExt + ".xml");
 
                 // guess initial configuration values
-                p.initGuesses();
+                //p.initGuesses();
                 d.addPage(p);
 
                 // do OCR!
@@ -489,6 +492,10 @@ public class CoreManager {
     	return _workingImage;
     }
     
+    public BufferedImage getProcessedImage() {
+    	return _processedImage;
+    }
+    
     /**
      * Given an order, it returns the page of the given
      * order from the working document.
@@ -508,15 +515,15 @@ public class CoreManager {
         return null;
     }
 
-//    // called when changing from edit mode to view mode
-//    // uses changes made in edit mode and rerenders the image
-//    public void updateWorkingImage() {
-//        Page curr = Parameters.getCoreManager().getWorkingPage();
-//        if (curr != null) {
-//        	BufferedImage newImage = VisionManager.rerenderImage(Parameters.getCurrPageImg(), curr.corners(), curr.config());
-//        	Parameters.setCurrPageImg(newImage);
-//        }
-//    }
+    // called when changing from edit mode to view mode
+    // uses changes made in edit mode and rerenders the image
+    public void updateWorkingImage() {
+        Page curr = getWorkingPage();
+        BufferedImage img = getWorkingImage();
+        if (curr != null && img != null) {
+        	_processedImage = VisionManager.rerenderImage(getWorkingImage(), curr.corners(), curr.config());
+        }
+    }
 //
 //	// called when user tries to place corner; tries to make a better point given the user's guess
 //    // writes the current process image to workspace/processed (as Tiff file)
