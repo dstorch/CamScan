@@ -463,7 +463,6 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 
 			this.transDR.dx += newX / this.scaleFactor;
 			this.transDR.dy += newY / this.scaleFactor;
-
 		}
 
 		
@@ -489,7 +488,6 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 		this.repaint();
 
 	}
-
 
 	/**
 	 * On mouse press, set the initial location for 
@@ -558,5 +556,4 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	public void mouseEntered(MouseEvent e) {}
 	public void mouseExited(MouseEvent e) {}
 	public void mouseMoved(MouseEvent arg0) {}
-
 }
