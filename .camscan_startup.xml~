@@ -9,7 +9,11 @@
     <DOC value="workspace/docs/hyphenation-example/doc.xml"/>
     <DOC value="workspace/docs/twocol600/doc.xml"/>
     <DOC value="workspace/docs/lazy/doc.xml"/>
-  </DOCLIST>
 =======
->>>>>>> 632157502854f474548be3fc25a4beffddd46adc
+  <TESSERACT path="/usr/local/bin/tesseract"/>
+  <WORKINGDOC value="workspace/docs/phototest/doc.xml"/>
+  <DOCLIST>
+    <DOC value="workspace/docs/phototest/doc.xml"/>
+>>>>>>> 5386596d83006b3b7e0ef74c411434969fac9738
+  </DOCLIST>
 </STARTUP>
