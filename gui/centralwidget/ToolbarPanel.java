@@ -74,11 +74,13 @@ public class ToolbarPanel extends JPanel {
 		JButton nextButton = new JButton("Next");
 		this.add(nextButton, c);
 
-                c.gridx = 2;
+        c.gridx = 2;
+        c.insets = new Insets(0,125,0,0);
 		zoomInButton = new JButton("Zoom In");
 		this.add(zoomInButton, c);
 
 		c.gridx = 3;
+		 c.insets = new Insets(0,0,0,0);
 		zoomOutButton = new JButton("Zoom Out");
 		this.add(zoomOutButton, c);
 
@@ -87,13 +89,13 @@ public class ToolbarPanel extends JPanel {
 		ModeListener modeListener = new ModeListener();
 		
 		// the view mode magnifying glass icon
-		c.gridx = 2;
-		c.insets = new Insets(0,250,0,0);
+		c.gridx = 4;
+		c.insets = new Insets(0,125,0,0);
 		JRadioButton viewIcon = new JRadioButton(new ImageIcon("libraries/icons/magnify.png"));
 		this.add(viewIcon, c);
 		
 		// Setup the view mode radio button.
-		c.gridx = 3;
+		c.gridx = 5;
 		c.insets = new Insets(0,0,0,0);
 		this.viewRButton = new JRadioButton("View Mode");
 		this.viewRButton.setActionCommand("VIEW");
@@ -102,13 +104,13 @@ public class ToolbarPanel extends JPanel {
 		this.add(this.viewRButton, c);
 		
 		// the edit mode pencil icon
-		c.gridx = 4;
+		c.gridx = 6;
 		c.insets = new Insets(0,10,0,0);
 		JRadioButton editIcon = new JRadioButton(new ImageIcon("libraries/icons/pencil.png"));
 		this.add(editIcon, c);
 		
 		// Setup the edit mode radio button.
-		c.gridx = 5;
+		c.gridx = 7;
 		c.insets = new Insets(0,0,0,0);
 		JRadioButton editRButton = new JRadioButton("Edit Mode");
 		editRButton.setActionCommand("EDIT");

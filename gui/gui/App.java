@@ -168,7 +168,6 @@ public class App extends JFrame {
 	 */
 	public static void main(String[] args) throws Exception {
 		new App();
-                System.out.println(Parameters.getCoreManager().getWorkingPage().metafile());
 	}
 
 	/****************************************

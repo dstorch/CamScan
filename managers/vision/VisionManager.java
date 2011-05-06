@@ -276,7 +276,7 @@ public class VisionManager {
 		return IplImage.createFrom(bufferedImage);
 	}
 	
-	public BufferedImage loadImage(String path){
+	public static BufferedImage loadImage(String path){
 		return IplImageToBufferedImage(cvLoadImage(path));
 	}
 	
