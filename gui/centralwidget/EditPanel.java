@@ -184,6 +184,23 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	 * Public Methods
 	 * 
 	 ****************************************/
+	
+	/**
+	 * Zooms in.
+	 */
+	public void zoomIn() {
+		this.scaleFactor += 0.2;
+		this.repaint();
+	}
+	
+	/**
+	 * Zooms out.
+	 */
+	public void zoomOut() {
+		if (this.scaleFactor > 0.2)
+			this.scaleFactor -= 0.2;
+		this.repaint();
+	}
 
 	/**
 	 * Updates the corners when the current page changes.
@@ -478,9 +495,9 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 
 		if (notches < 0) {
 			if (this.scaleFactor > 0.2)
-				this.scaleFactor -= 0.1;
+				this.scaleFactor -= 0.2;
 		} else {
-			this.scaleFactor += 0.1;
+			this.scaleFactor += 0.2;
 		}
 
 		this.repaint();

@@ -113,6 +113,24 @@ public class CentralPanel extends JPanel {
 		
 	}
 	
+	/**
+	 * Returns the view panel.
+	 * 
+	 * @return The view panel
+	 */
+	public ViewPanel getViewPanel() {
+		return this.viewPanel;
+	}
+	
+	/**
+	 * Returns the edit panel.
+	 * 
+	 * @return The edit panel
+	 */
+	public EditPanel getEditPanel() {
+		return this.editPanel;
+	}
+	
 	/****************************************
 	 * 
 	 * Setters

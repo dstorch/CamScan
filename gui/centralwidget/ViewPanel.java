@@ -194,6 +194,23 @@ public class ViewPanel extends JPanel implements MouseWheelListener {
 	 ****************************************/
 	
 	/**
+	 * Zooms in.
+	 */
+	public void zoomIn() {
+		this.scaleFactor += 0.2;
+		this.repaint();
+	}
+	
+	/**
+	 * Zooms out.
+	 */
+	public void zoomOut() {
+		if (this.scaleFactor > 0.2)
+			this.scaleFactor -= 0.2;
+		this.repaint();
+	}
+	
+	/**
 	 * The paintComponent method.
 	 */
 	@Override

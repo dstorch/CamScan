@@ -63,7 +63,6 @@ public class ToolbarPanel extends JPanel {
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
 		
-		//this.setBackground(Color.GRAY);
 		this.centralPanel = centralPanel;
 		
 		c.gridx = 0;
@@ -77,11 +76,13 @@ public class ToolbarPanel extends JPanel {
         c.gridx = 2;
         c.insets = new Insets(0,125,0,0);
 		zoomInButton = new JButton("Zoom In");
+		this.zoomInButton.addActionListener(new ZoomInListener());
 		this.add(zoomInButton, c);
 
 		c.gridx = 3;
-		 c.insets = new Insets(0,0,0,0);
+		c.insets = new Insets(0,0,0,0);
 		zoomOutButton = new JButton("Zoom Out");
+		this.zoomOutButton.addActionListener(new ZoomOutListener());
 		this.add(zoomOutButton, c);
 
 		// Setup the mode listener for the radio buttons
@@ -134,7 +135,7 @@ public class ToolbarPanel extends JPanel {
 	 * Unselects both mode radio buttons.
 	 */
 	public void unselectModeButtons() {
-		//this.modeButtonGroup.clearSelection();
+		this.modeButtonGroup.clearSelection();
 	}
 
         public void showZoomButtons(){
@@ -176,6 +177,35 @@ public class ToolbarPanel extends JPanel {
 				centralPanel.switchToEditPanel();
 			}
 		}
-		
+	}
+	
+	/**
+	 * The ZoomIn action listener.
+	 */
+	private class ZoomInListener implements ActionListener {
+
+		/**
+		 * Handles zooming in.
+		 */
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			centralPanel.getViewPanel().zoomIn();
+			centralPanel.getEditPanel().zoomIn();
+		}		
+	}
+	
+	/**
+	 * The ZoomOut action listener.
+	 */
+	private class ZoomOutListener implements ActionListener {
+
+		/**
+		 * Handles zooming out.
+		 */
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			centralPanel.getViewPanel().zoomOut();
+			centralPanel.getEditPanel().zoomOut();
+		}	
 	}
 }
