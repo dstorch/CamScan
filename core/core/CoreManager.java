@@ -490,6 +490,10 @@ public class CoreManager {
     	return _workingImage;
     }
     
+    public BufferedImage getProcessedImage() {
+    	return _processedImage;
+    }
+    
     /**
      * Given an order, it returns the page of the given
      * order from the working document.
