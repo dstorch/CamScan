@@ -92,7 +92,7 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	 * and the upper left corner.
 	 */
 	private Line2D lineDLUL;
-	
+
 	/**
 	 * The actual drawn ellipses. These
 	 * differ from cornerUR in that they
@@ -103,7 +103,7 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	private Ellipse2D drawableUL;
 	private Ellipse2D drawableDR;
 	private Ellipse2D drawableDL;
-	
+
 	/**
 	 * These point transform objects represent the affine
 	 * transform that must be applied to a point based on
@@ -113,6 +113,7 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	private PointTransform transUL = new PointTransform();
 	private PointTransform transDR = new PointTransform();
 	private PointTransform transDL = new PointTransform();
+	private PointTransform transImage = new PointTransform();
 
 	/**
 	 * The scale factor.
@@ -123,13 +124,18 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	 * The buffered image representing the page.
 	 */
 	private BufferedImage img;
-	
+
+	/**
+	 * The (x, y) position of the image
+	 */
+	private Point imgPosition;
+
 	/**
 	 * the color to display points when they are
 	 * being dragged.
 	 */
 	private static Color draggingColor = Color.RED;
-	
+
 	/**
 	 * the color in which to draw the points when
 	 * they are not being dragged
@@ -159,12 +165,12 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 		this.cornerUR = new Ellipse2D.Double();
 		this.cornerDR = new Ellipse2D.Double();
 		this.cornerDL = new Ellipse2D.Double();
-		
+
 		this.drawableUL = new Ellipse2D.Double();
 		this.drawableUR = new Ellipse2D.Double();
 		this.drawableDR = new Ellipse2D.Double();
 		this.drawableDL = new Ellipse2D.Double();
-		
+
 		this.lineULUR = new Line2D.Double();
 		this.lineURDR = new Line2D.Double();
 		this.lineDRDL = new Line2D.Double();
@@ -191,12 +197,13 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 		this.moveCornerTo(cornerUR, corners.upright().getX(), corners.upright().getY());
 		this.moveCornerTo(cornerDR, corners.downright().getX(), corners.downright().getY());
 		this.moveCornerTo(cornerDL, corners.downleft().getX(), corners.downleft().getY());
-		
+
 		// reset translation to zero
 		this.transUL = new PointTransform();
 		this.transUR = new PointTransform();
 		this.transDR = new PointTransform();
 		this.transDL = new PointTransform();
+		this.transImage = new PointTransform();
 
 		this.updateConnectingLines();
 		this.repaint();
@@ -231,40 +238,52 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 		if (this.img != null) {
 			int newW = (int) (this.img.getWidth() * this.scaleFactor);
 			int newH = (int) (this.img.getHeight() * this.scaleFactor);
-			g.drawImage(this.img, (this.getWidth() - newW)/2, (this.getHeight() - newH)/2, newW, newH, null);
+
+			double cornerX = (this.getWidth() - this.img.getWidth()) / 2;
+			double cornerY = (this.getHeight() - this.img.getHeight()) / 2;
+			
+			double newX = this.scaleFactor * (cornerX - this.getWidth()/2 + transImage.dx) + this.getWidth()/2 ;
+			double newY = this.scaleFactor * (cornerY - this.getHeight()/2 + transImage.dy) + this.getHeight()/2;
+			this.imgPosition = new Point((int) newX, (int) newY);
+
+			g.drawImage(this.img, (int) newX, (int) newY, newW, newH, null);
 		}
-		
+
 		// 1. scale and translate the upper right point
 		double x = this.scaleFactor * (this.cornerUR.getX() - this.getWidth()/2 + transUR.dx) + this.getWidth()/2 ;
 		double y = this.scaleFactor * (this.cornerUR.getY() - this.getHeight()/2 + transUR.dy) + this.getHeight()/2;
 		this.moveCornerTo(drawableUR, x, y);
-		Point p = new Point((int) (cornerUR.getX() + transUR.dx), (int) (cornerUR.getY() + transUR.dy));
+		Point p = new Point((int) (cornerUR.getX() + transUR.dx - transImage.dx),
+				(int) (cornerUR.getY() + transUR.dy - transImage.dy));
 		Parameters.getCoreManager().getWorkingPage().corners().setUpRight(p);
-		
+
 		// 2. scale and translate the upper left point
 		x = this.scaleFactor * (this.cornerUL.getX() - this.getWidth()/2 + transUL.dx) + this.getWidth()/2 ;
 		y = this.scaleFactor * (this.cornerUL.getY() - this.getHeight()/2 + transUL.dy) + this.getHeight()/2;
 		this.moveCornerTo(drawableUL, x, y);
-		p = new Point((int) (cornerUL.getX() + transUL.dx), (int) (cornerUL.getY() + transUL.dy));
+		p = new Point((int) (cornerUL.getX() + transUL.dx - transImage.dx),
+					(int) (cornerUL.getY() + transUL.dy - transImage.dy));
 		Parameters.getCoreManager().getWorkingPage().corners().setUpLeft(p);
-		
+
 		// 3. scale and translate the lower left point
 		x = this.scaleFactor * (this.cornerDL.getX() - this.getWidth()/2 + transDL.dx) + this.getWidth()/2 ;
 		y = this.scaleFactor * (this.cornerDL.getY() - this.getHeight()/2 + transDL.dy) + this.getHeight()/2;
 		this.moveCornerTo(drawableDL, x, y);
-		p = new Point((int) (cornerDL.getX() + transDL.dx), (int) (cornerDL.getY() + transDL.dy));
+		p = new Point((int) (cornerDL.getX() + transDL.dx - transImage.dx),
+					(int) (cornerDL.getY() + transDL.dy - transImage.dy));
 		Parameters.getCoreManager().getWorkingPage().corners().setDownLeft(p);
-		
+
 		// 4. scale and translate the lower right point
 		x = this.scaleFactor * (this.cornerDR.getX() - this.getWidth()/2 + transDR.dx) + this.getWidth()/2 ;
 		y = this.scaleFactor * (this.cornerDR.getY() - this.getHeight()/2 + transDR.dy) + this.getHeight()/2;
 		this.moveCornerTo(drawableDR, x, y);
-		p = new Point((int) (cornerDR.getX() + transDR.dx), (int) (cornerDR.getY() + transDR.dy));
+		p = new Point((int) (cornerDR.getX() + transDR.dx - transImage.dx),
+					(int) (cornerDR.getY() + transDR.dy - transImage.dy));
 		Parameters.getCoreManager().getWorkingPage().corners().setDownRight(p);
-		
+
 		// make the lines connect to the new point location
 		this.updateConnectingLines();
-		
+
 		// draw lines
 		brush.setColor(Color.BLACK);
 		brush.draw(this.lineULUR);
@@ -276,22 +295,22 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 		setCornerColor(this.transUR, brush);
 		brush.draw(this.drawableUR);
 		brush.fill(this.drawableUR);
-		
+
 		setCornerColor(this.transUL, brush);
 		brush.draw(this.drawableUL);
 		brush.fill(this.drawableUL);
-		
+
 		setCornerColor(this.transDR, brush);
 		brush.draw(this.drawableDR);
 		brush.fill(this.drawableDR);
-		
+
 		setCornerColor(this.transDL, brush);
 		brush.draw(this.drawableDL);
 		brush.fill(this.drawableDL);
 
 	}
-	
-	
+
+
 	private void setCornerColor(PointTransform pt, Graphics2D g) {
 		if (pt.dragging) {
 			g.setColor(draggingColor);
@@ -349,6 +368,20 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 				ellipse.getCenterY() - limit <= mY && mY <= ellipse.getCenterY() + limit);
 	}
 
+	/**
+	 * Returns true if the mouse press event is within the
+	 * image
+	 * 
+	 * @param mX The x-mouse-coordinate
+	 * @param mY The y-mouse-coordinate
+	 */
+	private boolean isWithinImage(double mX, double mY) {
+		int imgX = this.imgPosition.x;
+		int imgY = this.imgPosition.y;
+		return (mX > imgX && mX < (imgX + this.img.getWidth()) &&
+				mY > imgY && mY < (imgY + this.img.getHeight()));
+	}
+
 	/****************************************
 	 * 
 	 * Event Listener Methods
@@ -363,69 +396,78 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-		// move the ellipses on screen
-		Point p = new Point(arg0.getX(), arg0.getY());
+		// move the image
+		if (this.transImage.dragging) {
 
+			double newX = arg0.getX() - this.transImage.dragX;
+			double newY = arg0.getY() - this.transImage.dragY;
+
+			this.transImage.dragX += newX;
+			this.transImage.dragY += newY;
+
+			this.transImage.dx += newX / this.scaleFactor;
+			this.transImage.dy += newY / this.scaleFactor;
+
+		}
+		
 		// 1. move upper left ellipse during click and drag
-		if (this.isWithinCornerEllipse(this.drawableUL, arg0.getX(), arg0.getY())) {
-			
+		else if (this.transUL.dragging) {
+
 			double newX = arg0.getX() - this.transUL.dragX;
 			double newY = arg0.getY() - this.transUL.dragY;
-			
+
 			this.transUL.dragX += newX;
 			this.transUL.dragY += newY;
-			
+
 			this.transUL.dx += newX / this.scaleFactor;
 			this.transUL.dy += newY / this.scaleFactor;
-			
-			this.repaint();
+
 		}
 
 		// 2. move upper right ellipse
-		else if (this.isWithinCornerEllipse(this.drawableUR, arg0.getX(), arg0.getY())) {
-		
+		else if (this.transUR.dragging) {
+
 			double newX = arg0.getX() - this.transUR.dragX;
 			double newY = arg0.getY() - this.transUR.dragY;
-			
+
 			this.transUR.dragX += newX;
 			this.transUR.dragY += newY;
-			
+
 			this.transUR.dx += newX / this.scaleFactor;
 			this.transUR.dy += newY / this.scaleFactor;
-			
-			this.repaint();
+
 		}
 
 		// 3. move lower left ellipse
-		else if (this.isWithinCornerEllipse(this.drawableDL, arg0.getX(), arg0.getY())) {
-			
+		else if (this.transDL.dragging) {
+
 			double newX = arg0.getX() - this.transDL.dragX;
 			double newY = arg0.getY() - this.transDL.dragY;
-			
+
 			this.transDL.dragX += newX;
 			this.transDL.dragY += newY;
-			
+
 			this.transDL.dx += newX / this.scaleFactor;
 			this.transDL.dy += newY / this.scaleFactor;
-			
-			this.repaint();
+
 		}
 
 		// 4. move lower right ellipse
-		else if (this.isWithinCornerEllipse(this.drawableDR, arg0.getX(), arg0.getY())) {
-			
+		else if (this.transDR.dragging) {
+
 			double newX = arg0.getX() - this.transDR.dragX;
 			double newY = arg0.getY() - this.transDR.dragY;
-			
+
 			this.transDR.dragX += newX;
 			this.transDR.dragY += newY;
-			
+
 			this.transDR.dx += newX / this.scaleFactor;
 			this.transDR.dy += newY / this.scaleFactor;
-			
-			this.repaint();
-			
 		}
+
+		
+
+		this.repaint();
 	}
 
 	/**
@@ -442,11 +484,10 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 		} else {
 			this.scaleFactor += 0.1;
 		}
-		
+
 		this.repaint();
 
 	}
-
 
 	/**
 	 * On mouse press, set the initial location for 
@@ -456,22 +497,22 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	 * Also set the cursor to a hand.
 	 */
 	public void mousePressed(MouseEvent e) {
-		
+
 		// set the hand cursor
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		
+
 		// upper left corner
 		if (this.isWithinCornerEllipse(this.drawableUL, e.getX(), e.getY())) {
 			transUL.dragX = e.getX(); transUL.dragY = e.getY();
 			transUL.dragging = true;
 		}
-		
+
 		// upper right corner
 		else if (this.isWithinCornerEllipse(this.drawableUR, e.getX(), e.getY())) {
 			transUR.dragX = e.getX(); transUR.dragY = e.getY();
 			transUR.dragging = true;
 		}
-		
+
 		// lower left corner
 		else if (this.isWithinCornerEllipse(this.drawableDL, e.getX(), e.getY())) {
 			transDL.dragX = e.getX(); transDL.dragY = e.getY();
@@ -483,21 +524,28 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 			transDR.dragX = e.getX(); transDR.dragY = e.getY();
 			transDR.dragging = true;
 		}
-		
+
+		// the image
+		else if (this.isWithinImage(e.getX(), e.getY())) {
+			transImage.dragX = e.getX(); transImage.dragY = e.getY();
+			transImage.dragging = true;
+		}
+
 	}
-	
+
 	/**
 	 * Restore the default cursor upon mouse release.
 	 * Also reset each corner point to a non-dragging state.
 	 */
 	public void mouseReleased(MouseEvent e) {
 		this.setCursor(Cursor.getDefaultCursor());
-		
+
 		this.transUR.dragging = false;
 		this.transUL.dragging = false;
 		this.transDR.dragging = false;
 		this.transDL.dragging = false;
-		
+		this.transImage.dragging = false;
+
 		this.repaint();
 	}
 
@@ -508,5 +556,4 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	public void mouseEntered(MouseEvent e) {}
 	public void mouseExited(MouseEvent e) {}
 	public void mouseMoved(MouseEvent arg0) {}
-
 }
