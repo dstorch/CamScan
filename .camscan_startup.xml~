@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <STARTUP>
-  <TESSERACT path="/usr/local/bin/tesseract"/>
-  <DOCLIST/>
+  <TESSERACT path="/opt/local/bin/tesseract"/>
+  <WORKINGDOC value="workspace/docs/twocol600/doc.xml"/>
+  <WORKINGPAGE value="workspace/docs/twocol600/twocol600.xml" order="0"/>
+  <DOCLIST>
+    <DOC value="workspace/docs/phototest/doc.xml"/>
+    <DOC value="workspace/docs/test-layout/doc.xml"/>
+  </DOCLIST>
 </STARTUP>

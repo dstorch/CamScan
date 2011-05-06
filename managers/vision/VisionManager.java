@@ -18,6 +18,7 @@ import static com.googlecode.javacv.cpp.opencv_imgproc.*;
 import static com.googlecode.javacv.cpp.opencv_highgui.*;
 import static com.googlecode.javacv.cpp.opencv_calib3d.*;
 
+
 public class VisionManager {
 	
 	/*
@@ -276,7 +277,7 @@ public class VisionManager {
 		return IplImage.createFrom(bufferedImage);
 	}
 	
-	public BufferedImage loadImage(String path){
+	public static BufferedImage loadImage(String path){
 		return IplImageToBufferedImage(cvLoadImage(path));
 	}
 	

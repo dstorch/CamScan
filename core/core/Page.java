@@ -98,10 +98,12 @@ public class Page {
 	
 	public BufferedImage getRawImgFromDisk() throws IOException {
 		return ImageIO.read(new File(raw()));
+		//return VisionManager.loadImage(raw());
 	}
 	
 	public BufferedImage getProcessedImgFromDisk() throws IOException {
 		return ImageIO.read(new File(processed()));
+		//return VisionManager.loadImage(processed());
 	}
 	
     // sets corners and config file for the initial guesses of an imported document
@@ -110,6 +112,7 @@ public class Page {
 
     	// read a buffered image from the disk
     	BufferedImage buff = ImageIO.read(new File(raw()));
+    	//BufferedImage buff = VisionManager.loadImage(raw());
     	
     	// guess and set corners and configuration values of Page
     	setCorners(VisionManager.findCorners(buff));
@@ -118,10 +121,8 @@ public class Page {
     
     // writes the current process image to workspace/processed
     public void writeProcessedImage() throws IOException {
-
     	// write out image as a TIFF file
     	VisionManager.writeTIFF(getRawImgFromDisk(), processed());
-    	
     }
 	
 	public void setOcrResults() throws IOException {

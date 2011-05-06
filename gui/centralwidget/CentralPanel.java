@@ -154,6 +154,7 @@ public class CentralPanel extends JPanel {
 		this.add(this.viewPanel, BorderLayout.CENTER);
 		this.viewPanel.setVisible(true);
 		this.buttonPanel.setComponentsVisible(false);
+                this.toolbarPanel.showZoomButtons();
 	}
 	
 	/**
@@ -174,6 +175,7 @@ public class CentralPanel extends JPanel {
 		this.add(this.editPanel, BorderLayout.CENTER);
 		this.editPanel.setVisible(true);
 		this.buttonPanel.setComponentsVisible(true);
+                //this.toolbarPanel.hideZoomButtons();
 	}
 	
 	/**
@@ -196,6 +198,7 @@ public class CentralPanel extends JPanel {
 		this.add(this.searchResultsPanel, BorderLayout.CENTER);
 		this.searchResultsPanel.setVisible(true);
 		this.buttonPanel.setComponentsVisible(false);
+                //this.toolbarPanel.hideZoomButtons();
 	}
 	
 	/**

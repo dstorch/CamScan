@@ -27,6 +27,7 @@ public class CoreManager {
     private Document _workingDocument;
     private Page _workingPage;
     private BufferedImage _workingImage;
+    private BufferedImage _processedImage;
 
     public CoreManager() throws DocumentException, IOException {
         _xmlReader = new XMLReader();
@@ -183,7 +184,7 @@ public class CoreManager {
 		}
 	}
 	
-	public void renameDocument(Document d, String newName) throws IOException {
+	private void renameDocument(Document d, String newName) throws IOException {
 		d.rename(newName);
 		d.serialize();
 		writeStartupFile();
@@ -200,7 +201,7 @@ public class CoreManager {
 		deleteDocument(toDelete);
 	}
 	
-	public void deleteDocument(Document d) throws IOException {
+	private void deleteDocument(Document d) throws IOException {
 		d.delete();
 		_allDocuments.remove(d);
 		d = null;
@@ -215,39 +216,54 @@ public class CoreManager {
 		writeStartupFile();
 	}
 
-    // Merges two inputted documents (appends pages of d2 to end of d1)
-    public void mergeDocuments(Document d1, Document d2) throws IOException {
 
-        String[] fields = d1.pathname().split("/");
+        public void mergeDocuments(String d1, String d2) throws IOException{
+                Document toMerge1 = null;
+                Document toMerge2 = null;
+		for (Document d : _allDocuments) {
+			if (d1.equals(d.name())) {
+				toMerge1 = d;
+			}else if(d2.equals(d.name())){
+                            toMerge2 = d;
+                        }
+		}
 
-        // path of files in d1; need this to update paths for pages in d2
-        String path = "";
-        for (int i = 0; i < fields.length - 1; i++) {
-            path += fields[i] + "/";
+		mergeDocuments(toMerge1, toMerge2);
         }
+
+
+    // Merges two inputted documents (appends pages of d2 to end of d1)
+    private void mergeDocuments(Document d1, Document d2) throws IOException {
+
+        String doc1 = d1.name();
+        String doc2 = d2.name();
+
+        String docPath = Parameters.DOC_DIRECTORY+"/"+doc1+"/";
+
 
         // update metadata file path of pages in d2
         for (Page p : d2.pages()) {
             // extract name of file and append to path of document 1 to get new path
             String[] s = p.metafile().split("/");
-            String newMetaPath = path + "/" + s[s.length - 1];
+            String newMetaPath = docPath + s[s.length - 1];
 
             File oldFile = new File(p.metafile());
             File newFile = new File(newMetaPath);
 
             boolean success = oldFile.renameTo(newFile);
             if (!success) {
-                System.err.println(oldFile + " not moved to " + newFile);
+                System.err.println("***********"+oldFile + " not moved to " + newFile);
             }
-
-            // delete directory of second Document
-            d2.delete();
 
             p.setMetafile(newMetaPath);
         }
 
         // update list of Pages in d1
         d1.pages().addAll(d2.pages());
+        d1.serialize();
+        
+        // delete directory of second Document
+        d2.delete();
 
         // remove second Document from global list
         _allDocuments.remove(d2);
@@ -493,15 +509,15 @@ public class CoreManager {
         return null;
     }
 
-//    // called when changing from edit mode to view mode
-//    // uses changes made in edit mode and rerenders the image
-//    public void updateWorkingImage() {
-//        Page curr = Parameters.getCoreManager().getWorkingPage();
-//        if (curr != null) {
-//        	BufferedImage newImage = VisionManager.rerenderImage(Parameters.getCurrPageImg(), curr.corners(), curr.config());
-//        	Parameters.setCurrPageImg(newImage);
-//        }
-//    }
+    // called when changing from edit mode to view mode
+    // uses changes made in edit mode and rerenders the image
+    public void updateWorkingImage() {
+        Page curr = getWorkingPage();
+        BufferedImage img = getWorkingImage();
+        if (curr != null && img != null) {
+        	_processedImage = VisionManager.rerenderImage(getWorkingImage(), curr.corners(), curr.config());
+        }
+    }
 //
 //	// called when user tries to place corner; tries to make a better point given the user's guess
 //    // writes the current process image to workspace/processed (as Tiff file)
@@ -548,7 +564,7 @@ public class CoreManager {
     public static void main(String[] args) throws DocumentException, IOException {
         CoreManager core = new CoreManager();
         core.createDocumentFromFile(new File("tests/images/1col-300.tiff"));
-        //core.createDocumentFromFile(new File("tests/images/mexican_war_text.jpg"));
+        core.createDocumentFromFile(new File("tests/images/mexican_war_text.jpg"));
         //core.createDocumentFromFile(new File("../sample2.tiff"));
         //core.setWorkingDocumentFromName("sample_page");
         //core.exportToPdf("workspace/docs/sample2/doc.xml", "../foo.pdf");
