@@ -265,4 +265,11 @@ public class Page {
 		System.out.println("");
 	}
 
+
+        // deletes image file in the workspace/raw directory
+        public void deleteRawFile(){
+            File raw = new File(raw());
+            if(!raw.delete()) System.out.println("RAW file not deleted!!");
+        }
+
 }
