@@ -74,16 +74,18 @@ public class SearchPanel extends JPanel implements ActionListener {
 		
 		// TODO: Binding enter to the search button. Dunno why it doesn't work
 		searchButton.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "search");
-		searchButton.getActionMap().put("search", new AbstractAction() {
-			public void actionPerformed(ActionEvent e) {
-		       System.out.println("OK");
-		    }
-		});
+		searchButton.getActionMap().put("search", new SearchAction());
 		
 		// Setup a dummy label to leave some space below
 		// the search panel.
 		JLabel dummyLabel = new JLabel();
 		this.add(dummyLabel);
+	}
+	
+	private class SearchAction extends AbstractAction {
+		public void actionPerformed(ActionEvent e) {
+	       System.out.println("OK");
+	    }
 	}
 	
 	/****************************************
