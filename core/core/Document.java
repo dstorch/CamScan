@@ -73,7 +73,7 @@ public class Document {
 			// set path name variable for each page metafile
 			p.setMetafile(Parameters.DOC_DIRECTORY+"/"+newName+"/"+name);
 		}
-		
+
 		
 	}
 	
@@ -100,6 +100,11 @@ public class Document {
 	public void delete() throws IOException {
 		File docDirectory = new File(Parameters.DOC_DIRECTORY+"/"+name());
 		if (!deleteDir(docDirectory)) throw new IOException("Problem deleting the document!");
+
+                // delete all image files in raw directory (AND PROCESSED DIRECTORY?????)
+                for (Page p : pages()) {
+                    p.deleteRawFile();
+                }
 	}
 
 	public void serialize() throws IOException {
