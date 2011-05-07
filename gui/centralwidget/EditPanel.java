@@ -18,6 +18,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
+import core.CoreManager;
 import core.Corners;
 import core.Parameters;
 
@@ -114,6 +115,7 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	private PointTransform transDR = new PointTransform();
 	private PointTransform transDL = new PointTransform();
 	private PointTransform transImage = new PointTransform();
+	private PointTransform transCanvas = new PointTransform();
 
 	/**
 	 * The scale factor.
@@ -221,6 +223,7 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 		this.transDR = new PointTransform();
 		this.transDL = new PointTransform();
 		this.transImage = new PointTransform();
+		this.transCanvas = new PointTransform();
 
 		this.updateConnectingLines();
 		this.repaint();
@@ -234,9 +237,11 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 		super.paintComponent(g);
 		Graphics2D brush = (Graphics2D) g;
 
+		CoreManager cm = Parameters.getCoreManager();
+		
 		// calculate the initial scale factor if we are switching to a
 		// new working image
-		if (this.img != Parameters.getCoreManager().getWorkingImage()) {
+		if (this.img != cm.getWorkingImage()) {
 			this.scaleFactor = 1;
 			this.img = Parameters.getCoreManager().getWorkingImage();
 
@@ -259,40 +264,41 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 			double cornerX = (this.getWidth() - this.img.getWidth()) / 2;
 			double cornerY = (this.getHeight() - this.img.getHeight()) / 2;
 			
-			double newX = this.scaleFactor * (cornerX - this.getWidth()/2 + transImage.dx) + this.getWidth()/2 ;
-			double newY = this.scaleFactor * (cornerY - this.getHeight()/2 + transImage.dy) + this.getHeight()/2;
+			double newX = this.scaleFactor * (cornerX - this.getWidth()/2 + transImage.dx + transCanvas.dx) + this.getWidth()/2 ;
+			double newY = this.scaleFactor * (cornerY - this.getHeight()/2 + transImage.dy + transCanvas.dy) + this.getHeight()/2;
 			this.imgPosition = new Point((int) newX, (int) newY);
 
 			g.drawImage(this.img, (int) newX, (int) newY, newW, newH, null);
 		}
 
 		// 1. scale and translate the upper right point
-		double x = this.scaleFactor * (this.cornerUR.getX() - this.getWidth()/2 + transUR.dx) + this.getWidth()/2 ;
-		double y = this.scaleFactor * (this.cornerUR.getY() - this.getHeight()/2 + transUR.dy) + this.getHeight()/2;
+		double x = this.scaleFactor * (this.cornerUR.getX() - this.getWidth()/2 + transUR.dx + transCanvas.dx) + this.getWidth()/2 ;
+		double y = this.scaleFactor * (this.cornerUR.getY() - this.getHeight()/2 + transUR.dy + transCanvas.dy) + this.getHeight()/2;
 		this.moveCornerTo(drawableUR, x, y);
 		Point p = new Point((int) (cornerUR.getX() + transUR.dx - transImage.dx),
 				(int) (cornerUR.getY() + transUR.dy - transImage.dy));
+		if (cm != null)
 		Parameters.getCoreManager().getWorkingPage().corners().setUpRight(p);
 
 		// 2. scale and translate the upper left point
-		x = this.scaleFactor * (this.cornerUL.getX() - this.getWidth()/2 + transUL.dx) + this.getWidth()/2 ;
-		y = this.scaleFactor * (this.cornerUL.getY() - this.getHeight()/2 + transUL.dy) + this.getHeight()/2;
+		x = this.scaleFactor * (this.cornerUL.getX() - this.getWidth()/2 + transUL.dx + transCanvas.dx) + this.getWidth()/2 ;
+		y = this.scaleFactor * (this.cornerUL.getY() - this.getHeight()/2 + transUL.dy + transCanvas.dy) + this.getHeight()/2;
 		this.moveCornerTo(drawableUL, x, y);
 		p = new Point((int) (cornerUL.getX() + transUL.dx - transImage.dx),
 					(int) (cornerUL.getY() + transUL.dy - transImage.dy));
 		Parameters.getCoreManager().getWorkingPage().corners().setUpLeft(p);
 
 		// 3. scale and translate the lower left point
-		x = this.scaleFactor * (this.cornerDL.getX() - this.getWidth()/2 + transDL.dx) + this.getWidth()/2 ;
-		y = this.scaleFactor * (this.cornerDL.getY() - this.getHeight()/2 + transDL.dy) + this.getHeight()/2;
+		x = this.scaleFactor * (this.cornerDL.getX() - this.getWidth()/2 + transDL.dx + transCanvas.dx) + this.getWidth()/2 ;
+		y = this.scaleFactor * (this.cornerDL.getY() - this.getHeight()/2 + transDL.dy + transCanvas.dy) + this.getHeight()/2;
 		this.moveCornerTo(drawableDL, x, y);
 		p = new Point((int) (cornerDL.getX() + transDL.dx - transImage.dx),
 					(int) (cornerDL.getY() + transDL.dy - transImage.dy));
 		Parameters.getCoreManager().getWorkingPage().corners().setDownLeft(p);
 
 		// 4. scale and translate the lower right point
-		x = this.scaleFactor * (this.cornerDR.getX() - this.getWidth()/2 + transDR.dx) + this.getWidth()/2 ;
-		y = this.scaleFactor * (this.cornerDR.getY() - this.getHeight()/2 + transDR.dy) + this.getHeight()/2;
+		x = this.scaleFactor * (this.cornerDR.getX() - this.getWidth()/2 + transDR.dx + transCanvas.dx) + this.getWidth()/2 ;
+		y = this.scaleFactor * (this.cornerDR.getY() - this.getHeight()/2 + transDR.dy + transCanvas.dy) + this.getHeight()/2;
 		this.moveCornerTo(drawableDR, x, y);
 		p = new Point((int) (cornerDR.getX() + transDR.dx - transImage.dx),
 					(int) (cornerDR.getY() + transDR.dy - transImage.dy));
@@ -380,7 +386,7 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	 */
 	private boolean isWithinCornerEllipse(Ellipse2D ellipse, double mX, double mY) {
 
-		int limit = (int) (100 * this.scaleFactor);
+		int limit = (int) (75 * this.scaleFactor);
 		return (ellipse.getCenterX() - limit <= mX && mX <= ellipse.getCenterX() + limit &&
 				ellipse.getCenterY() - limit <= mY && mY <= ellipse.getCenterY() + limit);
 	}
@@ -395,8 +401,8 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	private boolean isWithinImage(double mX, double mY) {
 		int imgX = this.imgPosition.x;
 		int imgY = this.imgPosition.y;
-		return (mX > imgX && mX < (imgX + this.img.getWidth()) &&
-				mY > imgY && mY < (imgY + this.img.getHeight()));
+		return (mX > imgX && mX < (imgX + this.img.getWidth() * this.scaleFactor) &&
+				mY > imgY && mY < (imgY + this.img.getHeight() * this.scaleFactor));
 	}
 
 	/****************************************
@@ -481,6 +487,18 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 			this.transDR.dx += newX / this.scaleFactor;
 			this.transDR.dy += newY / this.scaleFactor;
 		}
+		
+		else if (this.transCanvas.dragging) {
+			
+			double newX = arg0.getX() - this.transCanvas.dragX;
+			double newY = arg0.getY() - this.transCanvas.dragY;
+
+			this.transCanvas.dragX += newX;
+			this.transCanvas.dragY += newY;
+
+			this.transCanvas.dx += newX / this.scaleFactor;
+			this.transCanvas.dy += newY / this.scaleFactor;
+		}
 
 		this.repaint();
 	}
@@ -544,6 +562,12 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 			transImage.dragX = e.getX(); transImage.dragY = e.getY();
 			transImage.dragging = true;
 		}
+		
+		// otherwise drag the canvas
+		else {
+			transCanvas.dragX = e.getX(); transCanvas.dragY = e.getY();
+			transCanvas.dragging = true;
+		}
 
 	}
 
@@ -559,6 +583,7 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 		this.transDR.dragging = false;
 		this.transDL.dragging = false;
 		this.transImage.dragging = false;
+		this.transCanvas.dragging = false;
 
 		this.repaint();
 	}
