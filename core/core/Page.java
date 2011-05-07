@@ -14,7 +14,7 @@ import search.*;
 import vision.ConfigurationDictionary;
 import vision.VisionManager;
 
-public class Page {
+public class Page implements Comparable{
 	
 	// used for searching the text of the page
 	private static final int GREP_WINDOW = 10;
@@ -97,13 +97,13 @@ public class Page {
 	}
 	
 	public BufferedImage getRawImgFromDisk() throws IOException {
-		//return ImageIO.read(new File(raw()));
-		return VisionManager.loadImage(raw());
+		return ImageIO.read(new File(raw()));
+		//return VisionManager.loadImage(raw());
 	}
 	
 	public BufferedImage getProcessedImgFromDisk() throws IOException {
-		//return ImageIO.read(new File(processed()));
-		return VisionManager.loadImage(processed());
+		return ImageIO.read(new File(processed()));
+		//return VisionManager.loadImage(processed());
 	}
 	
     // sets corners and config file for the initial guesses of an imported document
@@ -271,5 +271,24 @@ public class Page {
             File raw = new File(raw());
             if(!raw.delete()) System.out.println("RAW file not deleted!!");
         }
+
+        // deletes image file in the workspace/processed directory
+        public void deleteProcessedFile(){
+            File processed = new File(processed());
+            if(!processed.delete()) System.out.println("PROCESSED file not deleted!!");
+        }
+
+        // deletes metadata file
+        public void deleteMetadataFile(){
+            File meta = new File(metafile());
+            if(!meta.delete()) System.out.println("METADTA file not deleted!!");
+        }
+
+    public int compareTo(Object t) {
+        if(order()< ((Page) t).order()) return -1;
+        else if (order() == ((Page) t).order()) return 0;
+        else return 1;
+    }
+
 
 }

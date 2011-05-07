@@ -212,7 +212,7 @@ public class CoreManager {
                             if(_allDocuments.size()>1){
                                 Document first = _allDocuments.get(0);
                                 setWorkingDocument(first);
-                                setWorkingPageAndImage(first.pages().get(0));
+                                setWorkingPageAndImage(first.pages().first());
                             }else{ // there are no Documents
                                 _workingDocument = null;
                                 _workingPage = null;
@@ -383,7 +383,7 @@ public class CoreManager {
                 p.setMetafile(Parameters.DOC_DIRECTORY + "/" + d.name() + "/" + noExt + ".xml");
 
                 // guess initial configuration values
-                p.initGuesses();
+                //p.initGuesses();
                 d.addPage(p);
 
                 // do OCR!
@@ -487,7 +487,7 @@ public class CoreManager {
         for (Document doc : _allDocuments) {
             if (docName.equals(doc.name())) {
                 _workingDocument = doc;
-                setWorkingPageAndImage(doc.pages().get(0));
+                setWorkingPageAndImage(doc.pages().first());
             }
         }
     }

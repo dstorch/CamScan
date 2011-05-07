@@ -3,10 +3,10 @@
 <PAGE>
   <IMG path="workspace/raw/hyphenation-example.tiff" processed="workspace/processed/hyphenation-example.tiff"/>
   <CORNERS>
-    <UPRIGHT x="100" y="50"/>
-    <DOWNRIGHT x="100" y="200"/>
-    <UPLEFT x="50" y="50"/>
-    <DOWNLEFT x="50" y="200"/>
+    <UPRIGHT x="99" y="59"/>
+    <DOWNRIGHT x="99" y="209"/>
+    <UPLEFT x="49" y="59"/>
+    <DOWNLEFT x="49" y="209"/>
   </CORNERS>
   <TEXT>
     <FULLTEXT>compile and collate the literature and radiocar- bon dates that appear in this chapter: William</FULLTEXT>
