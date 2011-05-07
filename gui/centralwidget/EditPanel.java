@@ -209,7 +209,7 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	 * Updates the corners when the current page changes.
 	 */
 	public void updateCornersOnPanel() {
-
+            if(Parameters.getCoreManager().getWorkingPage() != null){
 		Corners corners = Parameters.getCoreManager().getWorkingPage().corners();
 		
 		// shift the original corners according to those in the working page
@@ -230,6 +230,7 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 
 		this.updateConnectingLines();
 		this.repaint();
+            }
 	}
 
 	/**
@@ -339,7 +340,7 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 		setCornerColor(this.transDL, brush);
 		brush.draw(this.drawableDL);
 		brush.fill(this.drawableDL);
-
+		
 	}
 
 

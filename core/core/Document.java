@@ -8,16 +8,16 @@ import search.*;
 
 public class Document {
 
-	private List<Page> _pages;
+	private SortedSet _pages;
 	private String _name;
 	private String _pathname;
 	
 	public Document() {
-		_pages = new LinkedList<Page>();
+		_pages = new TreeSet<Page>();
 	}
 	
 	public Document(String name, String pathname) {
-		_pages = new LinkedList<Page>();
+		_pages = new TreeSet<Page>();
 		_name = name;
 		_pathname = pathname;
 	}
@@ -36,7 +36,7 @@ public class Document {
 	public String name() {
 		return _name;
 	}
-	public List<Page> pages() {
+	public SortedSet<Page> pages() {
 		return _pages;
 	}
 	
@@ -145,5 +145,15 @@ public class Document {
 		}
 		return hits;
 	}
+        
+        public boolean equals(Document d){
+            return (d.name().equals(this.name()));
+        }
+
+        // deletes Page from list and all references
+        public void deletePage(Page p){
+            int index = p.order();
+            
+        }
 	
 }

@@ -210,8 +210,10 @@ public class ToolbarPanel extends JPanel {
 		 * Handles zooming out.
 		 */
 		public void actionPerformed(ActionEvent arg0) {
-			centralPanel.getViewPanel().zoomOut();
-			centralPanel.getEditPanel().zoomOut();
+			if (centralPanel.getViewPanel().isVisible())
+				centralPanel.getViewPanel().zoomOut();
+			else if (centralPanel.getEditPanel().isVisible())
+				centralPanel.getEditPanel().zoomOut();
 		}	
 	}
 }
