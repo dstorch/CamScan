@@ -188,6 +188,7 @@ public class CoreManager {
 		d.rename(newName);
 		d.serialize();
 		writeStartupFile();
+                setWorkingDocumentFromName(newName);
 	}
 	
 	public void deleteDocument(String docName) throws IOException {
@@ -236,12 +237,10 @@ public class CoreManager {
     private void mergeDocuments(Document d1, Document d2) throws IOException {
 
         String doc1 = d1.name();
-        String doc2 = d2.name();
+        int numPages = d1.pages().size();
 
         String docPath = Parameters.DOC_DIRECTORY+"/"+doc1+"/";
 
-
-        // update metadata file path of pages in d2
         for (Page p : d2.pages()) {
             // extract name of file and append to path of document 1 to get new path
             String[] s = p.metafile().split("/");
@@ -255,6 +254,9 @@ public class CoreManager {
                 System.err.println("***********"+oldFile + " not moved to " + newFile);
             }
 
+            // update order int of page
+            p.setOrder(numPages+p.order());
+            // update metafile path
             p.setMetafile(newMetaPath);
         }
 

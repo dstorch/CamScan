@@ -18,6 +18,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
+import core.CoreManager;
 import core.Corners;
 import core.Parameters;
 
@@ -219,9 +220,11 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 		super.paintComponent(g);
 		Graphics2D brush = (Graphics2D) g;
 
+		CoreManager cm = Parameters.getCoreManager();
+		
 		// calculate the initial scale factor if we are switching to a
 		// new working image
-		if (this.img != Parameters.getCoreManager().getWorkingImage()) {
+		if (this.img != cm.getWorkingImage()) {
 			this.scaleFactor = 1;
 			this.img = Parameters.getCoreManager().getWorkingImage();
 
@@ -257,6 +260,7 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 		this.moveCornerTo(drawableUR, x, y);
 		Point p = new Point((int) (cornerUR.getX() + transUR.dx - transImage.dx),
 				(int) (cornerUR.getY() + transUR.dy - transImage.dy));
+		if (cm != null)
 		Parameters.getCoreManager().getWorkingPage().corners().setUpRight(p);
 
 		// 2. scale and translate the upper left point
@@ -478,7 +482,7 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 			this.transCanvas.dx += newX / this.scaleFactor;
 			this.transCanvas.dy += newY / this.scaleFactor;
 		}
-		
+
 		this.repaint();
 	}
 
@@ -498,7 +502,6 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 		}
 
 		this.repaint();
-
 	}
 
 	/**
