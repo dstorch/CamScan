@@ -39,9 +39,15 @@ public class ToolbarPanel extends JPanel {
 	 */
 	private ButtonGroup modeButtonGroup;
 
-        private JButton zoomInButton;
+	/**
+	 * The zoom-in button.
+	 */
+    private JButton zoomInButton;
 
-        private JButton zoomOutButton;
+    /**
+     * The zoom-out button.
+     */
+    private JButton zoomOutButton;
 	
 	/**
 	 * The view radio button.
