@@ -189,8 +189,10 @@ public class ToolbarPanel extends JPanel {
 		 */
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			centralPanel.getViewPanel().zoomIn();
-			centralPanel.getEditPanel().zoomIn();
+			if (centralPanel.getViewPanel().isVisible())
+				centralPanel.getViewPanel().zoomIn();
+			else if (centralPanel.getEditPanel().isVisible())
+				centralPanel.getEditPanel().zoomIn();
 		}		
 	}
 	
