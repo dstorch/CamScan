@@ -145,5 +145,9 @@ public class Document {
 		}
 		return hits;
 	}
+        
+        public boolean equals(Document d){
+            return (d.name().equals(this.name()));
+        }
 	
 }

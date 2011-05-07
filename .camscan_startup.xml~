@@ -3,17 +3,17 @@
 <STARTUP>
 <<<<<<< HEAD
   <TESSERACT path="/opt/local/bin/tesseract"/>
-  <WORKINGDOC value="workspace/docs/lazy/doc.xml"/>
-  <WORKINGPAGE value="workspace/docs/lazy/phototest.xml" order="0"/>
+  <WORKINGDOC value="workspace/docs/phototest/doc.xml"/>
+  <WORKINGPAGE value="workspace/docs/phototest/phototest.xml" order="0"/>
   <DOCLIST>
+    <DOC value="workspace/docs/Alice/doc.xml"/>
+    <DOC value="workspace/docs/phototest/doc.xml"/>
     <DOC value="workspace/docs/hyphenation-example/doc.xml"/>
-    <DOC value="workspace/docs/twocol600/doc.xml"/>
-    <DOC value="workspace/docs/lazy/doc.xml"/>
 =======
   <TESSERACT path="/usr/local/bin/tesseract"/>
   <WORKINGDOC value="workspace/docs/phototest/doc.xml"/>
   <DOCLIST>
     <DOC value="workspace/docs/phototest/doc.xml"/>
->>>>>>> 5386596d83006b3b7e0ef74c411434969fac9738
+>>>>>>> d2a78797dd8ce192c39a2aa8c1b62d82bfc6efaa
   </DOCLIST>
 </STARTUP>
