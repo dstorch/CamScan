@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <STARTUP>
-  <TESSERACT path="/opt/local/bin/tesseract"/>
-  <WORKINGDOC value="workspace/docs/lazy/doc.xml"/>
-  <WORKINGPAGE value="workspace/docs/lazy/phototest.xml" order="0"/>
+  <TESSERACT path="/usr/local/bin/tesseract"/>
+  <WORKINGDOC value="workspace/docs/sample2/doc.xml"/>
+  <WORKINGPAGE value="workspace/docs/sample2/sample2.xml" order="0"/>
   <DOCLIST>
-    <DOC value="workspace/docs/hyphenation-example/doc.xml"/>
-    <DOC value="workspace/docs/twocol600/doc.xml"/>
-    <DOC value="workspace/docs/lazy/doc.xml"/>
+    <DOC value="workspace/docs/sample2/doc.xml"/>
   </DOCLIST>
 </STARTUP>
