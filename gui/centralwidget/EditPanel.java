@@ -20,6 +20,7 @@ import javax.swing.border.LineBorder;
 
 import core.CoreManager;
 import core.Corners;
+import core.Page;
 import core.Parameters;
 
 /**
@@ -210,12 +211,14 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	public void updateCornersOnPanel() {
             if(Parameters.getCoreManager().getWorkingPage() != null){
 		Corners corners = Parameters.getCoreManager().getWorkingPage().corners();
-
+		
 		// shift the original corners according to those in the working page
 		this.moveCornerTo(cornerUL, corners.upleft().getX(), corners.upleft().getY());
 		this.moveCornerTo(cornerUR, corners.upright().getX(), corners.upright().getY());
 		this.moveCornerTo(cornerDR, corners.downright().getX(), corners.downright().getY());
 		this.moveCornerTo(cornerDL, corners.downleft().getX(), corners.downleft().getY());
+		
+		System.out.println(cornerUL.getX()+", "+cornerUL.getY());
 
 		// reset translation to zero
 		this.transUL = new PointTransform();
@@ -239,8 +242,11 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 		Graphics2D brush = (Graphics2D) g;
 
 		CoreManager cm = Parameters.getCoreManager();
-
-                if(cm.getWorkingImage() != null){
+		Page wp = null;
+		if (cm != null) wp = cm.getWorkingPage();
+		
+		// break if anything is null
+		if (cm == null || wp == null) return;
 		
 		// calculate the initial scale factor if we are switching to a
 		// new working image
@@ -278,34 +284,35 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 		double x = this.scaleFactor * (this.cornerUR.getX() - this.getWidth()/2 + transUR.dx + transCanvas.dx) + this.getWidth()/2 ;
 		double y = this.scaleFactor * (this.cornerUR.getY() - this.getHeight()/2 + transUR.dy + transCanvas.dy) + this.getHeight()/2;
 		this.moveCornerTo(drawableUR, x, y);
-		Point p = new Point((int) (cornerUR.getX() + transUR.dx - transImage.dx),
-				(int) (cornerUR.getY() + transUR.dy - transImage.dy));
-		if (cm != null)
-		Parameters.getCoreManager().getWorkingPage().corners().setUpRight(p);
+		double offX = (this.getWidth() - this.img.getWidth()) / 2;
+		double offY = (this.getHeight() - this.img.getHeight()) / 2;
+		Point p = new Point((int) (cornerUR.getX() + transUR.dx - transImage.dx + offX),
+				(int) (cornerUR.getY() + transUR.dy - transImage.dy + offY));
+		wp.corners().setUpRight(p);
 
 		// 2. scale and translate the upper left point
 		x = this.scaleFactor * (this.cornerUL.getX() - this.getWidth()/2 + transUL.dx + transCanvas.dx) + this.getWidth()/2 ;
 		y = this.scaleFactor * (this.cornerUL.getY() - this.getHeight()/2 + transUL.dy + transCanvas.dy) + this.getHeight()/2;
 		this.moveCornerTo(drawableUL, x, y);
-		p = new Point((int) (cornerUL.getX() + transUL.dx - transImage.dx),
-					(int) (cornerUL.getY() + transUL.dy - transImage.dy));
-		Parameters.getCoreManager().getWorkingPage().corners().setUpLeft(p);
+		p = new Point((int) (cornerUL.getX() + transUL.dx - transImage.dx + offX),
+					(int) (cornerUL.getY() + transUL.dy - transImage.dy + offY));
+		wp.corners().setUpLeft(p);
 
 		// 3. scale and translate the lower left point
 		x = this.scaleFactor * (this.cornerDL.getX() - this.getWidth()/2 + transDL.dx + transCanvas.dx) + this.getWidth()/2 ;
 		y = this.scaleFactor * (this.cornerDL.getY() - this.getHeight()/2 + transDL.dy + transCanvas.dy) + this.getHeight()/2;
 		this.moveCornerTo(drawableDL, x, y);
-		p = new Point((int) (cornerDL.getX() + transDL.dx - transImage.dx),
-					(int) (cornerDL.getY() + transDL.dy - transImage.dy));
-		Parameters.getCoreManager().getWorkingPage().corners().setDownLeft(p);
+		p = new Point((int) (cornerDL.getX() + transDL.dx - transImage.dx + offX),
+					(int) (cornerDL.getY() + transDL.dy - transImage.dy + offY));
+		wp.corners().setDownLeft(p);
 
 		// 4. scale and translate the lower right point
 		x = this.scaleFactor * (this.cornerDR.getX() - this.getWidth()/2 + transDR.dx + transCanvas.dx) + this.getWidth()/2 ;
 		y = this.scaleFactor * (this.cornerDR.getY() - this.getHeight()/2 + transDR.dy + transCanvas.dy) + this.getHeight()/2;
 		this.moveCornerTo(drawableDR, x, y);
-		p = new Point((int) (cornerDR.getX() + transDR.dx - transImage.dx),
-					(int) (cornerDR.getY() + transDR.dy - transImage.dy));
-		Parameters.getCoreManager().getWorkingPage().corners().setDownRight(p);
+		p = new Point((int) (cornerDR.getX() + transDR.dx - transImage.dx + offX),
+					(int) (cornerDR.getY() + transDR.dy - transImage.dy + offY));
+		wp.corners().setDownRight(p);
 
 		// make the lines connect to the new point location
 		this.updateConnectingLines();
@@ -333,8 +340,7 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 		setCornerColor(this.transDL, brush);
 		brush.draw(this.drawableDL);
 		brush.fill(this.drawableDL);
-            }
-
+		
 	}
 
 

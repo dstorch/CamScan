@@ -16,6 +16,7 @@ import javax.swing.event.ListSelectionListener;
 import core.Document;
 import core.Page;
 import core.Parameters;
+import java.util.Iterator;
 
 
 /**

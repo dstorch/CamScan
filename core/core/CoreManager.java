@@ -212,7 +212,7 @@ public class CoreManager {
                             if(_allDocuments.size()>1){
                                 Document first = _allDocuments.get(0);
                                 setWorkingDocument(first);
-                                setWorkingPageAndImage(first.pages().get(0));
+                                setWorkingPageAndImage(first.pages().first());
                             }else{ // there are no Documents
                                 _workingDocument = null;
                                 _workingPage = null;
@@ -459,19 +459,7 @@ public class CoreManager {
     }
 
     public SearchResults search(String query) {
-        SearchResults results = _searcher.getSearchResults(query, _workingDocument, _allDocuments);
-
-        // REMOVE WHEN READY
-        System.out.println("In the working page: ");
-        for (SearchHit hit : results.inWorkingDoc()) {
-            System.out.println(hit.snippet() + " " + hit.score());
-        }
-        System.out.println("In all other pages: ");
-        for (SearchHit hit : results.elsewhere()) {
-            System.out.println(hit.snippet() + " " + hit.score());
-        }
-
-        return results;
+    	return _searcher.getSearchResults(query, _workingDocument, _allDocuments);
     }
 
     /**
@@ -487,7 +475,7 @@ public class CoreManager {
         for (Document doc : _allDocuments) {
             if (docName.equals(doc.name())) {
                 _workingDocument = doc;
-                setWorkingPageAndImage(doc.pages().get(0));
+                setWorkingPageAndImage(doc.pages().first());
             }
         }
     }
