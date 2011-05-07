@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<DOCUMENT name="dsd">
+  <PAGES>
+    <PAGE order="0" metafile="workspace/docs/dsd/hyphenation-example.xml"/>
+    <PAGE order="0" metafile="workspace/docs/dsd/phototest.xml"/>
+    <PAGE order="0" metafile="workspace/docs/dsd/twocol600.xml"/>
+  </PAGES>
+</DOCUMENT>
