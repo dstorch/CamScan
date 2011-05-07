@@ -141,7 +141,7 @@ public class ToolbarPanel extends JPanel {
 	 * Unselects both mode radio buttons.
 	 */
 	public void unselectModeButtons() {
-		this.modeButtonGroup.clearSelection();
+		//this.modeButtonGroup.clearSelection();
 	}
 
         public void showZoomButtons(){
@@ -193,7 +193,6 @@ public class ToolbarPanel extends JPanel {
 		/**
 		 * Handles zooming in.
 		 */
-		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			if (centralPanel.getViewPanel().isVisible())
 				centralPanel.getViewPanel().zoomIn();
@@ -210,7 +209,6 @@ public class ToolbarPanel extends JPanel {
 		/**
 		 * Handles zooming out.
 		 */
-		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			centralPanel.getViewPanel().zoomOut();
 			centralPanel.getEditPanel().zoomOut();
