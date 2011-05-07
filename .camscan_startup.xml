@@ -2,11 +2,11 @@
 
 <STARTUP>
   <TESSERACT path="/opt/local/bin/tesseract"/>
-  <WORKINGDOC value="workspace/docs/hyphenation-example/doc.xml"/>
-  <WORKINGPAGE value="workspace/docs/hyphenation-example/hyphenation-example.xml" order="0"/>
+  <WORKINGDOC value="workspace/docs/phototest/doc.xml"/>
+  <WORKINGPAGE value="workspace/docs/phototest/phototest.xml" order="0"/>
   <DOCLIST>
+    <DOC value="workspace/docs/Alice/doc.xml"/>
+    <DOC value="workspace/docs/phototest/doc.xml"/>
     <DOC value="workspace/docs/hyphenation-example/doc.xml"/>
-    <DOC value="workspace/docs/twocol600/doc.xml"/>
-    <DOC value="workspace/docs/lazy/doc.xml"/>
   </DOCLIST>
 </STARTUP>

@@ -3,8 +3,6 @@ package eastwidget;
 import gui.MainPanel;
 
 import java.awt.Dimension;
-import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.Vector;
 
@@ -12,7 +10,6 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 

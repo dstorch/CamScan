@@ -215,7 +215,8 @@ public class ViewPanel extends JPanel implements MouseWheelListener {
 	 */
 	@Override
 	public void paintComponent(Graphics g) {
-		super.paintComponent(g);
+                super.paintComponent(g);
+		if(Parameters.getCoreManager().getWorkingImage() != null){
 		
 		if (this.img != Parameters.getCoreManager().getWorkingImage()) {
 			this.scaleFactor = 1;
@@ -242,6 +243,7 @@ public class ViewPanel extends JPanel implements MouseWheelListener {
 //		int h = (int) (this.getHeight()*this.scaleFactor);
 //		System.out.println(w + " " + h);
 //		this.setSize(w, h);
+            }
 	}
 
 	/**
