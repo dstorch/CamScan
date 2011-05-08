@@ -205,6 +205,7 @@ public class DocExplorerPanel extends JPanel {
                     try {
                         Parameters.getCoreManager().deleteDocument(docName);
                         update();
+                        centralPanel.updatePanels(false);
                     } catch (IOException ex) {
                         JOptionPane.showMessageDialog(null, ex.getMessage(), "Delete Error", JOptionPane.ERROR_MESSAGE);
                     }
@@ -226,8 +227,10 @@ public class DocExplorerPanel extends JPanel {
                 String input = JOptionPane.showInputDialog(null, "Enter new document name: ", "Rename Document", 1);
                 if(input != null){
                     try {
-                        Parameters.getCoreManager().renameDocument(docName, input);
+                        Parameters.getCoreManager().renameDocument(docName, input);                       
                         update();
+                        setDocOrder(input);
+
                     } catch (IOException ex) {
                         JOptionPane.showMessageDialog(null, ex.getMessage(), "Rename Error", JOptionPane.ERROR_MESSAGE);
                     }

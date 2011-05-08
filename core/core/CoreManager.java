@@ -203,17 +203,29 @@ public class CoreManager {
 	}
 	
 	private void deleteDocument(Document d) throws IOException {
-		d.delete();
-		_allDocuments.remove(d);
-		d = null;
 		
 		// make sure that all references to the document are
 		// deleted (so that it gets garbage collected, and will
 		// not get serialized)
 		if (_workingDocument != null) {
-			if (_workingDocument.equals(d)) _workingDocument = null;
+			if (_workingDocument.equals(d)){
+                            if(_allDocuments.size()>1){
+                                Document first = _allDocuments.get(0);
+                                setWorkingDocument(first);
+                                setWorkingPageAndImage(first.pages().first());
+                            }else{ // there are no Documents
+                                _workingDocument = null;
+                                _workingPage = null;
+                                _workingImage = null;
+                            }
+                        }
 		}
+
+                d.delete();
+		_allDocuments.remove(d);
+		d = null;
 		
+
 		writeStartupFile();
 	}
 
@@ -447,19 +459,7 @@ public class CoreManager {
     }
 
     public SearchResults search(String query) {
-        SearchResults results = _searcher.getSearchResults(query, _workingDocument, _allDocuments);
-
-        // REMOVE WHEN READY
-        System.out.println("In the working page: ");
-        for (SearchHit hit : results.inWorkingDoc()) {
-            System.out.println(hit.snippet() + " " + hit.score());
-        }
-        System.out.println("In all other pages: ");
-        for (SearchHit hit : results.elsewhere()) {
-            System.out.println(hit.snippet() + " " + hit.score());
-        }
-
-        return results;
+    	return _searcher.getSearchResults(query, _workingDocument, _allDocuments);
     }
 
     /**
@@ -475,7 +475,7 @@ public class CoreManager {
         for (Document doc : _allDocuments) {
             if (docName.equals(doc.name())) {
                 _workingDocument = doc;
-                setWorkingPageAndImage(doc.pages().get(0));
+                setWorkingPageAndImage(doc.pages().first());
             }
         }
     }
