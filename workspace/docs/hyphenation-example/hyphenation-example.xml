@@ -3,10 +3,10 @@
 <PAGE>
   <IMG path="workspace\raw\hyphenation-example.tiff" processed="workspace/processed/hyphenation-example.tiff"/>
   <CORNERS>
-    <UPRIGHT x="100" y="50"/>
-    <DOWNRIGHT x="100" y="200"/>
-    <UPLEFT x="50" y="50"/>
-    <DOWNLEFT x="50" y="200"/>
+    <UPRIGHT x="1264" y="405"/>
+    <DOWNRIGHT x="1267" y="496"/>
+    <UPLEFT x="308" y="405"/>
+    <DOWNLEFT x="306" y="491"/>
   </CORNERS>
   <TEXT>
     <FULLTEXT></FULLTEXT>
