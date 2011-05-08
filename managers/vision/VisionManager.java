@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import static com.googlecode.javacv.cpp.opencv_core.*;
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
@@ -325,6 +326,26 @@ public class VisionManager {
 		return gray;
 	}
 	
+	private static IplImage linearScaledImage(IplImage scaled){
+		final FloatBuffer scaledbuf = scaled.getByteBuffer().asFloatBuffer();
+		IplImage output = cvCreateImage(cvSize(scaled.width(), scaled.height()), IPL_DEPTH_8U, 1);
+		
+    	float v;
+    	float min = Float.MAX_VALUE;
+    	float max = 0;
+    	for(int i=0;i<scaledbuf.capacity();i++){
+    		v = scaledbuf.get(i);
+    		if (v < min){min=v;}
+    		if (v > max){max=v;}
+    	}
+    	cvConvertScale(scaled, output, 255.0/(max-min), -min);
+    	
+    	//System.out.println(min);
+    	//System.out.println(max);
+    	
+    	return output;
+	}
+	
 	@SuppressWarnings("unused")
 	public static void main(String[] args) throws IOException{
 		System.out.println("Vision library stub launcher");
@@ -355,6 +376,8 @@ public class VisionManager {
         	cvResize(image, mini);
         	
         	if (true){
+        		long start = System.nanoTime();
+        		
         		IplImage gray = customGrayTransform(mini, 1, 0, 0);
         		
         		
@@ -373,23 +396,38 @@ public class VisionManager {
         		final FloatBuffer warpbuf = warpage.getByteBuffer().asFloatBuffer();
         		
         		
-        		for(int wx=0;wx<width;wx++){
-        			for(int wy=0;wy<height;wy++){
-        				Double result = 0.0; //edgebuf.get(width*wy + wx);
+        		double[][] warp_arr = new double[width][height];
+        		for(int x=0;x<width;x++){
+        			for(int y=0;y<height;y++){
+        				warp_arr[x][y] = 0;
+        			}
+        		}
+        		
+        		
+        		float _v;
+        		for(int x=0;x<width;x++){
+        			for(int y=0;y<height;y++){
+        				_v = edgebuf.get(width*y + x);
         				
-        				for(int x=0;x<width;x++){
-        					for(int y=0;y<height;y++){
+        				if ( Math.abs(_v) < 1e-4 ){continue;}
+        				
+        				for(int wx=0;wx<width;wx++){
+        					for(int wy=0;wy<height;wy++){
         						if (x==wx && y==wy){continue;}
-        						//edgebuf.get(width*y + x)
-        						//System.out.println( 1.0/ Math.sqrt( (wx-x)*(wx-x) + (wy-y)*(wy-y) ) );
-        						result += edgebuf.get(width*y + x)/Math.sqrt( (wx-x)*(wx-x) + (wy-y)*(wy-y) ); //0.01 / Math.sqrt( (wx-x)*(wx-x) + (wy-y)*(wy-y) );
+        						warp_arr[wx][wy] += _v/Math.sqrt((wx-x)*(wx-x) + (wy-y)*(wy-y));
         					}
         				}
         				
-        				warpbuf.put(width*wy + wx, result.floatValue());
         			}
         		}
-
+        		
+        		for(int x=0;x<width;x++){
+        			for(int y=0;y<height;y++){
+        				warpbuf.put( y*width+x, (float)warp_arr[x][y] );
+        			}
+        		}
+        		
+        		
         		
         		//cluster some points!
         		ArrayList<Point> points = new ArrayList<Point>();
@@ -426,39 +464,72 @@ public class VisionManager {
         				p.y = best.y;
         			}
         			
-        			System.out.println(motion);
         			if (motion >= 1){
         				last_still_round = round;
         			}
         			
-        			round ++;
+        			round++;
+        		}
+        		System.out.println(round + " rounds");
+        		
+        		
+        		//integrate the warped image
+        		IplImage integral = cvCloneImage(warpage);
+        		final FloatBuffer integralbuf = integral.getByteBuffer().asFloatBuffer();
+        		
+        		for(int i=1;i<width;i++){
+        			integralbuf.put(i, integralbuf.get(i) + integralbuf.get(i-1));
+        		}for(int i=1;i<height;i++){
+        			integralbuf.put(i*width, integralbuf.get(i*width) + integralbuf.get((i-1)*width));
+        		}
+        		for(int y=1;y<height;y++){
+        			for(int x=1;x<width;x++){
+        				integralbuf.put(y*width+x, integralbuf.get(y*width+x) + integralbuf.get((y-1)*width+x) + integralbuf.get(y*width+x-1) - integralbuf.get((y-1)*width+x-1));
+        			}
         		}
         		
-        		//convert to 8bit for output
-        		IplImage output = cvCreateImage(cvSize(nw, nh), IPL_DEPTH_8U, 1);
-            	
-            	
-            	float v;
-            	float min = Float.MAX_VALUE;
-            	float max = 0;
-            	for(int i=0;i<warpbuf.capacity();i++){
-            		v = warpbuf.get(i);
-            		if (v < min){min=v;}
-            		if (v > max){max=v;}
+        		//extract the points
+        		ArrayList<MergeZone> merged = new ArrayList<MergeZone>();
+        		for(Point p: points){
+        			boolean already_inserted = false;
+        			for(MergeZone pp: merged){
+        				if ( pp.distance(p) < 5 ){
+        					already_inserted = true;
+        					break;
+        				}
+        			}
+        			
+        			if (!already_inserted){
+        				merged.add(new MergeZone(p));
+        			}
+        		}
+        		System.out.println(merged.size() + " merged points");
+        		
+        		for(MergeZone pp: merged){
+        			Point p = pp.point;
+        			pp.weight = integralbuf.get((p.y-3)*width+(p.x-3)) + integralbuf.get((p.y+3)*width+(p.x+3)) - integralbuf.get((p.y-3)*width+(p.x+3)) - integralbuf.get((p.y+3)*width+(p.x-3));
+        		}
+        		Collections.sort( merged );
+        		
+        		while(merged.size() > 4){
+        			merged.remove(merged.size() - 1);
+        		}
+        		
+        		//ideas: use angle invariance to do RANSAC on the points, clustering + morphological ops to segment image for best corners
+        		
+        		warpage = linearScaledImage(warpage);
+        		for(MergeZone pp: merged){
+        			Point p = pp.point;
+        			cvCircle(warpage, makePoint(p.x,p.y), 1, CV_RGB(255,255,255), 1, 8, 0);
+            		cvCircle(gray, makePoint(p.x,p.y), 1, CV_RGB(255,255,255), 1, 8, 0);
             	}
-            	System.out.println(min);
-            	System.out.println(max);
-            	cvConvertScale(warpage, output, 255.0/(max-min), -min);
-            	
-            	
-            	for(Point p: points){
-            		cvCircle(output, makePoint(p.x,p.y), 1, CV_RGB(255,255,255), 1, 8, 0);
-            	}
-            	
-            	
-            	//save!
-            	cvSaveImage("edges.png", output);
-                cvSaveImage("output.png", gray);
+        		
+        		cvSaveImage("gray.png", gray);
+        		cvSaveImage("warpage.png", warpage);
+        		cvSaveImage("integral.png", linearScaledImage(integral));
+        		
+        		System.out.println((System.nanoTime() - start)/1e9);
+        		
         	}else if (false){
         		IplImage output = cvCreateImage(cvSize(nw, nh), IPL_DEPTH_8U, 1);
         		
