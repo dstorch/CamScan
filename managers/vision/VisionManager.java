@@ -402,7 +402,10 @@ public class VisionManager {
         		}
         		
         		int round = 0;
-        		while(round < 500){
+        		int last_still_round = 0;
+        		double motion;
+        		while(round-last_still_round < 5 && round < 500){
+        			motion = 0;
         			for(Point p: points){
         				float current = warpbuf.get( p.y*width + p.x );
         				Point best = p;
@@ -417,8 +420,15 @@ public class VisionManager {
         						}
         					}
         				}
+        				motion += Math.sqrt( (p.x-best.x)*(p.x-best.x) + (p.y-best.y)*(p.y-best.y) );
+        				
         				p.x = best.x;
         				p.y = best.y;
+        			}
+        			
+        			System.out.println(motion);
+        			if (motion >= 1){
+        				last_still_round = round;
         			}
         			
         			round ++;
