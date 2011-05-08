@@ -373,6 +373,10 @@ public class VisionManager {
         		final FloatBuffer warpbuf = warpage.getByteBuffer().asFloatBuffer();
         		
         		
+        		
+        		
+        		//15.7 seconds
+        		/*
         		for(int wx=0;wx<width;wx++){
         			for(int wy=0;wy<height;wy++){
         				Double result = 0.0; //edgebuf.get(width*wy + wx);
@@ -389,7 +393,44 @@ public class VisionManager {
         				warpbuf.put(width*wy + wx, result.floatValue());
         			}
         		}
-
+        		 */
+        		
+        		
+        		
+        		//long start = System.nanoTime();
+        		
+        		double[][] warp_arr = new double[width][height];
+        		for(int x=0;x<width;x++){
+        			for(int y=0;y<height;y++){
+        				warp_arr[x][y] = 0;
+        			}
+        		}
+        		
+        		
+        		float _v;
+        		for(int x=0;x<width;x++){
+        			for(int y=0;y<height;y++){
+        				_v = edgebuf.get(width*y + x);
+        				
+        				if ( Math.abs(_v) < 1e-4 ){continue;}
+        				
+        				for(int wx=0;wx<width;wx++){
+        					for(int wy=0;wy<height;wy++){
+        						if (x==wx && y==wy){continue;}
+        						warp_arr[wx][wy] += _v/Math.sqrt((wx-x)*(wx-x) + (wy-y)*(wy-y));
+        					}
+        				}
+        				
+        			}
+        		}
+        		
+        		for(int x=0;x<width;x++){
+        			for(int y=0;y<height;y++){
+        				warpbuf.put( y*width+x, (float)warp_arr[x][y] );
+        			}
+        		}
+        		
+        		//System.out.println((System.nanoTime() - start)/1e9);
         		
         		//cluster some points!
         		ArrayList<Point> points = new ArrayList<Point>();
@@ -426,13 +467,13 @@ public class VisionManager {
         				p.y = best.y;
         			}
         			
-        			System.out.println(motion);
         			if (motion >= 1){
         				last_still_round = round;
         			}
         			
         			round ++;
         		}
+        		System.out.println(round + " rounds");
         		
         		//convert to 8bit for output
         		IplImage output = cvCreateImage(cvSize(nw, nh), IPL_DEPTH_8U, 1);
