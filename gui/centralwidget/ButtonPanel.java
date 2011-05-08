@@ -12,6 +12,8 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
 
+import core.Parameters;
+
 /**
  * The button panel that contains basic tools for
  * manipulating the current page.
@@ -138,7 +140,7 @@ public class ButtonPanel extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			
+			Parameters.getCoreManager().flipImage(true, true);
 		}
 	}
 	
@@ -149,7 +151,8 @@ public class ButtonPanel extends JPanel {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			
+
+			Parameters.getCoreManager().flipImage(false, true);
 		}
 	}
 }

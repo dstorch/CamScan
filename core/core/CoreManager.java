@@ -389,9 +389,7 @@ public class CoreManager {
                 // do OCR!
                 launchOcrThread(p);
             }
-
         }
-
     }
 
     private void launchOcrThread(Page page) {
@@ -524,6 +522,22 @@ public class CoreManager {
         	_processedImage = VisionManager.rerenderImage(getWorkingImage(), curr.corners(), curr.config());
         }
     }
+    
+    public void flipImage(boolean isHorizontal, boolean isFlipped) {
+    	if (isHorizontal){
+    		try {
+				Parameters.getCoreManager().getWorkingPage().config().setKey(new ConfigurationValue(ConfigurationValue.ValueType.FlipHorizontal, true));
+			} catch (InvalidTypingException e) {
+				e.printStackTrace();
+			}
+    	}else{
+    		try {
+				Parameters.getCoreManager().getWorkingPage().config().setKey(new ConfigurationValue(ConfigurationValue.ValueType.FlipVertical, true));
+			} catch (InvalidTypingException e) {
+				e.printStackTrace();
+			}
+    	}
+    }
 //
 //	// called when user tries to place corner; tries to make a better point given the user's guess
 //    // writes the current process image to workspace/processed (as Tiff file)
@@ -543,11 +557,11 @@ public class CoreManager {
 //        VisionManager.outputToFile(Parameters.getCurrPageImg(), path, curr.corners(), curr.config());
 //    }
 //
-//    // Called every time entering Edit Mode or Configuration Dictionary is changed
-//    public void getEditImageTransform() {
-//        Parameters.setCurrPageImg(VisionManager.imageGlobalTransforms(Parameters.getCurrPageImg(),
-//        		Parameters.getCoreManager().getWorkingPage().config()));
-//    }
+    // Called every time entering Edit Mode or Configuration Dictionary is changed
+    public void getEditImageTransform() {
+        _workingImage = VisionManager.imageGlobalTransforms(_processedImage,
+        		Parameters.getCoreManager().getWorkingPage().config());
+    }
 //
 //    // sets corners and config file for the initial guesses of an imported document
 //    private void initGuesses(Document d) throws IOException {
