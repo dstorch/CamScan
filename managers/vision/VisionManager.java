@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import static com.googlecode.javacv.cpp.opencv_core.*;
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
@@ -339,8 +340,8 @@ public class VisionManager {
     	}
     	cvConvertScale(scaled, output, 255.0/(max-min), -min);
     	
-    	System.out.println(min);
-    	System.out.println(max);
+    	//System.out.println(min);
+    	//System.out.println(max);
     	
     	return output;
 	}
@@ -375,6 +376,8 @@ public class VisionManager {
         	cvResize(image, mini);
         	
         	if (true){
+        		long start = System.nanoTime();
+        		
         		IplImage gray = customGrayTransform(mini, 1, 0, 0);
         		
         		
@@ -392,32 +395,6 @@ public class VisionManager {
         		IplImage warpage = cvCreateImage(cvSize(nw, nh), IPL_DEPTH_32F, 1);
         		final FloatBuffer warpbuf = warpage.getByteBuffer().asFloatBuffer();
         		
-        		
-        		
-        		
-        		//15.7 seconds
-        		/*
-        		for(int wx=0;wx<width;wx++){
-        			for(int wy=0;wy<height;wy++){
-        				Double result = 0.0; //edgebuf.get(width*wy + wx);
-        				
-        				for(int x=0;x<width;x++){
-        					for(int y=0;y<height;y++){
-        						if (x==wx && y==wy){continue;}
-        						//edgebuf.get(width*y + x)
-        						//System.out.println( 1.0/ Math.sqrt( (wx-x)*(wx-x) + (wy-y)*(wy-y) ) );
-        						result += edgebuf.get(width*y + x)/Math.sqrt( (wx-x)*(wx-x) + (wy-y)*(wy-y) ); //0.01 / Math.sqrt( (wx-x)*(wx-x) + (wy-y)*(wy-y) );
-        					}
-        				}
-        				
-        				warpbuf.put(width*wy + wx, result.floatValue());
-        			}
-        		}
-        		 */
-        		
-        		
-        		
-        		//long start = System.nanoTime();
         		
         		double[][] warp_arr = new double[width][height];
         		for(int x=0;x<width;x++){
@@ -450,7 +427,7 @@ public class VisionManager {
         			}
         		}
         		
-        		//System.out.println((System.nanoTime() - start)/1e9);
+        		
         		
         		//cluster some points!
         		ArrayList<Point> points = new ArrayList<Point>();
@@ -528,6 +505,17 @@ public class VisionManager {
         		}
         		System.out.println(merged.size() + " merged points");
         		
+        		for(MergeZone pp: merged){
+        			Point p = pp.point;
+        			pp.weight = integralbuf.get((p.y-3)*width+(p.x-3)) + integralbuf.get((p.y+3)*width+(p.x+3)) - integralbuf.get((p.y-3)*width+(p.x+3)) - integralbuf.get((p.y+3)*width+(p.x-3));
+        		}
+        		Collections.sort( merged );
+        		
+        		while(merged.size() > 4){
+        			merged.remove(merged.size() - 1);
+        		}
+        		
+        		//ideas: use angle invariance to do RANSAC on the points, clustering + morphological ops to segment image for best corners
         		
         		warpage = linearScaledImage(warpage);
         		for(MergeZone pp: merged){
@@ -539,6 +527,8 @@ public class VisionManager {
         		cvSaveImage("gray.png", gray);
         		cvSaveImage("warpage.png", warpage);
         		cvSaveImage("integral.png", linearScaledImage(integral));
+        		
+        		System.out.println((System.nanoTime() - start)/1e9);
         		
         	}else if (false){
         		IplImage output = cvCreateImage(cvSize(nw, nh), IPL_DEPTH_8U, 1);
