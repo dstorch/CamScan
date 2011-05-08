@@ -3,10 +3,10 @@
 <PAGE>
   <IMG path="workspace\raw\alice_1.tiff" processed="workspace/processed/alice_1.tiff"/>
   <CORNERS>
-    <UPRIGHT x="2488" y="0"/>
-    <DOWNRIGHT x="2488" y="3507"/>
-    <UPLEFT x="0" y="0"/>
-    <DOWNLEFT x="0" y="3507"/>
+    <UPRIGHT x="2289" y="405"/>
+    <DOWNRIGHT x="2203" y="2871"/>
+    <UPLEFT x="350" y="467"/>
+    <DOWNLEFT x="380" y="2932"/>
   </CORNERS>
   <TEXT>
     <FULLTEXT></FULLTEXT>

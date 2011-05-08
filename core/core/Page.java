@@ -290,6 +290,4 @@ public class Page implements Comparable{
         else if (order() == ((Page) t).order()) return 0;
         else return 1;
     }
-
-
 }

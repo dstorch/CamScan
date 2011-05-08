@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <STARTUP>
-  <TESSERACT path="/usr/local/bin/tesseract"/>
-  <WORKINGDOC value="workspace/docs/IMG_148/doc.xml"/>
+ <WORKINGDOC value="workspace/docs/IMG_148/doc.xml"/>
   <WORKINGPAGE value="workspace/docs/alice_1/alice_1.xml" order="0"/>
   <DOCLIST>
     <DOC value="workspace/docs/alice_1/doc.xml"/>

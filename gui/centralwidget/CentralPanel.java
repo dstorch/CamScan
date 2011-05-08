@@ -6,6 +6,8 @@ import java.awt.event.AdjustmentListener;
 
 import javax.swing.JPanel;
 
+import core.Parameters;
+
 import westwidget.WestPanel;
 
 import eastwidget.EastPanel;
@@ -155,6 +157,8 @@ public class CentralPanel extends JPanel {
 	 * Switches to the view panel.
 	 */
 	public void switchToViewPanel() {
+
+		Parameters.getCoreManager().updateProcessedImage();
 		
 		this.toolbarPanel.selectViewRButton();
 		
@@ -171,7 +175,7 @@ public class CentralPanel extends JPanel {
 		this.add(this.viewPanel, BorderLayout.CENTER);
 		this.viewPanel.setVisible(true);
 		this.buttonPanel.setComponentsVisible(false);
-                this.toolbarPanel.showZoomButtons();
+        this.toolbarPanel.showZoomButtons();
 	}
 	
 	/**
