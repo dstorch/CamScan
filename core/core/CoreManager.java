@@ -190,15 +190,21 @@ public class CoreManager {
 		writeStartupFile();
                 setWorkingDocumentFromName(newName);
 	}
-	
-	public void deleteDocument(String docName) throws IOException {
-		Document toDelete = null;
+
+        // returns null if there isn't a document with name
+        private Document getDocFromName(String docName){
+            Document doc = null;
 		for (Document d : _allDocuments) {
 			if (docName.equals(d.name())) {
-				toDelete = d;
+				doc = d;
 			}
 		}
-		
+
+		return doc;
+        }
+
+	public void deleteDocument(String docName) throws IOException {
+                Document toDelete = getDocFromName(docName);
 		deleteDocument(toDelete);
 	}
 	
@@ -228,6 +234,24 @@ public class CoreManager {
 
 		writeStartupFile();
 	}
+
+        private Page getPageFromOrder(Document d, int o){
+            for (Page p : d.pages()) {
+                if(p.order() == o) return p;
+            }
+            return null;
+        }
+
+        public void deletePage(Document d, int order) throws IOException{
+            Page p = getPageFromOrder(d, order);
+            deletePage(d, p);
+        }
+
+        private void deletePage(Document d, Page p) throws IOException{
+            d.deletePage(p);
+            // if the last page is deleted, delete the document as well
+            if(d.pages().size()==0) deleteDocument(d);
+        }
 
 
         public void mergeDocuments(String d1, String d2) throws IOException{
@@ -483,13 +507,9 @@ public class CoreManager {
      * @throws IOException 
      */
     public void setWorkingDocumentFromName(String docName) throws IOException {
-
-        for (Document doc : _allDocuments) {
-            if (docName.equals(doc.name())) {
-                _workingDocument = doc;
-                setWorkingPageAndImage(doc.pages().first());
-            }
-        }
+        Document doc = getDocFromName(docName);
+         _workingDocument = doc;
+         setWorkingPageAndImage(doc.pages().first());
     }
     
     public void setWorkingDocument(Document doc) {

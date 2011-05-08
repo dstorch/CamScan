@@ -1,19 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <STARTUP>
-<<<<<<< HEAD
   <TESSERACT path="/opt/local/bin/tesseract"/>
-  <WORKINGDOC value="workspace/docs/phototest/doc.xml"/>
-  <WORKINGPAGE value="workspace/docs/phototest/phototest.xml" order="0"/>
+  <WORKINGDOC value="workspace/docs/Alice/doc.xml"/>
+  <WORKINGPAGE value="workspace/docs/Alice/alice_1.xml" order="0"/>
   <DOCLIST>
     <DOC value="workspace/docs/Alice/doc.xml"/>
-    <DOC value="workspace/docs/phototest/doc.xml"/>
-    <DOC value="workspace/docs/hyphenation-example/doc.xml"/>
-=======
-  <TESSERACT path="/usr/local/bin/tesseract"/>
-  <WORKINGDOC value="workspace/docs/phototest/doc.xml"/>
-  <DOCLIST>
-    <DOC value="workspace/docs/phototest/doc.xml"/>
->>>>>>> d2a78797dd8ce192c39a2aa8c1b62d82bfc6efaa
+    <DOC value="workspace/docs/Hyphenation/doc.xml"/>
   </DOCLIST>
 </STARTUP>

@@ -104,6 +104,7 @@ public class Document {
                 // delete all image files in raw directory (AND PROCESSED DIRECTORY?????)
                 for (Page p : pages()) {
                     p.deleteRawFile();
+                    //p.deleteProcessedFile();
                 }
 	}
 
@@ -151,9 +152,17 @@ public class Document {
         }
 
         // deletes Page from list and all references
-        public void deletePage(Page p){
+        public void deletePage(Page p) throws IOException{
             int index = p.order();
-            
+            _pages.remove(p);
+            // update orders of all pages below deleted page
+            for (Page page : pages()) {
+		if(page.order()>index) page.setOrder(page.order() - 1);
+            }
+            p.deleteMetadataFile();
+            //p.deleteProcessedFile();
+            p.deleteRawFile(); 
+            serialize();
         }
 	
 }
