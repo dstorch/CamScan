@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <STARTUP>
+<<<<<<< HEAD
   <TESSERACT path="/opt/local/bin/tesseract"/>
-  <WORKINGDOC value="workspace/docs/twocol600/doc.xml"/>
-  <WORKINGPAGE value="workspace/docs/twocol600/twocol600.xml" order="0"/>
+  <WORKINGDOC value="workspace/docs/alice_1/doc.xml"/>
+  <WORKINGPAGE value="workspace/docs/alice_1/alice_1.xml" order="0"/>
   <DOCLIST>
-    <DOC value="workspace/docs/twocol600/doc.xml"/>
+    <DOC value="workspace/docs/alice_1/doc.xml"/>
+=======
+  <TESSERACT path="/usr/local/bin/tesseract"/>
+  <WORKINGDOC value="workspace/docs/IMG_148/doc.xml"/>
+  <WORKINGPAGE value="workspace/docs/alice_1/alice_1.xml" order="0"/>
+  <DOCLIST>
+    <DOC value="workspace/docs/alice_1/doc.xml"/>
+    <DOC value="workspace/docs/IMG_148/doc.xml"/>
+>>>>>>> c1ebab494ec093f462e351810a431990e780058d
   </DOCLIST>
 </STARTUP>
