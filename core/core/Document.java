@@ -164,5 +164,13 @@ public class Document {
             p.deleteRawFile(); 
             serialize();
         }
+
+        public void reorderPage(Page p, int newOrder){
+            p.setOrder(newOrder);
+            for (Page page : pages()) {
+		if(page.order()>=newOrder) page.setOrder(page.order() + 1);
+            }
+
+        }
 	
 }

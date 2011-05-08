@@ -60,6 +60,7 @@ public class PageExplorerPanel extends JPanel {
 
         this.mainPanel = mainPanel;
         this.pageList = new JList(this.getPageNames());
+        //this.pageList = new DDList();
 
         this.pageList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         this.pageList.getSelectionModel().addListSelectionListener(new SelectionListener());
@@ -165,7 +166,7 @@ public class PageExplorerPanel extends JPanel {
             public void keyPressed(java.awt.event.KeyEvent evt) {
 
                 if (evt.getKeyCode() == 8) {
-                    int index = pageList.getSelectedIndex();
+                    int index = pageList.getSelectedIndex() + 1;
                     Document d = Parameters.getCoreManager().workingDocument();
                     int selected = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete page" + index + "?", "Delete Document", JOptionPane.OK_CANCEL_OPTION);
                     if (selected == JOptionPane.OK_OPTION) {
@@ -173,7 +174,7 @@ public class PageExplorerPanel extends JPanel {
                         try {
                             Parameters.getCoreManager().deletePage(d, index);
                             update();
-                            //centralPanel.updatePanels(false);
+                            // Parameters.getFrame().getContentPane().centralPanel.updatePanels(false);
                         } catch (IOException ex) {
                             JOptionPane.showMessageDialog(null, ex.getMessage(), "Delete Error", JOptionPane.ERROR_MESSAGE);
                         }
@@ -187,3 +188,9 @@ public class PageExplorerPanel extends JPanel {
             public void keyReleased(KeyEvent ke) {}
         }
 }
+
+
+/**
+ * Classes to support drag and dropping for reordering pages
+ *
+ */

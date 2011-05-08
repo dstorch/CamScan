@@ -253,6 +253,10 @@ public class CoreManager {
             if(d.pages().size()==0) deleteDocument(d);
         }
 
+        public void reorderPage(Document d, Page p, int newOrder){
+            d.reorderPage(p, newOrder);
+        }
+
 
         public void mergeDocuments(String d1, String d2) throws IOException{
                 Document toMerge1 = null;
@@ -407,7 +411,7 @@ public class CoreManager {
                 p.setMetafile(Parameters.DOC_DIRECTORY + "/" + d.name() + "/" + noExt + ".xml");
 
                 // guess initial configuration values
-                //p.initGuesses();
+                p.initGuesses();
                 d.addPage(p);
 
                 // do OCR!
@@ -483,19 +487,7 @@ public class CoreManager {
     }
 
     public SearchResults search(String query) {
-        SearchResults results = _searcher.getSearchResults(query, _workingDocument, _allDocuments);
-
-        // REMOVE WHEN READY
-        System.out.println("In the working page: ");
-        for (SearchHit hit : results.inWorkingDoc()) {
-            System.out.println(hit.snippet() + " " + hit.score());
-        }
-        System.out.println("In all other pages: ");
-        for (SearchHit hit : results.elsewhere()) {
-            System.out.println(hit.snippet() + " " + hit.score());
-        }
-
-        return results;
+    	return _searcher.getSearchResults(query, _workingDocument, _allDocuments);
     }
 
     /**

@@ -111,13 +111,14 @@ public class Page implements Comparable{
     	System.out.println("Raw file: "+raw());
 
     	// read a buffered image from the disk
-    	//BufferedImage buff = ImageIO.read(new File(raw()));
-    	BufferedImage buff = VisionManager.loadImage(raw());
+    	BufferedImage buff = ImageIO.read(new File(raw()));
+    	//BufferedImage buff = VisionManager.loadImage(raw());
     	
     	// guess and set corners and configuration values of Page
     	setCorners(VisionManager.findCorners(buff));
     	setConfig(VisionManager.estimateConfigurationValues(buff));
     }
+    
     
     // writes the current process image to workspace/processed
     public void writeProcessedImage() throws IOException {
@@ -281,7 +282,8 @@ public class Page implements Comparable{
         // deletes metadata file
         public void deleteMetadataFile(){
             File meta = new File(metafile());
-            if(!meta.delete()) System.out.println("METADTA file not deleted!!");
+            System.out.println("Metafile: "+ metafile());
+            if(!meta.delete()) System.out.println("******METADTA file not deleted!!");
         }
 
     public int compareTo(Object t) {
