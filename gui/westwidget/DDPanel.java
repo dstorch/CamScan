@@ -6,6 +6,8 @@ import java.awt.Dimension;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetDropEvent;
@@ -111,6 +113,10 @@ public class DDPanel extends JPanel implements DropTargetListener, ActionListene
 	 */
 	public void drop(DropTargetDropEvent evt) {
 		
+		// make the panel stop flashing
+		this.timer.stop();
+		this.setBackground(Color.WHITE);
+		
 		int action = evt.getDropAction();
 		evt.acceptDrop(action);
 		try {
@@ -138,20 +144,12 @@ public class DDPanel extends JPanel implements DropTargetListener, ActionListene
 	public void dragEnter(DropTargetDragEvent arg0) {
 		this.repeats = 0;
 		this.setBackground(dndColor);
-		timer.start();
+		this.timer.start();
 	}
 
 	public void dragExit(DropTargetEvent arg0) {
-		timer.stop();
+		this.timer.stop();
 		this.setBackground(Color.WHITE);
-	}
-
-	public void dragOver(DropTargetDragEvent arg0) {
-		timer.start();
-	}
-
-	public void dropActionChanged(DropTargetDragEvent arg0) {
-		timer.start();
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -184,4 +182,7 @@ public class DDPanel extends JPanel implements DropTargetListener, ActionListene
 		if (blue > 255) blue = 255;
 		return new Color(red, blue, green);
 	}
+	
+	public void dragOver(DropTargetDragEvent e) {}
+	public void dropActionChanged(DropTargetDragEvent e) {}
 }
