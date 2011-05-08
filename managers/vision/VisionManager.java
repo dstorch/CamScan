@@ -12,7 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 import static com.googlecode.javacv.cpp.opencv_core.*;
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
@@ -365,34 +365,70 @@ public class VisionManager {
             	//cvLaplace(gray, edges, 3); //cvConvertScale(edges, output, 1, 0);
             	//cvCornerMinEigenVal(gray, edges, 80, 3);
         		cvCornerHarris(gray, edges, (int) (maxsize*0.05), 5, 0.04);
-        		
-        		//cluster some points!
         		final FloatBuffer edgebuf = edges.getByteBuffer().asFloatBuffer();
-        		LinkedList<Point> points = new LinkedList<Point>();
-        		
-        		for(int x=0;x<40;x++){
-        			for(int y=0;y<40;y++){
-        				points.add( new Point(x*5,y*5) );
-        			}
-        		}
-        		
         		int width = edges.width();
         		int height = edges.height();
         		
-        		int round = 0;
-        		while(round < 100){
-        			for(Point p: points){
-        				float current = edgebuf.get( p.y*width + p.x );
+        		IplImage warpage = cvCreateImage(cvSize(nw, nh), IPL_DEPTH_32F, 1);
+        		final FloatBuffer warpbuf = warpage.getByteBuffer().asFloatBuffer();
+        		
+        		
+        		for(int wx=0;wx<width;wx++){
+        			for(int wy=0;wy<height;wy++){
+        				Double result = 0.0; //edgebuf.get(width*wy + wx);
         				
-        				
-        				for(int sx=-1;sx<2;sx++){
-        					for(int sy=-1;sy<2;sy++){
-        						if (sx==0&&sy==0){continue;}
-        						
-        						//float newpoint = edgebuf.get( ()*width + p.x+sx )
+        				for(int x=0;x<width;x++){
+        					for(int y=0;y<height;y++){
+        						if (x==wx && y==wy){continue;}
+        						//edgebuf.get(width*y + x)
+        						//System.out.println( 1.0/ Math.sqrt( (wx-x)*(wx-x) + (wy-y)*(wy-y) ) );
+        						result += edgebuf.get(width*y + x)/Math.sqrt( (wx-x)*(wx-x) + (wy-y)*(wy-y) ); //0.01 / Math.sqrt( (wx-x)*(wx-x) + (wy-y)*(wy-y) );
         					}
         				}
         				
+        				warpbuf.put(width*wy + wx, result.floatValue());
+        			}
+        		}
+
+        		
+        		//cluster some points!
+        		ArrayList<Point> points = new ArrayList<Point>();
+        		
+        		
+        		for(int x=0;x<width;x+=5){
+        			for(int y=0;y<height;y+=5){
+        				points.add( new Point(x,y) );
+        			}
+        		}
+        		
+        		int round = 0;
+        		int last_still_round = 0;
+        		double motion;
+        		while(round-last_still_round < 5 && round < 500){
+        			motion = 0;
+        			for(Point p: points){
+        				float current = warpbuf.get( p.y*width + p.x );
+        				Point best = p;
+        				
+        				for(int sx=-1;sx<=1;sx++){
+        					for(int sy=-1;sy<=1;sy++){
+        						if ((sx==0&&sy==0) || p.x+sx < 0 || p.y+sy < 0 || p.x+sx >= width || p.y+sy >= height){continue;}
+        						
+        						float newpoint = warpbuf.get( (p.y+sy)*width + p.x+sx );
+        						if (newpoint > current){
+        							best = new Point(p.x+sx, p.y+sy);
+        						}
+        					}
+        				}
+        				motion += Math.sqrt( (p.x-best.x)*(p.x-best.x) + (p.y-best.y)*(p.y-best.y) );
+        				
+        				p.x = best.x;
+        				p.y = best.y;
+        			}
+        			
+        			System.out.println(motion);
+        			if (motion >= 1){
+        				last_still_round = round;
         			}
         			
         			round ++;
@@ -405,14 +441,14 @@ public class VisionManager {
             	float v;
             	float min = Float.MAX_VALUE;
             	float max = 0;
-            	for(int i=0;i<edgebuf.capacity();i++){
-            		v = edgebuf.get(i);
+            	for(int i=0;i<warpbuf.capacity();i++){
+            		v = warpbuf.get(i);
             		if (v < min){min=v;}
             		if (v > max){max=v;}
             	}
             	System.out.println(min);
             	System.out.println(max);
-            	cvConvertScale(edges, output, 255.0/(max-min), -min);
+            	cvConvertScale(warpage, output, 255.0/(max-min), -min);
             	
             	
             	for(Point p: points){

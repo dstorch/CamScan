@@ -2,10 +2,6 @@
 
 <STARTUP>
   <TESSERACT path="/usr/local/bin/tesseract"/>
-  <WORKINGDOC value="workspace/docs/sample_page/doc.xml"/>
-  <WORKINGPAGE value="workspace/docs/sample_page/sample_page.xml" order="0"/>
   <DOCLIST>
-    <DOC value="workspace/docs/sample2/doc.xml"/>
-    <DOC value="workspace/docs/sample_page/doc.xml"/>
   </DOCLIST>
 </STARTUP>
