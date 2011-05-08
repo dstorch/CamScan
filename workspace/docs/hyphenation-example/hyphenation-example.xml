@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<PAGE>
+  <IMG path="workspace\raw\hyphenation-example.tiff" processed="workspace/processed/hyphenation-example.tiff"/>
+  <CORNERS>
+    <UPRIGHT x="100" y="50"/>
+    <DOWNRIGHT x="100" y="200"/>
+    <UPLEFT x="50" y="50"/>
+    <DOWNLEFT x="50" y="200"/>
+  </CORNERS>
+  <TEXT>
+    <FULLTEXT></FULLTEXT>
+    <POSITIONS/>
+  </TEXT>
+  <CONFIG/>
+</PAGE>
