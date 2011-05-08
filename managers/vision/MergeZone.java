@@ -6,9 +6,10 @@ import java.awt.Point;
 /*
  * Because Java doesn't have tuples.
  */
-public class MergeZone {
+public class MergeZone implements Comparable{
 	public int count;
 	public Point point;
+	public double weight;
 	public MergeZone(Point p){
 		this.point = p;
 	}
@@ -18,5 +19,18 @@ public class MergeZone {
 	}
 	public double distance(Point p){
 		return Math.sqrt( (this.point.x-p.x)*(this.point.x-p.x) + (this.point.y-p.y)*(this.point.y-p.y) );
+	}
+	
+	@Override
+	public int compareTo(Object a) {
+		if (a instanceof MergeZone){
+			MergeZone other = (MergeZone)a;
+			if (other.weight < this.weight){
+				return -1;
+			}else if (this.weight < other.weight){
+				return 1;
+			}
+		}
+		return 0;
 	}
 }
