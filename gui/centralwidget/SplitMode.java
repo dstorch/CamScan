@@ -17,6 +17,24 @@ public class SplitMode extends EditPanel {
 	private Corners box2;
 	
 	/**
+	 * the color to display points when they are
+	 * being dragged.
+	 */
+	private static Color draggingColor = Color.RED;
+
+	/**
+	 * the color in which to draw the first set of points when
+	 * they are not being dragged
+	 */
+	private static Color staticColor1 = Color.GREEN;
+	
+	/**
+	 * the color in which to draw the first set of points when
+	 * they are not being dragged
+	 */
+	private static Color staticColor2 = Color.ORANGE;
+	
+	/**
 	 * The actual drawn ellipses. These
 	 * differ from cornerUR in that they
 	 * have the transform applied to them,
@@ -64,20 +82,55 @@ public class SplitMode extends EditPanel {
 		this.box1 = box1;
 		this.box2 = box2;
 		this.editPanel = panel;
+		
+		this.drawableUL1 = new Ellipse2D.Double();
+		this.drawableUR1 = new Ellipse2D.Double();
+		this.drawableDR1 = new Ellipse2D.Double();
+		this.drawableDL1 = new Ellipse2D.Double();
+		this.drawableUL2 = new Ellipse2D.Double();
+		this.drawableUR2 = new Ellipse2D.Double();
+		this.drawableDR2 = new Ellipse2D.Double();
+		this.drawableDL2 = new Ellipse2D.Double();
+
+		this.lineULUR1 = new Line2D.Double();
+		this.lineURDR1 = new Line2D.Double();
+		this.lineDRDL1 = new Line2D.Double();
+		this.lineDLUL1 = new Line2D.Double();
+		this.lineULUR2 = new Line2D.Double();
+		this.lineURDR2 = new Line2D.Double();
+		this.lineDRDL2 = new Line2D.Double();
+		this.lineDLUL2 = new Line2D.Double();
+	}
+	
+	/**
+	 * Set the corner color based on whether or not the
+	 * corner is currently being dragged.
+	 * 
+	 * @param pt - the PointTransform for the corner to draw
+	 * @param g - the graphics object used to draw the corner
+	 */
+	private void setCornerColor(PointTransform pt, Graphics2D g, boolean isBox1) {
+		if (pt.dragging) {
+			g.setColor(draggingColor);
+		} else if (isBox1) {
+			g.setColor(staticColor1);
+		} else {
+			g.setColor(staticColor2);
+		}
 	}
 
 	public void paint(Graphics2D brush) {
 
 		// apply the transforms to the corners
-		this.scaleAndTranslate(this.box1.upright(), this.transUR1, this.transCanvas, this.drawableUR1);
-		this.scaleAndTranslate(this.box1.upleft(), this.transUL1, this.transCanvas, this.drawableUL1);
-		this.scaleAndTranslate(this.box1.downleft(), this.transDL1, this.transCanvas, this.drawableDL1);
-		this.scaleAndTranslate(this.box1.downright(), this.transDR1, this.transCanvas, this.drawableDR1);
+		editPanel.scaleAndTranslate(this.box1.upright(), this.transUR1, editPanel.transCanvas, this.drawableUR1);
+		editPanel.scaleAndTranslate(this.box1.upleft(), this.transUL1, editPanel.transCanvas, this.drawableUL1);
+		editPanel.scaleAndTranslate(this.box1.downleft(), this.transDL1, editPanel.transCanvas, this.drawableDL1);
+		editPanel.scaleAndTranslate(this.box1.downright(), this.transDR1, editPanel.transCanvas, this.drawableDR1);
 		
-		this.scaleAndTranslate(this.box2.upright(), this.transUR2, this.transCanvas, this.drawableUR2);
-		this.scaleAndTranslate(this.box2.upleft(), this.transUL2, this.transCanvas, this.drawableUL2);
-		this.scaleAndTranslate(this.box2.downleft(), this.transDL2, this.transCanvas, this.drawableDL2);
-		this.scaleAndTranslate(this.box2.downright(), this.transDR2, this.transCanvas, this.drawableDR2);
+		editPanel.scaleAndTranslate(this.box2.upright(), this.transUR2, editPanel.transCanvas, this.drawableUR2);
+		editPanel.scaleAndTranslate(this.box2.upleft(), this.transUL2, editPanel.transCanvas, this.drawableUL2);
+		editPanel.scaleAndTranslate(this.box2.downleft(), this.transDL2, editPanel.transCanvas, this.drawableDL2);
+		editPanel.scaleAndTranslate(this.box2.downright(), this.transDR2, editPanel.transCanvas, this.drawableDR2);
 
 		// make the lines connect to the new point location
 		this.updateConnectingLinesSplitMode();
@@ -94,21 +147,29 @@ public class SplitMode extends EditPanel {
 		brush.draw(this.lineDLUL2);
 
 		// draw points
+		setCornerColor(this.transUR1, brush, true);
 		brush.draw(this.drawableUR1);
 		brush.fill(this.drawableUR1);
+		setCornerColor(this.transUL1, brush, true);
 		brush.draw(this.drawableUL1);
 		brush.fill(this.drawableUL1);
+		setCornerColor(this.transDR1, brush, true);
 		brush.draw(this.drawableDR1);
 		brush.fill(this.drawableDR1);
+		setCornerColor(this.transDL1, brush, true);
 		brush.draw(this.drawableDL1);
 		brush.fill(this.drawableDL1);
 		
+		setCornerColor(this.transUR2, brush, false);
 		brush.draw(this.drawableUR2);
 		brush.fill(this.drawableUR2);
+		setCornerColor(this.transUL2, brush, false);
 		brush.draw(this.drawableUL2);
 		brush.fill(this.drawableUL2);
+		setCornerColor(this.transDR2, brush, false);
 		brush.draw(this.drawableDR2);
 		brush.fill(this.drawableDR2);
+		setCornerColor(this.transDL2, brush, false);
 		brush.draw(this.drawableDL2);
 		brush.fill(this.drawableDL2);
 	}
@@ -123,7 +184,8 @@ public class SplitMode extends EditPanel {
 		else if (this.transUR2.dragging) this.dragPoint(this.transUR2, e);
 		else if (this.transDL2.dragging) this.dragPoint(this.transDL2, e);
 		else if (this.transDR2.dragging) this.dragPoint(this.transDR2, e);
-		else if (editPanel.transCanvas.dragging) this.dragPoint(editPanel.transCanvas, e);
+		else if (editPanel.transImage.dragging) editPanel.dragPoint(editPanel.transImage, e);
+		else if (editPanel.transCanvas.dragging) editPanel.dragPoint(editPanel.transCanvas, e);
 	}
 	
 	public void mousePressed(MouseEvent e) {
@@ -142,7 +204,7 @@ public class SplitMode extends EditPanel {
 		}
 		
 		// register drags for the corners of box2
-		if (this.isWithinCornerEllipse(this.drawableUL2, e.getX(), e.getY())) {
+		else if (this.isWithinCornerEllipse(this.drawableUL2, e.getX(), e.getY())) {
 			this.registerMousePress(this.transUL2, e);
 		} else if (this.isWithinCornerEllipse(this.drawableUR2, e.getX(), e.getY())) {
 			this.registerMousePress(this.transUR2, e);

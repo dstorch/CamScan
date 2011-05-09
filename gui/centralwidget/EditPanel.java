@@ -366,8 +366,8 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	 * Set the corner color based on whether or not the
 	 * corner is currently being dragged.
 	 * 
-	 * @param pt
-	 * @param g
+	 * @param pt - the PointTransform for the corner to draw
+	 * @param g - the graphics object used to draw the corner
 	 */
 	private void setCornerColor(PointTransform pt, Graphics2D g) {
 		if (pt.dragging) {
@@ -532,16 +532,12 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		
-		switch (this.mode) {
-			case STANDARD :
-				this.mouseDraggedStandard(e);
-				break;
-			case HSPLIT :
-				horizontalSplit.mouseDragged(e);
-				break;
-			case VSPLIT :
-				verticalSplit.mouseDragged(e);
-				break;
+		if (this.mode == EditPanelMode.STANDARD) {
+			this.mouseDraggedStandard(e);
+		} else if (this.mode == EditPanelMode.HSPLIT) {
+			horizontalSplit.mouseDragged(e);
+		} else if (this.mode == EditPanelMode.VSPLIT) {
+			verticalSplit.mouseDragged(e);
 		}
 		
 		this.repaint();
@@ -567,18 +563,15 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 
 	
 	public void mousePressed(MouseEvent e) {
-
-		switch (this.mode) {
-			case STANDARD :
-				this.mousePressedStandard(e);
-				break;
-			case HSPLIT :
-				horizontalSplit.mousePressed(e);
-				break;
-			case VSPLIT :
-				verticalSplit.mousePressed(e);
-				break;
+		
+		if (this.mode == EditPanelMode.STANDARD) {
+			this.mousePressedStandard(e);
+		} else if (this.mode == EditPanelMode.HSPLIT) {
+			horizontalSplit.mousePressed(e);
+		} else if (this.mode == EditPanelMode.VSPLIT) {
+			verticalSplit.mousePressed(e);
 		}
+
 	}
 	
 	/**
@@ -672,4 +665,82 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	 * SPLIT HORIZONTAL AND SPLIT VERTICAL
 	 * 
 	 ****************************************/
+	
+	public EditPanelMode getEditPanelMode() {
+		return this.mode;
+	}
+	
+	public void toggleHorizontalFlipMode() {
+		
+		// toggle back to standard mode
+		if (this.mode == EditPanelMode.HSPLIT) {
+			this.mode = EditPanelMode.STANDARD;
+		}
+		
+		// otherwise toggle to horizontal split mode
+		else {
+		
+			this.mode = EditPanelMode.HSPLIT;
+			
+			// midpoint between top left and bottom left
+			Point mid1 = this.midpoint(this.cornerUL, this.cornerDL);
+			
+			// midpoint between top right and bottom right
+			Point mid2 = this.midpoint(this.cornerUR, this.cornerDR);
+			
+			// make a "margin" between the points
+			Point mid1up = new Point(mid1.x, mid1.y - 10);
+			Point mid2up = new Point(mid2.x, mid2.y - 10);
+			Point mid1down = new Point(mid1.x, mid1.y + 10);
+			Point mid2down = new Point(mid2.x, mid2.y + 10);
+			
+			Corners box1 = new Corners(this.cornerUL, this.cornerUR, mid1up, mid2up);
+			Corners box2 = new Corners(mid1down, mid2down, this.cornerDL, this.cornerDR);
+			
+			this.horizontalSplit = new SplitMode(box1, box2, this);
+		
+		}
+		
+		this.repaint();
+	}
+	
+	public void toggleVerticalFlipMode() {
+		
+		// toggle back to standard mode from vertical split mode
+		if (this.mode == EditPanelMode.VSPLIT) {
+			this.mode = EditPanelMode.STANDARD;
+		}
+		
+		// toggle to vertical split mode from any other mode
+		else {
+		
+			this.mode = EditPanelMode.VSPLIT;
+			
+			// midpoint between top left and top right
+			Point mid1 = this.midpoint(this.cornerUL, this.cornerUR);
+			
+			// midpoint between bottom left and bottom right
+			Point mid2 = this.midpoint(this.cornerDL, this.cornerDR);
+			
+			// make a "margin" between the points
+			Point mid1left = new Point(mid1.x - 10, mid1.y);
+			Point mid2left = new Point(mid2.x - 10, mid2.y);
+			Point mid1right = new Point(mid1.x + 10, mid1.y);
+			Point mid2right = new Point(mid2.x + 10, mid2.y);
+			
+			Corners box1 = new Corners(this.cornerUL, mid1left, this.cornerDL, mid2left);
+			Corners box2 = new Corners(mid1right, this.cornerUR, mid2right, this.cornerDR);
+			
+			this.verticalSplit = new SplitMode(box1, box2, this);
+			
+		}
+		
+		this.repaint();
+	}
+	
+	private Point midpoint(Point p1, Point p2) {
+		int x = (p1.x + p2.x) / 2;
+		int y = (p1.y + p2.y) / 2;
+		return new Point(x, y);
+	}
 }

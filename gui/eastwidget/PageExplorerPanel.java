@@ -158,7 +158,7 @@ public class PageExplorerPanel extends JPanel {
 					} catch (IOException e1) {
 						e1.printStackTrace();
 					}
-					Parameters.getCoreManager().updateProcessedImage();
+					//Parameters.getCoreManager().updateProcessedImage();
 		        	mainPanel.updateCentralPanels(false);
 		        }
 		    }
