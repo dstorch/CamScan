@@ -59,4 +59,8 @@ public class ConfigurationValue {
 		System.err.println("ConfigurationValue doesn't know how to return a value for its type!");
 		return null;
 	}
+	
+	public String toString(){
+		return "<" + type2name(this.type) + ": " + this.value().toString() + ">";
+	}
 }

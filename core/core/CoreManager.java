@@ -26,7 +26,7 @@ public class CoreManager {
     // instance variables telling the GUI which page to display
     private Document _workingDocument;
     private Page _workingPage;
-    private BufferedImage _workingImage;
+    private BufferedImage _rawImage;
     private BufferedImage _processedImage;
 
     public CoreManager() throws DocumentException, IOException {
@@ -165,7 +165,7 @@ public class CoreManager {
 	
 	public void setWorkingPageAndImage(Page page) throws IOException {
 		_workingPage = page;
-		_workingImage = page.getRawImgFromDisk();
+		_rawImage = page.getRawImgFromDisk();
 	}
 	
 	// when a working document is "closed" it is serialized
@@ -216,7 +216,7 @@ public class CoreManager {
                             }else{ // there are no Documents
                                 _workingDocument = null;
                                 _workingPage = null;
-                                _workingImage = null;
+                                _rawImage = null;
                             }
                         }
 		}
@@ -486,8 +486,8 @@ public class CoreManager {
 		return _workingPage;
 	}
     
-    public BufferedImage getWorkingImage() {
-    	return _workingImage;
+    public BufferedImage getRawImage() {
+    	return _rawImage;
     }
     
     public BufferedImage getProcessedImage() {
@@ -517,22 +517,25 @@ public class CoreManager {
     // uses changes made in edit mode and rerenders the image
     public void updateProcessedImage() {
         Page curr = getWorkingPage();
-        BufferedImage img = getWorkingImage();
+        BufferedImage img = getRawImage();
         if (curr != null && img != null) {
-        	_processedImage = VisionManager.rerenderImage(getWorkingImage(), curr.corners(), curr.config());
+        	_processedImage = VisionManager.rerenderImage(getRawImage(), curr.corners(), curr.config());
         }
     }
     
-    public void flipImage(boolean isHorizontal, boolean isFlipped) {
-    	if (isHorizontal){
+    public void flipImage(boolean isVertical) {
+    	
+    	if (isVertical){
     		try {
-				Parameters.getCoreManager().getWorkingPage().config().setKey(new ConfigurationValue(ConfigurationValue.ValueType.FlipHorizontal, true));
+    			ConfigurationValue configVal = this.getWorkingPage().config().getKey(ConfigurationValue.ValueType.FlipVertical);
+				Parameters.getCoreManager().getWorkingPage().config().setKey(new ConfigurationValue(ConfigurationValue.ValueType.FlipVertical, !(Boolean) configVal.value()));
 			} catch (InvalidTypingException e) {
 				e.printStackTrace();
 			}
     	}else{
-    		try {
-				Parameters.getCoreManager().getWorkingPage().config().setKey(new ConfigurationValue(ConfigurationValue.ValueType.FlipVertical, true));
+			try {
+    	    	ConfigurationValue configVal = this.getWorkingPage().config().getKey(ConfigurationValue.ValueType.FlipHorizontal);
+				Parameters.getCoreManager().getWorkingPage().config().setKey(new ConfigurationValue(ConfigurationValue.ValueType.FlipHorizontal, !(Boolean) configVal.value()));
 			} catch (InvalidTypingException e) {
 				e.printStackTrace();
 			}
@@ -625,7 +628,7 @@ public class CoreManager {
 //
     // Called every time entering Edit Mode or Configuration Dictionary is changed
     public void getEditImageTransform() {
-        _workingImage = VisionManager.imageGlobalTransforms(_processedImage,
+        _processedImage = VisionManager.imageGlobalTransforms(_rawImage,
         		Parameters.getCoreManager().getWorkingPage().config());
     }
 //

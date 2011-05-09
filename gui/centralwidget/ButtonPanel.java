@@ -53,6 +53,11 @@ public class ButtonPanel extends JPanel {
 	 */
 	private JButton hSplitButton;
 	
+	/**
+	 * Reference to the central panel.
+	 */
+	private CentralPanel centralPanel;
+	
 	/****************************************
 	 * 
 	 * Constructor(s)
@@ -62,11 +67,12 @@ public class ButtonPanel extends JPanel {
 	/**
 	 * Constructor.
 	 */
-	public ButtonPanel(EditPanel editPanel) {
+	public ButtonPanel(EditPanel editPanel, CentralPanel centralPanel) {
 		super();
 		this.setLayout(new GridLayout(2,4));
 		
 		this.editPanel = editPanel;
+		this.centralPanel = centralPanel;
 		
 		this.controls = new ArrayList<Component>();
 		
@@ -186,8 +192,9 @@ public class ButtonPanel extends JPanel {
 	private class FlipHorizontallyListener implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
-			Parameters.getCoreManager().flipImage(true, true);
+			Parameters.getCoreManager().flipImage(false);
 			Parameters.getCoreManager().getEditImageTransform();
+			centralPanel.updatePanels(false);
 		}
 	}
 	
@@ -198,9 +205,9 @@ public class ButtonPanel extends JPanel {
 
 		public void actionPerformed(ActionEvent e) {
 
-			Parameters.getCoreManager().flipImage(false, true);
+			Parameters.getCoreManager().flipImage(true);
 			Parameters.getCoreManager().getEditImageTransform();
-			Parameters.getCoreManager().updateProcessedImage();
+			centralPanel.updatePanels(false);
 		}
 	}
 }

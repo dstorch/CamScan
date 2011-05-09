@@ -263,9 +263,9 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 
 		// calculate the initial scale factor if we are switching to a
 		// new working image
-		if (this.img != cm.getWorkingImage()) {
+		if (this.img != cm.getProcessedImage()) {
 			this.scaleFactor = 1;
-			this.img = Parameters.getCoreManager().getWorkingImage();
+			this.img = Parameters.getCoreManager().getProcessedImage();
 
 			// set the initial corners when we change images
 			updateCornersOnPanel();

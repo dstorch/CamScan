@@ -121,9 +121,9 @@ public class VisionManager {
 	 */
 	private static IplImage applyFlipCorrection(IplImage img, ConfigurationValue flip){
 		if (!(Boolean)flip.value()){return img;}
-		int flipmode = 0;
+		int flipmode = 1;
 		if (flip.type == ConfigurationValue.ValueType.FlipVertical){
-			flipmode = 1;
+			flipmode = 0;
 		}
 		cvFlip(img, img, flipmode);
 		return img;
@@ -228,7 +228,6 @@ public class VisionManager {
 	public static Corners findCorners(BufferedImage img){
 		if (!OPENCV_ENABLED){return new Corners(new Point(0,0), new Point(img.getWidth(),0), new Point(0,img.getHeight()), new Point(img.getWidth(),img.getHeight()));}
 		//TODO
-		System.out.println(img);
 		
 		//take the magnitude of the differential
 		
@@ -526,6 +525,12 @@ public class VisionManager {
 	
 	@SuppressWarnings("unused")
 	public static void main(String[] args) throws IOException{
+		
+		if (!OPENCV_ENABLED){
+			System.out.println("OpenCV disabled!");
+			System.exit(1);
+		}
+		
 		System.out.println("Vision library stub launcher");
 		IplImage image = cvLoadImage("tests/images/DSC_7381.JPG");
 		System.out.println("Loaded");
