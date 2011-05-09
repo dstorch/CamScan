@@ -527,6 +527,14 @@ public class CoreManager {
         }
     }
     
+    public void updateProcessedImageWithRawDimensions() {
+    	Page curr = getWorkingPage();
+        BufferedImage img = getRawImage();
+        if (curr != null && img != null) {
+        	_processedImage = VisionManager.rerenderImage(getRawImage(), VisionManager.findCorners(getRawImage()), curr.config());
+        }
+    }
+    
     public void flipImage(boolean isVertical) {
     	
     	if (isVertical){
@@ -547,9 +555,13 @@ public class CoreManager {
     }
 
     public void boostConstrast(boolean boost) {
-    //TODO: Write me!
-//    	ConfigurationValue configVal = this.getWorkingPage().config().getKey(ConfigurationValue.ValueType.ContrastBoost);
-//    	Parameters.getCoreManager().getWorkingPage().config().setKey(new ConfigurationValue(ConfigurationValue.ValueType.ContrastBoost, !(Boolean) configVal.value()));
+    	ConfigurationValue configVal = this.getWorkingPage().config().getKey(ConfigurationValue.ValueType.ContrastBoost);
+    	
+    	try {
+			Parameters.getCoreManager().getWorkingPage().config().setKey(new ConfigurationValue(ConfigurationValue.ValueType.ContrastBoost, !(Boolean) configVal.value()));
+		} catch (InvalidTypingException e) {
+			e.printStackTrace();
+		}
     }
 
     /**
@@ -579,7 +591,7 @@ public class CoreManager {
         // rename the metafile for the split product
         String newMetafile = removeExtension(metafile) + "_split.xml";
         splitProduct.setMetafile(newMetafile);
-        splitProduct.setConfig(_workingPage.config());
+        splitProduct.setConfig(_workingPage.config().getCopy());
         splitProduct.setRawFile(_workingPage.raw());
         
         _workingDocument.addPage(splitProduct);
@@ -600,6 +612,7 @@ public class CoreManager {
         
         Parameters.getPageExpPanel().update();
         this.setProcessedImage(this.getRawImage());
+        Parameters.getCoreManager().updateProcessedImageWithRawDimensions();
 
     }
     

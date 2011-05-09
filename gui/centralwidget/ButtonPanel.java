@@ -55,6 +55,11 @@ public class ButtonPanel extends JPanel {
 	private JButton hSplitButton;
 	
 	/**
+	 * The contrast button.
+	 */
+	private JButton contrastButton;
+	
+	/**
 	 * Reference to the central panel.
 	 */
 	private CentralPanel centralPanel;
@@ -102,9 +107,10 @@ public class ButtonPanel extends JPanel {
 		this.add(contrastLabel);
 		this.controls.add(contrastLabel);
 		
-		JSlider contrastSlider = new JSlider();
-		this.add(contrastSlider);
-		this.controls.add(contrastSlider);
+		this.contrastButton = new JButton("Boost Contrast");
+		this.add(this.contrastButton);
+		this.contrastButton.addActionListener(new ContrastListener());
+		this.controls.add(this.contrastButton);
 		
 		JLabel temperatureLabel = new JLabel("Temperature: ", SwingConstants.CENTER);
 		this.add(temperatureLabel);
@@ -222,5 +228,24 @@ public class ButtonPanel extends JPanel {
 			Parameters.getCoreManager().getEditImageTransform();
 			centralPanel.updatePanels(false);
 		}
+	}
+	
+	private class ContrastListener implements ActionListener {
+
+		private boolean boostContrast = false;
+		
+		public void actionPerformed(ActionEvent arg0) {
+			boostContrast = !boostContrast;
+			
+			if (boostContrast)
+				contrastButton.setText("Reduce Contrast");
+			else 
+				contrastButton.setText("Boost Contrast");
+			
+			Parameters.getCoreManager().boostConstrast(boostContrast);
+			Parameters.getCoreManager().getEditImageTransform();
+			centralPanel.updatePanels(false);
+		}
+		
 	}
 }

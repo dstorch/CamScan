@@ -102,6 +102,11 @@ public class Parameters {
 	 */
 	private static PageExplorerPanel pageExpPanel;
 	
+	/**
+	 * Keeps track of whether the app is in edit mode.
+	 */
+	private static boolean isInEditMode;
+	
 	/****************************************
 	 * 
 	 * Getters for the Mutable Parameters
@@ -151,6 +156,16 @@ public class Parameters {
 	 */
 	public static PageExplorerPanel getPageExpPanel() {
 		return pageExpPanel;
+	}
+	
+	/**
+	 * Returns whether the app is in edit mode.
+	 * 
+	 * @return True if it is in edit mode; false if
+	 * otherwise
+	 */
+	public static boolean isInEditMode() {
+		return isInEditMode;
 	}
 	
 	/****************************************
@@ -210,6 +225,15 @@ public class Parameters {
 		
 		if (pageExpPanel == null) 
 			pageExpPanel = p;
+	}
+	
+	/**
+	 * Sets whether the app is in edit mode.
+	 * 
+	 * @param b The boolean to set
+	 */
+	public static void setIsInEditMode(boolean b) {
+		isInEditMode = b;
 	}
 	
 	

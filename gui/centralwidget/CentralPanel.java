@@ -185,6 +185,7 @@ public class CentralPanel extends JPanel {
 	public void switchToEditPanel() {
 	
 		Parameters.getCoreManager().setProcessedImage(Parameters.getCoreManager().getRawImage());
+		Parameters.getCoreManager().updateProcessedImageWithRawDimensions();
 		
 		if (this.viewPanel.getParent() != null) {
 			this.viewPanel.setVisible(false);

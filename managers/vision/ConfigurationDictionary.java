@@ -45,6 +45,11 @@ public class ConfigurationDictionary {
 			}
 		}
 	}
+	
+	public ConfigurationDictionary(HashMap<String, ConfigurationValue> map) {
+		this.map = map;
+	}
+	
 	public ConfigurationValue getKey(ConfigurationValue.ValueType key){
 		return this.map.get(ConfigurationValue.type2name(key));
 	}
@@ -110,5 +115,9 @@ public class ConfigurationDictionary {
 			repr.add( key + ": " + currentValue.value().toString() );
 		}
 		return join(repr, "\n");
+	}
+	
+	public ConfigurationDictionary getCopy() {
+		return new ConfigurationDictionary((HashMap<String, ConfigurationValue>) this.map.clone());
 	}
 }

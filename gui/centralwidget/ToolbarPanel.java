@@ -13,6 +13,8 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
+import core.Parameters;
+
 /**
  * The Toolbal Panel contains basic tools for the Central Panel,
  * such as switching mode tools, going back and forth between images,
@@ -141,7 +143,7 @@ public class ToolbarPanel extends JPanel {
 	 * Unselects both mode radio buttons.
 	 */
 	public void unselectModeButtons() {
-		//this.modeButtonGroup.clearSelection();
+		this.modeButtonGroup.clearSelection();
 	}
 
         public void showZoomButtons(){
@@ -179,8 +181,10 @@ public class ToolbarPanel extends JPanel {
 		public void actionPerformed(ActionEvent e) {
 			if (e.getActionCommand().equals("VIEW")) {
 				centralPanel.switchToViewPanel();
+				Parameters.setIsInEditMode(false);
 			} else {
 				centralPanel.switchToEditPanel();
+				Parameters.setIsInEditMode(true);
 			}
 		}
 	}
