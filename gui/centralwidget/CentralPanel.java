@@ -181,7 +181,6 @@ public class CentralPanel extends JPanel {
 		
 		this.currentMode = Mode.EDIT;
 
-		//System.out.println(Parameters.getCoreManager().getWorkingPage().config().toString());
 		CoreManager cm = Parameters.getCoreManager();
 		cm.updateProcessedImage();
 		
@@ -209,6 +208,9 @@ public class CentralPanel extends JPanel {
 	public void switchToEditPanel() {
 		
 		this.currentMode = Mode.EDIT;
+		
+		CoreManager cm = Parameters.getCoreManager();
+		cm.updateProcessedImageWithRawDimensions();
 		
 		if (this.viewPanel.getParent() != null) {
 			this.viewPanel.setVisible(false);
