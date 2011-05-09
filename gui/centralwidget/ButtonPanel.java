@@ -34,6 +34,25 @@ public class ButtonPanel extends JPanel {
 	 */
 	private ArrayList<Component> controls;
 	
+	/**
+	 * A reference to the edit panel is needed
+	 * so that the action listeners can take
+	 * their effect.
+	 */
+	private EditPanel editPanel;
+	
+	/**
+	 * The JButton by which vertical split
+	 * mode is entered
+	 */
+	private JButton vSplitButton;
+	
+	/**
+	 * The JButton by which horizontal split
+	 * mode is entered
+	 */
+	private JButton hSplitButton;
+	
 	/****************************************
 	 * 
 	 * Constructor(s)
@@ -43,22 +62,24 @@ public class ButtonPanel extends JPanel {
 	/**
 	 * Constructor.
 	 */
-	public ButtonPanel() {
+	public ButtonPanel(EditPanel editPanel) {
 		super();
 		this.setLayout(new GridLayout(2,4));
+		
+		this.editPanel = editPanel;
 		
 		this.controls = new ArrayList<Component>();
 		
 		// Setup all the buttons
-		JButton hFlipButton = new JButton("Horizontal Split");
-		this.add(hFlipButton);
-		hFlipButton.addActionListener(new HorizontalSplitListener());
-		this.controls.add(hFlipButton);
+		this.hSplitButton = new JButton("Horizontal Split");
+		this.add(this.hSplitButton);
+		this.hSplitButton.addActionListener(new HorizontalSplitListener());
+		this.controls.add(this.hSplitButton);
 		
-		JButton vFlipButton = new JButton("Vertical Split");
-		this.add(vFlipButton);
-		vFlipButton.addActionListener(new VerticalSplitListener());
-		this.controls.add(vFlipButton);
+		this.vSplitButton = new JButton("Vertical Split");
+		this.add(vSplitButton);
+		this.vSplitButton.addActionListener(new VerticalSplitListener());
+		this.controls.add(this.vSplitButton);
 		
 		JButton flipHorizontally = new JButton("Flip Horizontally");
 		this.add(flipHorizontally);
@@ -116,9 +137,17 @@ public class ButtonPanel extends JPanel {
 	 */
 	private class HorizontalSplitListener implements ActionListener {
 
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
+		public void actionPerformed(ActionEvent e) {
 			
+			EditPanelMode mode = editPanel.getEditPanelMode();
+			
+			if (mode == EditPanelMode.HSPLIT) {
+				hSplitButton.setText("Horizontal Split");
+			} else {
+				hSplitButton.setText("Cancel Split");
+			}
+			
+			editPanel.toggleHorizontalFlipMode();
 		}
 	}
 	
@@ -127,9 +156,17 @@ public class ButtonPanel extends JPanel {
 	 */
 	private class VerticalSplitListener implements ActionListener {
 
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
+		public void actionPerformed(ActionEvent e) {
 			
+			EditPanelMode mode = editPanel.getEditPanelMode();
+			
+			if (mode == EditPanelMode.VSPLIT) {
+				vSplitButton.setText("Vertical Split");
+			} else {
+				vSplitButton.setText("Cancel Split");
+			}
+			
+			editPanel.toggleVerticalFlipMode();
 		}
 	}
 	
@@ -138,9 +175,9 @@ public class ButtonPanel extends JPanel {
 	 */
 	private class FlipHorizontallyListener implements ActionListener {
 
-		@Override
 		public void actionPerformed(ActionEvent e) {
 			Parameters.getCoreManager().flipImage(true, true);
+			Parameters.getCoreManager().getEditImageTransform();
 		}
 	}
 	
@@ -149,10 +186,11 @@ public class ButtonPanel extends JPanel {
 	 */
 	private class FlipVerticallyListener implements ActionListener {
 
-		@Override
 		public void actionPerformed(ActionEvent e) {
 
 			Parameters.getCoreManager().flipImage(false, true);
+			Parameters.getCoreManager().getEditImageTransform();
+			Parameters.getCoreManager().updateProcessedImage();
 		}
 	}
 }

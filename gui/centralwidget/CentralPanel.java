@@ -100,7 +100,7 @@ public class CentralPanel extends JPanel {
 		this.searchResultsPanel.setSize(this.getSize());
 		
 		// Add the button panel.
-		this.buttonPanel = new ButtonPanel();
+		this.buttonPanel = new ButtonPanel(this.editPanel);
 		this.buttonPanel.setComponentsVisible(false);
 		this.add(this.buttonPanel, BorderLayout.SOUTH);
 	}
@@ -158,7 +158,7 @@ public class CentralPanel extends JPanel {
 	 */
 	public void switchToViewPanel() {
 
-		Parameters.getCoreManager().updateProcessedImage();
+		//Parameters.getCoreManager().updateProcessedImage();
 		
 		this.toolbarPanel.selectViewRButton();
 		
