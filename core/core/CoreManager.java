@@ -62,7 +62,8 @@ public class CoreManager {
 			Element workingPage = (Element) i.next();
 			String workingStr = workingPage.attribute("value").getStringValue();
 			String order = workingPage.attribute("order").getStringValue();
-			setWorkingPage(workingStr, Integer.parseInt(order));
+                        String name = workingPage.attribute("name").getStringValue();
+			setWorkingPage(workingStr, Integer.parseInt(order), name);
 		}
 		
 		for (Iterator i = root.elementIterator("TESSERACT"); i.hasNext();) {
@@ -150,9 +151,9 @@ public class CoreManager {
 		}
 	}
 	
-	public void setWorkingPage(String path, int order) throws FileNotFoundException, DocumentException {
+	public void setWorkingPage(String path, int order, String name) throws FileNotFoundException, DocumentException {
 		try {
-			_workingPage = _xmlReader.parsePage(path, order, _workingDocument);
+			_workingPage = _xmlReader.parsePage(path, order, _workingDocument, name);
 		} catch (FileNotFoundException e) {
 			JOptionPane.showMessageDialog(Parameters.getFrame(),
 					"Some of your data might be lost. Did CamScan shut down correctly?",
@@ -191,15 +192,29 @@ public class CoreManager {
 		writeStartupFile();
         setWorkingDocumentFromName(newName);
 	}
-	
-	public void deleteDocument(String docName) throws IOException {
-		Document toDelete = null;
+
+        public void renamePage(Document d, int order, String newName) throws IOException{
+            Page p = getPageFromOrder(d,order);
+            for(Page page : d.pages()){
+                if(page.equals(p)) page.rename(newName);
+            }
+        }
+
+
+        // returns null if there isn't a document with name
+        private Document getDocFromName(String docName){
+            Document doc = null;
 		for (Document d : _allDocuments) {
 			if (docName.equals(d.name())) {
-				toDelete = d;
+				doc = d;
 			}
 		}
-		
+
+		return doc;
+        }
+
+	public void deleteDocument(String docName) throws IOException {
+                Document toDelete = getDocFromName(docName);
 		deleteDocument(toDelete);
 	}
 	
@@ -229,6 +244,28 @@ public class CoreManager {
 
 		writeStartupFile();
 	}
+
+        public Page getPageFromOrder(Document d, int o){
+            for (Page p : d.pages()) {
+                if(p.order() == o) return p;
+            }
+            return null;
+        }
+
+        public void deletePage(Document d, int order) throws IOException{
+            Page p = getPageFromOrder(d, order);
+            deletePage(d, p);
+        }
+
+        private void deletePage(Document d, Page p) throws IOException{
+            d.deletePage(p);
+            // if the last page is deleted, delete the document as well
+            if(d.pages().size()==0) deleteDocument(d);
+        }
+
+        public void reorderPage(Document d, Page p, int newOrder) throws IOException{
+            if(p.order()!=newOrder) d.reorderPage(p, newOrder);
+        }
 
 
         public void mergeDocuments(String d1, String d2) throws IOException{
@@ -376,7 +413,7 @@ public class CoreManager {
                 String noExt = imageFile.substring(0, lastIndex);
 
                 // construct the page and add it to the document
-                Page p = new Page(d, order);
+                Page p = new Page(d, order, noExt);
 
                 // set pathname attributes of the page
                 p.setRawFile(targetLocation.getPath());
@@ -470,13 +507,9 @@ public class CoreManager {
      * @throws IOException 
      */
     public void setWorkingDocumentFromName(String docName) throws IOException {
-
-        for (Document doc : _allDocuments) {
-            if (docName.equals(doc.name())) {
-                _workingDocument = doc;
-                setWorkingPageAndImage(doc.pages().first());
-            }
-        }
+        Document doc = getDocFromName(docName);
+         _workingDocument = doc;
+         setWorkingPageAndImage(doc.pages().first());
     }
     
     public void setWorkingDocument(Document doc) {
@@ -574,7 +607,9 @@ public class CoreManager {
      * @param box2 - the second bounding box on which to do the split
      */
     public void applySplit(Corners box1, Corners box2) {
-    	
+
+        Page p = this._workingPage;
+
     	int order = _workingPage.order();
     	String processed = _workingPage.processed();
     	String metafile = _workingPage.metafile();
@@ -582,7 +617,7 @@ public class CoreManager {
     	_workingPage.setCorners(box1);
 
     	// construct the page and add it to the document
-        Page splitProduct = new Page(_workingDocument, ++order);
+        Page splitProduct = new Page(_workingDocument, ++order, p.name()+"_split");
         splitProduct.setCorners(box2);
     	
     	// rename the processed file for the split product

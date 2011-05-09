@@ -14,6 +14,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import static com.googlecode.javacv.cpp.opencv_core.*;
 import static com.googlecode.javacv.cpp.opencv_imgproc.*;
@@ -227,21 +228,55 @@ public class VisionManager {
 	 */
 	public static Corners findCorners(BufferedImage img){
 		if (!OPENCV_ENABLED){return new Corners(new Point(0,0), new Point(img.getWidth(),0), new Point(0,img.getHeight()), new Point(img.getWidth(),img.getHeight()));}
-		//TODO
 		
-		//take the magnitude of the differential
+		IplImage image = BufferedImageToIplImage(img);
 		
-		//create the Harris matrix (window size?)
+		IplImage mini = resizeMaxSide(image, 200);
+    	final ByteBuffer minibuf = mini.getByteBuffer();
+    	
+    	IplImage gray = optimalGrayImage(mini, 1);
+    	IplImage gray_original = cvCloneImage(gray);
+    		
+    	ArrayList<MergeZone> merged = findPotentialZones(gray);
+    		
+    	while(merged.size() > 4){
+    		merged.remove(merged.size() - 1);
+    	}
+    	
+    	if (merged.size() < 4){
+    		//handle this!
+    		//oh god!
+    	}
 		
-		//seed the image randomly with points
+		return pointsToCorners(merged);
+	}
+	
+	private static double angular_distance(double a1, double a2){
+		a1 += Math.PI;
+		a2 += Math.PI;
 		
-		//hill-climbing to convergence
+		double d1 = Math.abs(a2-a1);
+		double d2 = Math.abs(Math.min(a1,a2)) + Math.abs(Math.PI*2 - Math.max(a1,a2));
 		
-		//pick four points (which/how?)
+		return Math.min(d1,d2);
+	}
+	
+	private static Corners pointsToCorners(List<MergeZone> merged){
+		double mx = 0;
+		double my = 0;
+		for(MergeZone pp: merged){
+			mx += pp.point.x;
+			my += pp.point.y;
+		}
+		mx /= merged.size();
+		my /= merged.size();
 		
-		//figure out which ones are which corners
+		for(MergeZone pp: merged){
+			pp.weight = angular_distance(Math.atan2( pp.point.y-my, pp.point.x-mx ), Math.PI);
+		}
+		Collections.sort(merged);
 		
-		return new Corners(new Point(0,0), new Point(img.getWidth(),0), new Point(0,img.getHeight()), new Point(img.getWidth(),img.getHeight()));
+		return new Corners(merged.get(0).point, merged.get(1).point, merged.get(2).point, merged.get(3).point);
 	}
 	
 	
@@ -337,9 +372,6 @@ public class VisionManager {
     	}
     	cvConvertScale(scaled, output, 255.0/(max-min), -min);
     	
-    	//System.out.println(min);
-    	//System.out.println(max);
-    	
     	return output;
 	}
 	
@@ -353,10 +385,7 @@ public class VisionManager {
 		for(int x=0;x<color.width();x++){
 			for(int y=0;y<color.height();y++){
 				
-				double ng = (colorbuf.get(y*color.width()*3 + x*3 + 0)&0xff)*r + (colorbuf.get(y*color.width()*3 + x*3 + 1)&0xff)*g + (colorbuf.get(y*color.width()*3 + x*3 + 2)&0xff)*b;
-				
-				//System.out.println(colorbuf.get(y*color.width()*3 + x*3 + 0)*r +"+"+ colorbuf.get(y*color.width()*3 + x*3 + 1)*g +"+"+ colorbuf.get(y*color.width()*3 + x*3 + 2)*b + " = " + ng);
-				
+				double ng = (colorbuf.get(y*color.width()*3 + x*3 + 0)&0xff)*r + (colorbuf.get(y*color.width()*3 + x*3 + 1)&0xff)*g + (colorbuf.get(y*color.width()*3 + x*3 + 2)&0xff)*b;				
 				set = (int)ng;
 				
 				graybuf.put(y*color.width()+x, (byte)set);
@@ -551,9 +580,9 @@ public class VisionManager {
 		
 		for(int x=0;x<width;x++){
 			for(int y=0;y<height;y++){
-				var_r += Math.pow((colorbuf.get(y*width*3 + x*3 + 0)&0xff) - mu_r, power);
-				var_g += Math.pow((colorbuf.get(y*width*3 + x*3 + 1)&0xff) - mu_g, power);
-				var_b += Math.pow((colorbuf.get(y*width*3 + x*3 + 2)&0xff) - mu_b, power);
+				var_r += Math.abs(Math.pow((colorbuf.get(y*width*3 + x*3 + 0)&0xff) - mu_r, power));
+				var_g += Math.abs(Math.pow((colorbuf.get(y*width*3 + x*3 + 1)&0xff) - mu_g, power));
+				var_b += Math.abs(Math.pow((colorbuf.get(y*width*3 + x*3 + 2)&0xff) - mu_b, power));
 			}
 		}
 		var_r /= c;
@@ -577,6 +606,22 @@ public class VisionManager {
 		return optimalGrayImage(color, 2);
 	}
 	
+	private static IplImage resizeMaxSide(IplImage image, int maxSide){
+    	int nw = 0;
+    	int nh = 0;
+    	if (image.width() > image.height()){
+    		nw = maxSide;
+    		nh = (int) ((image.height()*1.0/image.width())*nw);
+    	}else{
+    		nh = maxSide;
+    		nw = (int) ((image.width()*1.0/image.height())*nh);
+    	}
+    	
+    	IplImage mini = cvCreateImage(cvSize(nw, nh), IPL_DEPTH_8U, 3);
+    	cvResize(image, mini, CV_INTER_AREA);
+    	return mini;
+	}
+	
 	@SuppressWarnings("unused")
 	public static void main(String[] args) throws IOException{
 		
@@ -590,27 +635,7 @@ public class VisionManager {
 		System.out.println("Loaded");
         if (image != null) {
         	
-        	int maxsize = 200;
-        	
-        	int nw = 0;
-        	int nh = 0;
-        	if (image.width() > image.height()){
-        		nw = maxsize;
-        		nh = (int) ((image.height()*1.0/image.width())*nw);
-        	}else{
-        		nh = maxsize;
-        		nw = (int) ((image.width()*1.0/image.height())*nh);
-        	}
-        	IplImage bgray = cvCreateImage(cvSize(image.width(), image.height()), IPL_DEPTH_8U, 1);
-        	cvCvtColor(image, bgray, CV_RGB2GRAY);
-        	cvSmooth(bgray, bgray, CV_GAUSSIAN, 5);
-        	
-        	//IplImage gray = cvCreateImage(cvSize(nw, nh), IPL_DEPTH_8U, 1);
-        	//cvResize(bgray, gray);
-        	//cvEqualizeHist(gray, gray);
-        	
-        	IplImage mini = cvCreateImage(cvSize(nw, nh), IPL_DEPTH_8U, 3);
-        	cvResize(image, mini);
+        	IplImage mini = resizeMaxSide(image, 200);
         	final ByteBuffer minibuf = mini.getByteBuffer();
         	
         	if (true){
@@ -623,8 +648,8 @@ public class VisionManager {
         		 */
         		
         		long start = System.nanoTime();
-        		int width = nw;
-        		int height = nh;
+        		int width = mini.width();
+        		int height = mini.height();
         		
         		
         		IplImage gray = optimalGrayImage(mini, 1);
@@ -646,7 +671,7 @@ public class VisionManager {
         		System.out.println((System.nanoTime() - start)/1e9 + " seconds");
         		
         	}else if (false){
-        		IplImage output = cvCreateImage(cvSize(nw, nh), IPL_DEPTH_8U, 1);
+        		IplImage output = cvCreateImage(cvSize(mini.width(), mini.height()), IPL_DEPTH_8U, 1);
         		
         		CvMat lines_storage = cvCreateMat(4, 1, CV_32SC4);
             	CvSeq results = cvHoughLines2(output, lines_storage, CV_HOUGH_PROBABILISTIC, 1, Math.PI/180, 100, 5, 3);

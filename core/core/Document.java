@@ -104,6 +104,7 @@ public class Document {
                 // delete all image files in raw directory (AND PROCESSED DIRECTORY?????)
                 for (Page p : pages()) {
                     p.deleteRawFile();
+                    //p.deleteProcessedFile();
                 }
 	}
 
@@ -128,6 +129,7 @@ public class Document {
 				Integer order = new Integer(p.order());
 				pageEl.addAttribute("order", order.toString());
 				pageEl.addAttribute("metafile", p.metafile());
+                                pageEl.addAttribute("name", p.name());
 				pages.add(pageEl);
 			}
 			
@@ -151,9 +153,57 @@ public class Document {
         }
 
         // deletes Page from list and all references
-        public void deletePage(Page p){
+        public void deletePage(Page p) throws IOException{
             int index = p.order();
-            
+            _pages.remove(p);
+            // update orders of all pages below deleted page
+            for (Page page : pages()) {
+		if(page.order()>index) page.setOrder(page.order() - 1);
+            }
+            p.deleteMetadataFile();
+            //p.deleteProcessedFile();
+            p.deleteRawFile(); 
+            serialize();
+        }
+
+        public void reorderPage(Page p, int newOrder) throws IOException{
+            int oldOrder = p.order();
+
+            if(oldOrder<newOrder){ // moving a Page down
+                 for (Page page : pages()) {
+                    if((page.order()<=newOrder)&&(page.order()>oldOrder)){
+                        System.out.println("****IN IF: changing "+page.order()+ " TO "+page.order()+1);
+                        page.setOrder(page.order() + 1);
+                    }
+                 }
+            }else{ // moving a Page up
+                 for (Page page : pages()) {
+                    if((page.order()>=newOrder)&&(page.order()<oldOrder)){
+                        System.out.println("****IN IF: changing "+page.order()+ " TO "+page.order()+1);
+                        page.setOrder(page.order() + 1);
+                    }
+                 }
+            }
+
+            p.setOrder(newOrder);
+            /*for (Page page : pages()) {
+		if((page.order()>=newOrder)&&(page.metafile()!=p.metafile())&&(page.order()<oldOrder)){
+                    System.out.println("****IN IF: changing "+page.order()+ " TO "+page.order()+1);
+                    page.setOrder(page.order() + 1);
+                }
+            }*/
+            updateList();
+            serialize();
+
+        }
+
+        // need to update list everytime you change the orders to ensure that it stays sorted
+        private void updateList(){
+            TreeSet<Page> temp = new TreeSet<Page>();
+            for (Page page : pages()) {
+                temp.add(page);
+            }
+            _pages = temp;
         }
 	
 }

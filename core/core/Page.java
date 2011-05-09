@@ -24,6 +24,9 @@ public class Page implements Comparable{
 	private ConfigurationDictionary _config;
 	private Corners _corners;
 
+        // name of Page
+        private String _name;
+	
 	// pathnames of files on disk
 	private String _raw;
 	private String _processed;
@@ -36,13 +39,19 @@ public class Page implements Comparable{
 	// pages in the document
 	private int _order;
 
-	public Page(Document parent, int order) {
+	public Page(Document parent, int order, String name) {
+
 		_parentDoc = parent;
 		_order = order;
+                _name = name;
 		_config = new ConfigurationDictionary();
 		_corners = new Corners();
 		_text = new PageText();
 	}
+
+	public String name(){
+            return _name;
+        }
 
 	public int order() {
 		return _order;
@@ -71,6 +80,9 @@ public class Page implements Comparable{
 	public Document getContainingDocument() {
 		return _parentDoc;
 	}
+        public void setName(String name) {
+		_name = name;
+	}
 	public void setOrder(int order) {
 		_order = order;
 	}
@@ -97,35 +109,58 @@ public class Page implements Comparable{
 	}
 
 	public BufferedImage getRawImgFromDisk() throws IOException {
-		//return ImageIO.read(new File(raw()));
-		return VisionManager.loadImage(raw());
+		return ImageIO.read(new File(raw()));
+		//return VisionManager.loadImage(raw());
 	}
 
 	public BufferedImage getProcessedImgFromDisk() throws IOException {
-		//return ImageIO.read(new File(processed()));
-		return VisionManager.loadImage(processed());
+		return ImageIO.read(new File(processed()));
+		//return VisionManager.loadImage(processed());
 	}
 
-	// sets corners and config file for the initial guesses of an imported document
-	public void initGuesses() throws IOException {
-		System.out.println("Raw file: "+raw());
+	
+    // sets corners and config file for the initial guesses of an imported document
+    public void initGuesses() throws IOException {
+    	System.out.println("Raw file: "+raw());
 
-		// read a buffered image from the disk
-		//BufferedImage buff = ImageIO.read(new File(raw()));
-		BufferedImage buff = VisionManager.loadImage(raw());
+    	// read a buffered image from the disk
+    	BufferedImage buff = ImageIO.read(new File(raw()));
+    	//BufferedImage buff = VisionManager.loadImage(raw());
+    	
+    	// guess and set corners and configuration values of Page
+    	setCorners(VisionManager.findCorners(buff));
+    	setConfig(VisionManager.estimateConfigurationValues(buff));
+    }
 
-		// guess and set corners and configuration values of Page
-		setCorners(VisionManager.findCorners(buff));
-		setConfig(VisionManager.estimateConfigurationValues(buff));
+    public void rename(String newName) throws IOException {
+
+		// change the name of the metadata and processed files
+                String newMet = metafile().substring(0, (metafile().length()-(name().length()+4)))+newName+".xml";
+                String newPro = Parameters.PROCESSED_DIRECTORY+"/"+newName+".tiff";
+
+                System.out.println("New Metafile " + newMet);
+                System.out.println("New Profile " + newPro);
+
+		File oldMeta = new File(metafile());
+		File newMeta = new File(newMet);
+                File oldProcessed = new File(processed());
+                //File newProcessed = new File(newPro);
+		if (!oldMeta.renameTo(newMeta)) throw new IOException("Could not rename document!");
+                //if (!oldProcessed.renameTo(newProcessed)) throw new IOException("Could not rename document!");
+
+		// reset instance variables
+		setName(newName);
+		setMetafile(newMet);
+                setProcessedFile(newPro);
+
 	}
-
-
-	// writes the current process image to workspace/processed
-	public void writeProcessedImage() throws IOException {
-		// write out image as a TIFF file
-		VisionManager.writeTIFF(getRawImgFromDisk(), processed());
-	}
-
+    
+    // writes the current process image to workspace/processed
+    public void writeProcessedImage() throws IOException {
+    	// write out image as a TIFF file
+    	VisionManager.writeTIFF(getRawImgFromDisk(), processed());
+    }
+	
 	public void setOcrResults() throws IOException {
 		String[] fields = metafile().split("/");
 		PageText text = ocrManager.getPageText(_raw, fields[fields.length-1]);
@@ -149,6 +184,9 @@ public class Page implements Comparable{
 			org.dom4j.Document xmlDoc = DocumentHelper.createDocument();
 			Element root = DocumentHelper.createElement("PAGE");
 			xmlDoc.setRootElement(root);
+
+                        root.addAttribute("name", name());
+
 
 			Element image = DocumentHelper.createElement("IMG");
 			image.addAttribute("path", raw());
@@ -279,16 +317,23 @@ public class Page implements Comparable{
 		if(!processed.delete()) System.out.println("PROCESSED file not deleted!!");
 	}
 
-	// deletes metadata file
-	public void deleteMetadataFile(){
-		File meta = new File(metafile());
-		if(!meta.delete()) System.out.println("METADTA file not deleted!!");
-	}
+        // deletes metadata file
+        public void deleteMetadataFile(){
+            File meta = new File(metafile());
+            System.out.println("Metafile: "+ metafile());
+            if(!meta.delete()) System.out.println("******METADTA file not deleted!!");
+        }
+    
 
     public int compareTo(Object t) {
         if(order()< ((Page) t).order()) return -1;
         else if (order() == ((Page) t).order()) return 0;
         else return 1;
     }
+
+    public boolean equals(Page p){
+        return (name() == p.name());
+    }
+
 
 }
