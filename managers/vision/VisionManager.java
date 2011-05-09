@@ -227,7 +227,8 @@ public class VisionManager {
 	 * Return the best estimate of the four corners of a piece of paper in the image.
 	 */
 	public static Corners findCorners(BufferedImage img){
-		if (true/*!OPENCV_ENABLED*/){return new Corners(new Point(0,0), new Point(img.getWidth(),0), new Point(0,img.getHeight()), new Point(img.getWidth(),img.getHeight()));}
+		Corners defaultCorners = new Corners(new Point(0,0), new Point(img.getWidth(),0), new Point(0,img.getHeight()), new Point(img.getWidth(),img.getHeight()));
+		if (true/*!OPENCV_ENABLED*/){return defaultCorners;}
 		
 		IplImage image = BufferedImageToIplImage(img);
 		
@@ -246,6 +247,7 @@ public class VisionManager {
     	if (merged.size() < 4){
     		//handle this!
     		//oh god!
+    		return defaultCorners;
     	}
 		
 		return pointsToCorners(merged);
