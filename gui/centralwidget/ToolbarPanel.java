@@ -14,8 +14,9 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import core.Event;
+
 import core.Mode;
+import javax.swing.JRadioButton;
 import core.Parameters;
 
 /**
@@ -87,22 +88,11 @@ public class ToolbarPanel extends JPanel {
 		this.centralPanel = centralPanel;
 
 		c.gridx = 0;
-		this.backButton = new JButton("Back");
-		this.backButton.addActionListener(new BackButtonListener());
-		this.add(this.backButton, c);
-
-		c.gridx = 1;
-		this.nextButton = new JButton("Next");
-		this.nextButton.addActionListener(new NextButtonListener());
-		this.add(this.nextButton, c);
-
-		c.gridx = 2;
-		c.insets = new Insets(0,125,0,0);
 		zoomInButton = new JButton("Zoom In");
 		this.zoomInButton.addActionListener(new ZoomInListener());
 		this.add(zoomInButton, c);
 
-		c.gridx = 3;
+		c.gridx = 1;
 		c.insets = new Insets(0,0,0,0);
 		zoomOutButton = new JButton("Zoom Out");
 		this.zoomOutButton.addActionListener(new ZoomOutListener());
@@ -113,13 +103,13 @@ public class ToolbarPanel extends JPanel {
 		ModeListener modeListener = new ModeListener();
 
 		// the view mode magnifying glass icon
-		c.gridx = 4;
-		c.insets = new Insets(0,125,0,0);
+		c.gridx = 2;
+		c.insets = new Insets(0,100,0,0);
 		JRadioButton viewIcon = new JRadioButton(new ImageIcon("libraries/icons/magnify.png"));
 		this.add(viewIcon, c);
 
 		// Setup the view mode radio button.
-		c.gridx = 5;
+		c.gridx = 3;
 		c.insets = new Insets(0,0,0,0);
 		this.viewRButton = new JRadioButton("View Mode");
 		this.viewRButton.setActionCommand("VIEW");
@@ -128,13 +118,13 @@ public class ToolbarPanel extends JPanel {
 		this.add(this.viewRButton, c);
 
 		// the edit mode pencil icon
-		c.gridx = 6;
+		c.gridx = 4;
 		c.insets = new Insets(0,10,0,0);
 		JRadioButton editIcon = new JRadioButton(new ImageIcon("libraries/icons/pencil.png"));
 		this.add(editIcon, c);
 
 		// Setup the edit mode radio button.
-		c.gridx = 7;
+		c.gridx = 5;
 		c.insets = new Insets(0,0,0,0);
 		JRadioButton editRButton = new JRadioButton("Edit Mode");
 		editRButton.setActionCommand("EDIT");
@@ -158,7 +148,7 @@ public class ToolbarPanel extends JPanel {
 	 * Unselects both mode radio buttons.
 	 */
 	public void unselectModeButtons() {
-		this.modeButtonGroup.clearSelection();
+		//this.modeButtonGroup.clearSelection();
 	}
 
 	/**
@@ -184,11 +174,12 @@ public class ToolbarPanel extends JPanel {
 		 */
 		public void actionPerformed(ActionEvent e) {
 			Mode lastMode = centralPanel.getCurrentMode();
+
 			if (e.getActionCommand().equals("VIEW")) {
-				centralPanel.switchToViewPanel(true, lastMode, null);
+				centralPanel.switchToViewPanel();
 				Parameters.setIsInEditMode(false);
 			} else {
-				centralPanel.switchToEditPanel(true, lastMode, null);
+				centralPanel.switchToEditPanel();
 				Parameters.setIsInEditMode(true);
 			}
 		}
@@ -226,69 +217,4 @@ public class ToolbarPanel extends JPanel {
 		}	
 	}
 
-	/**
-	 * The back button action listener.
-	 */
-	private class BackButtonListener implements ActionListener {
-
-		/**
-		 * Handles going back in the history
-		 */
-		public void actionPerformed(ActionEvent arg0) {
-			
-			Event e = Parameters.getCoreManager().getHistory().back();
-			
-			// if null, then we don't need to do anything
-			// if not null, then go backwards in the history
-			if (e != null) {
-				
-				// we need to reset the core manager if the Event from the history
-				// was either an Edit or a View
-				if (e.getMode() == Mode.EDIT || e.getMode() == Mode.VIEW) {
-					
-					System.out.println(e);
-					
-					// try to reset the core manager instance variables,
-					// throwing an exception if needed
-					try {
-						Parameters.getCoreManager().setFromEvent(e);
-						
-						Mode lastMode = centralPanel.getCurrentMode();
-						
-						if (e.getMode() == Mode.EDIT) {
-							centralPanel.switchToEditPanel(false, lastMode, null);
-						} else if (e.getMode() == Mode.VIEW) {
-							centralPanel.switchToViewPanel(false, lastMode, null);
-						}
-						
-						centralPanel.updatePanels(false);
-						
-					} catch (IOException e1) {
-						JOptionPane.showMessageDialog(Parameters.getFrame(),
-								"Unexpected problem encountered while going back!",
-								"Back Button Error", JOptionPane.ERROR_MESSAGE);
-					}
-					
-				} else {
-					// TODO
-					// make going back to search mode work
-				}
-			}
-		}	
-	}
-
-
-	/**
-	 * The next button action listener.
-	 */
-	private class NextButtonListener implements ActionListener {
-
-		/**
-		 * Handles going back in the history
-		 */
-		public void actionPerformed(ActionEvent arg0) {
-			// TODO
-			System.out.println("next button pressed");
-		}	
-	}
 }

@@ -10,6 +10,7 @@ import javax.swing.JFrame;
 import search.SearchResults;
 import westwidget.DocExplorerPanel;
 import eastwidget.PageExplorerPanel;
+import gui.MainPanel;
 
 public class Parameters {
 
@@ -103,6 +104,11 @@ public class Parameters {
 	private static PageExplorerPanel pageExpPanel;
 	
 	/**
+	 * Reference to the main panel
+	 */
+	private static MainPanel mainPanel;
+
+	/**
 	 * Keeps track of whether the app is in edit mode.
 	 */
 	private static boolean isInEditMode;
@@ -156,6 +162,15 @@ public class Parameters {
 	 */
 	public static PageExplorerPanel getPageExpPanel() {
 		return pageExpPanel;
+	}
+	
+	/**
+	 * Returns the reference to the main panel.
+	 * 
+	 * @return The reference to the main panel
+	 */
+	public static MainPanel getMainPanel() {
+		return mainPanel;
 	}
 	
 	/**
@@ -226,6 +241,18 @@ public class Parameters {
 		if (pageExpPanel == null) 
 			pageExpPanel = p;
 	}
+	
+	/**
+	 * Sets the main panel reference.
+	 * 
+	 * @param p The main panel references
+	 */
+	public static void setMainPanel(MainPanel p) {
+		
+		if (mainPanel == null) 
+			mainPanel = p;
+	}
+	
 	
 	/**
 	 * Sets whether the app is in edit mode.

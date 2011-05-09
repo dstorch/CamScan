@@ -20,6 +20,7 @@ import javax.swing.event.ListSelectionListener;
 import centralwidget.CentralPanel;
 
 import core.Document;
+import core.Mode;
 import core.Page;
 import core.Parameters;
 
@@ -166,6 +167,9 @@ public class DocExplorerPanel extends JPanel {
 
         public void valueChanged(ListSelectionEvent e) {
             if (e.getValueIsAdjusting() == false) {
+            	
+            	// remember the old working page
+            	Page workingPage = Parameters.getCoreManager().getWorkingPage();
 
                 // Get the current selection and set it as the working document.
                 String currDocName = (String) docList.getSelectedValue();
@@ -188,6 +192,7 @@ public class DocExplorerPanel extends JPanel {
                 // Get the very first page and display its image on the
                 // central panel.
                 centralPanel.updatePanels(false);
+                
             }
         }
     }

@@ -46,6 +46,11 @@ public class App extends JFrame {
 	 * JFileChooser.
 	 */
 	private File lastDirectory;
+	
+	/**
+	 * The main panel of the application
+	 */
+	private MainPanel mainPanel;
 
 	/****************************************
 	 * 
@@ -142,14 +147,14 @@ public class App extends JFrame {
 		this.setJMenuBar(menuBar);
 
 		// Instantiate the main panel
-		MainPanel mainPanel = new MainPanel();
+		this.mainPanel = new MainPanel();
 		
 		// CamScan logo: won't work on all platforms
 		Image i = Toolkit.getDefaultToolkit().getImage(Parameters.LOGO);
 		this.setIconImage(i);
 		
 		// Add the panel to the frame
-		this.add(mainPanel, BorderLayout.CENTER);
+		this.add(this.mainPanel, BorderLayout.CENTER);
 		this.pack();
 		this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 		this.setVisible(true);

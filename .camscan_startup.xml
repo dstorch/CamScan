@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <STARTUP>
-
+  <TESSERACT path="/usr/local/bin/tesseract"/>
+  <DOCLIST>
+  </DOCLIST>
 </STARTUP>

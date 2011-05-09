@@ -240,7 +240,7 @@ public class SearchResultsPanel extends JPanel implements ActionListener {
     		e1.printStackTrace();
     	}
 
-    	this.centralPanel.switchToViewPanel(true, Mode.SEARCH_RESULTS, this.results);
+    	this.centralPanel.switchToViewPanel();
     	this.centralPanel.updatePanels(false);
 	}
 	
@@ -367,7 +367,7 @@ public class SearchResultsPanel extends JPanel implements ActionListener {
 		 * Called when the GoToViewMode button has been pressed.
 		 */
 		public void actionPerformed(ActionEvent arg0) {
-			centralPanel.switchToViewPanel(true, Mode.SEARCH_RESULTS, results);
+			centralPanel.switchToViewPanel();
 		} 
 	}
 }
