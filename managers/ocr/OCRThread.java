@@ -20,7 +20,7 @@ public class OCRThread extends Thread {
 	public void run() {
 		try {
 			System.out.println("writing processed image");
-			//_page.writeProcessedImage();
+			_page.writeProcessedImage();
 			System.out.println("doing OCR");
 			_page.setOcrResults();
 		} catch (IOException e) {
