@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -159,6 +160,12 @@ public class ButtonPanel extends JPanel {
 			}
 			
 			editPanel.toggleHorizontalFlipMode();
+			
+//			try {
+//				Parameters.getCoreManager().setProcessedImage(Parameters.getCoreManager().getWorkingPage().getRawImgFromDisk());
+//			} catch (IOException e1) {
+//				e1.printStackTrace();
+//			}
 		}
 	}
 	
@@ -183,6 +190,12 @@ public class ButtonPanel extends JPanel {
 			}
 			
 			editPanel.toggleVerticalFlipMode();
+			
+//			try {
+//				Parameters.getCoreManager().setProcessedImage(Parameters.getCoreManager().getWorkingPage().getRawImgFromDisk());
+//			} catch (IOException e1) {
+//				e1.printStackTrace();
+//			}
 		}
 	}
 	

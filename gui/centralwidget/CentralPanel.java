@@ -3,6 +3,7 @@ package centralwidget;
 import java.awt.BorderLayout;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.io.IOException;
 
 import javax.swing.JPanel;
 
@@ -158,7 +159,6 @@ public class CentralPanel extends JPanel {
 	 */
 	public void switchToViewPanel() {
 
-		//System.out.println(Parameters.getCoreManager().getWorkingPage().config().toString());
 		Parameters.getCoreManager().updateProcessedImage();
 		
 		this.toolbarPanel.selectViewRButton();
@@ -183,6 +183,12 @@ public class CentralPanel extends JPanel {
 	 * Switches to the edit panel.
 	 */
 	public void switchToEditPanel() {
+	
+		try {
+			Parameters.getCoreManager().setProcessedImage(Parameters.getCoreManager().getWorkingPage().getRawImgFromDisk());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
 		if (this.viewPanel.getParent() != null) {
 			this.viewPanel.setVisible(false);

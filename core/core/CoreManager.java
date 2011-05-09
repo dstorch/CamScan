@@ -490,6 +490,10 @@ public class CoreManager {
     	return _rawImage;
     }
     
+    public void setProcessedImage(BufferedImage img) {
+    	_processedImage = img;
+	}
+    
     public BufferedImage getProcessedImage() {
     	return _processedImage;
     }
@@ -593,6 +597,14 @@ public class CoreManager {
     	// do OCR!
         launchOcrThread(_workingPage);
         launchOcrThread(splitProduct);
+        
+        Parameters.getPageExpPanel().update();
+        
+    	try {
+			Parameters.getCoreManager().setProcessedImage(Parameters.getCoreManager().getWorkingPage().getRawImgFromDisk());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     }
     
     private String removeExtension(String file) {

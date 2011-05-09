@@ -23,7 +23,7 @@ import static com.googlecode.javacv.cpp.opencv_calib3d.*;
 
 public class VisionManager {
 	
-	private static final boolean OPENCV_ENABLED = false;
+	private static final boolean OPENCV_ENABLED = true;
 	
 	/*
 	 * Estimate good values for the configuration dictionary for a raw image.
