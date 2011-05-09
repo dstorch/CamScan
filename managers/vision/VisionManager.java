@@ -255,7 +255,9 @@ public class VisionManager {
 		a1 += Math.PI;
 		a2 += Math.PI;
 		
+		//inside
 		double d1 = Math.abs(a2-a1);
+		//around
 		double d2 = Math.abs(Math.min(a1,a2)) + Math.abs(Math.PI*2 - Math.max(a1,a2));
 		
 		return Math.min(d1,d2);
@@ -272,9 +274,14 @@ public class VisionManager {
 		my /= merged.size();
 		
 		for(MergeZone pp: merged){
-			pp.weight = angular_distance(Math.atan2( pp.point.y-my, pp.point.x-mx ), Math.PI);
+			pp.weight = -angular_distance(Math.atan2( pp.point.y-my, pp.point.x-mx ), Math.PI);
 		}
 		Collections.sort(merged);
+		
+		int i=0;
+		for(MergeZone pp: merged){
+			System.out.println((++i) + ": " + merged.weight);
+		}
 		
 		return new Corners(merged.get(0).point, merged.get(1).point, merged.get(3).point, merged.get(2).point);
 	}
