@@ -526,6 +526,12 @@ public class VisionManager {
 	
 	@SuppressWarnings("unused")
 	public static void main(String[] args) throws IOException{
+		
+		if (!OPENCV_ENABLED){
+			System.out.println("OpenCV disabled!");
+			System.exit(1);
+		}
+		
 		System.out.println("Vision library stub launcher");
 		IplImage image = cvLoadImage("tests/images/DSC_7381.JPG");
 		System.out.println("Loaded");
