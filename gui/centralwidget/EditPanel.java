@@ -672,13 +672,32 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	
 	public void toggleHorizontalFlipMode() {
 		
-		// toggle back to standard mode
-		if (this.mode == EditPanelMode.HSPLIT) {
+		// apply the horizontal split and toggle back to standard mode
+		if (this.mode == EditPanelMode.HSPLIT || this.mode == EditPanelMode.VSPLIT) {
+			
+			Corners box1 = this.horizontalSplit.getFirstPageCorners();
+			Corners box2 = this.horizontalSplit.getSecondPageCorners();
+			
+			// actually split into two pages
+			Parameters.getCoreManager().applySplit(box1, box2);
+			
+			this.mode = EditPanelMode.STANDARD;
+		}
+		
+		// apply the vertical split and toggle back to standard mode
+		else if (this.mode == EditPanelMode.VSPLIT) {
+			
+			Corners box1 = this.verticalSplit.getFirstPageCorners();
+			Corners box2 = this.verticalSplit.getSecondPageCorners();
+			
+			// actually split into two pages
+			Parameters.getCoreManager().applySplit(box1, box2);
+			
 			this.mode = EditPanelMode.STANDARD;
 		}
 		
 		// otherwise toggle to horizontal split mode
-		else {
+		else if (this.mode == EditPanelMode.STANDARD){
 		
 			this.mode = EditPanelMode.HSPLIT;
 			
@@ -709,13 +728,18 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	
 	public void toggleVerticalFlipMode() {
 		
-		// toggle back to standard mode from vertical split mode
-		if (this.mode == EditPanelMode.VSPLIT) {
+		// toggle back to standard mode---cancel button was pressed
+		if (this.mode == EditPanelMode.VSPLIT) {			
 			this.mode = EditPanelMode.STANDARD;
 		}
 		
-		// toggle to vertical split mode from any other mode
-		else {
+		// toggle back to standard mode---cancel button was pressed
+		else if (this.mode == EditPanelMode.HSPLIT) {
+			this.mode = EditPanelMode.STANDARD;
+		}
+		
+		// otherwise toggle to horizontal split mode
+		else if (this.mode == EditPanelMode.STANDARD){
 		
 			this.mode = EditPanelMode.VSPLIT;
 			
