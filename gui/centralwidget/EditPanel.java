@@ -682,11 +682,14 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 		
 			this.mode = EditPanelMode.HSPLIT;
 			
+			// get the corners from the working page
+			Page wp = Parameters.getCoreManager().getWorkingPage();
+			
 			// midpoint between top left and bottom left
-			Point mid1 = this.midpoint(this.cornerUL, this.cornerDL);
+			Point mid1 = this.midpoint(wp.corners().upleft(), wp.corners().downleft());
 			
 			// midpoint between top right and bottom right
-			Point mid2 = this.midpoint(this.cornerUR, this.cornerDR);
+			Point mid2 = this.midpoint(wp.corners().upright(), wp.corners().downright());
 			
 			// make a "margin" between the points
 			Point mid1up = new Point(mid1.x, mid1.y - 10);
@@ -694,8 +697,8 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 			Point mid1down = new Point(mid1.x, mid1.y + 10);
 			Point mid2down = new Point(mid2.x, mid2.y + 10);
 			
-			Corners box1 = new Corners(this.cornerUL, this.cornerUR, mid1up, mid2up);
-			Corners box2 = new Corners(mid1down, mid2down, this.cornerDL, this.cornerDR);
+			Corners box1 = new Corners(wp.corners().upleft(), wp.corners().upright(), mid1up, mid2up);
+			Corners box2 = new Corners(mid1down, mid2down, wp.corners().downleft(), wp.corners().downright());
 			
 			this.horizontalSplit = new SplitMode(box1, box2, this);
 		
@@ -716,11 +719,14 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 		
 			this.mode = EditPanelMode.VSPLIT;
 			
+			// get the corners from the working page
+			Page wp = Parameters.getCoreManager().getWorkingPage();
+			
 			// midpoint between top left and top right
-			Point mid1 = this.midpoint(this.cornerUL, this.cornerUR);
+			Point mid1 = this.midpoint(wp.corners().upleft(), wp.corners().upright());
 			
 			// midpoint between bottom left and bottom right
-			Point mid2 = this.midpoint(this.cornerDL, this.cornerDR);
+			Point mid2 = this.midpoint(wp.corners().downleft(), wp.corners().downright());
 			
 			// make a "margin" between the points
 			Point mid1left = new Point(mid1.x - 10, mid1.y);
@@ -728,8 +734,8 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 			Point mid1right = new Point(mid1.x + 10, mid1.y);
 			Point mid2right = new Point(mid2.x + 10, mid2.y);
 			
-			Corners box1 = new Corners(this.cornerUL, mid1left, this.cornerDL, mid2left);
-			Corners box2 = new Corners(mid1right, this.cornerUR, mid2right, this.cornerDR);
+			Corners box1 = new Corners(wp.corners().upleft(), mid1left, wp.corners().downleft(), mid2left);
+			Corners box2 = new Corners(mid1right, wp.corners().upright(), mid2right, wp.corners().downright());
 			
 			this.verticalSplit = new SplitMode(box1, box2, this);
 			

@@ -175,15 +175,15 @@ public class SplitMode extends EditPanel {
 	}
 	
 	public void mouseDragged(MouseEvent e) {
-		if (this.transImage.dragging) this.dragPoint(transImage, e);
-		else if (this.transUL1.dragging) this.dragPoint(this.transUL1, e);
-		else if (this.transUR1.dragging) this.dragPoint(this.transUR1, e);
-		else if (this.transDL1.dragging) this.dragPoint(this.transDL1, e);
-		else if (this.transDR1.dragging) this.dragPoint(this.transDR1, e);
-		else if (this.transUL2.dragging) this.dragPoint(this.transUL2, e);
-		else if (this.transUR2.dragging) this.dragPoint(this.transUR2, e);
-		else if (this.transDL2.dragging) this.dragPoint(this.transDL2, e);
-		else if (this.transDR2.dragging) this.dragPoint(this.transDR2, e);
+		if (this.transImage.dragging) editPanel.dragPoint(transImage, e);
+		else if (this.transUL1.dragging) editPanel.dragPoint(this.transUL1, e);
+		else if (this.transUR1.dragging) editPanel.dragPoint(this.transUR1, e);
+		else if (this.transDL1.dragging) editPanel.dragPoint(this.transDL1, e);
+		else if (this.transDR1.dragging) editPanel.dragPoint(this.transDR1, e);
+		else if (this.transUL2.dragging) editPanel.dragPoint(this.transUL2, e);
+		else if (this.transUR2.dragging) editPanel.dragPoint(this.transUR2, e);
+		else if (this.transDL2.dragging) editPanel.dragPoint(this.transDL2, e);
+		else if (this.transDR2.dragging) editPanel.dragPoint(this.transDR2, e);
 		else if (editPanel.transImage.dragging) editPanel.dragPoint(editPanel.transImage, e);
 		else if (editPanel.transCanvas.dragging) editPanel.dragPoint(editPanel.transCanvas, e);
 	}
