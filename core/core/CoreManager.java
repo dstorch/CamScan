@@ -168,6 +168,11 @@ public class CoreManager {
 	public void setWorkingPageAndImage(Page page) throws IOException {
 		_workingPage = page;
 		_rawImage = page.getRawImgFromDisk();
+		
+		if (Parameters.isInEditMode())
+			this.updateProcessedImageWithRawDimensions();
+		else
+			this.updateProcessedImage();
 	}
 	
 	// when a working document is "closed" it is serialized
