@@ -61,7 +61,8 @@ public class CoreManager {
 			Element workingPage = (Element) i.next();
 			String workingStr = workingPage.attribute("value").getStringValue();
 			String order = workingPage.attribute("order").getStringValue();
-			setWorkingPage(workingStr, Integer.parseInt(order));
+                        String name = workingPage.attribute("name").getStringValue();
+			setWorkingPage(workingStr, Integer.parseInt(order), name);
 		}
 		
 		for (Iterator i = root.elementIterator("TESSERACT"); i.hasNext();) {
@@ -149,9 +150,9 @@ public class CoreManager {
 		}
 	}
 	
-	public void setWorkingPage(String path, int order) throws FileNotFoundException, DocumentException {
+	public void setWorkingPage(String path, int order, String name) throws FileNotFoundException, DocumentException {
 		try {
-			_workingPage = _xmlReader.parsePage(path, order, _workingDocument);
+			_workingPage = _xmlReader.parsePage(path, order, _workingDocument, name);
 		} catch (FileNotFoundException e) {
 			JOptionPane.showMessageDialog(Parameters.getFrame(),
 					"Some of your data might be lost. Did CamScan shut down correctly?",
@@ -190,6 +191,14 @@ public class CoreManager {
 		writeStartupFile();
                 setWorkingDocumentFromName(newName);
 	}
+
+        public void renamePage(Document d, int order, String newName) throws IOException{
+            Page p = getPageFromOrder(d,order);
+            for(Page page : d.pages()){
+                if(page.equals(p)) page.rename(newName);
+            }
+        }
+
 
         // returns null if there isn't a document with name
         private Document getDocFromName(String docName){
@@ -235,7 +244,7 @@ public class CoreManager {
 		writeStartupFile();
 	}
 
-        private Page getPageFromOrder(Document d, int o){
+        public Page getPageFromOrder(Document d, int o){
             for (Page p : d.pages()) {
                 if(p.order() == o) return p;
             }
@@ -253,8 +262,8 @@ public class CoreManager {
             if(d.pages().size()==0) deleteDocument(d);
         }
 
-        public void reorderPage(Document d, Page p, int newOrder){
-            d.reorderPage(p, newOrder);
+        public void reorderPage(Document d, Page p, int newOrder) throws IOException{
+            if(p.order()!=newOrder) d.reorderPage(p, newOrder);
         }
 
 
@@ -403,7 +412,7 @@ public class CoreManager {
                 String noExt = imageFile.substring(0, lastIndex);
 
                 // construct the page and add it to the document
-                Page p = new Page(d, order);
+                Page p = new Page(d, order, noExt);
 
                 // set pathname attributes of the page
                 p.setRawFile(targetLocation.getPath());
@@ -567,11 +576,11 @@ public class CoreManager {
 //        VisionManager.outputToFile(Parameters.getCurrPageImg(), path, curr.corners(), curr.config());
 //    }
 //
-//    // Called every time entering Edit Mode or Configuration Dictionary is changed
-//    public void getEditImageTransform() {
-//        Parameters.setCurrPageImg(VisionManager.imageGlobalTransforms(Parameters.getCurrPageImg(),
-//        		Parameters.getCoreManager().getWorkingPage().config()));
-//    }
+    // Called every time entering Edit Mode or Configuration Dictionary is changed
+    public void getEditImageTransform() {
+       _workingImage = (VisionManager.imageGlobalTransforms(_processedImage,
+        		getWorkingPage().config()));
+    }
 //
 //    // sets corners and config file for the initial guesses of an imported document
 //    private void initGuesses(Document d) throws IOException {

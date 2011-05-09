@@ -129,6 +129,7 @@ public class Document {
 				Integer order = new Integer(p.order());
 				pageEl.addAttribute("order", order.toString());
 				pageEl.addAttribute("metafile", p.metafile());
+                                pageEl.addAttribute("name", p.name());
 				pages.add(pageEl);
 			}
 			
@@ -165,12 +166,44 @@ public class Document {
             serialize();
         }
 
-        public void reorderPage(Page p, int newOrder){
-            p.setOrder(newOrder);
-            for (Page page : pages()) {
-		if(page.order()>=newOrder) page.setOrder(page.order() + 1);
+        public void reorderPage(Page p, int newOrder) throws IOException{
+            int oldOrder = p.order();
+
+            if(oldOrder<newOrder){ // moving a Page down
+                 for (Page page : pages()) {
+                    if((page.order()<=newOrder)&&(page.order()>oldOrder)){
+                        System.out.println("****IN IF: changing "+page.order()+ " TO "+page.order()+1);
+                        page.setOrder(page.order() + 1);
+                    }
+                 }
+            }else{ // moving a Page up
+                 for (Page page : pages()) {
+                    if((page.order()>=newOrder)&&(page.order()<oldOrder)){
+                        System.out.println("****IN IF: changing "+page.order()+ " TO "+page.order()+1);
+                        page.setOrder(page.order() + 1);
+                    }
+                 }
             }
 
+            p.setOrder(newOrder);
+            /*for (Page page : pages()) {
+		if((page.order()>=newOrder)&&(page.metafile()!=p.metafile())&&(page.order()<oldOrder)){
+                    System.out.println("****IN IF: changing "+page.order()+ " TO "+page.order()+1);
+                    page.setOrder(page.order() + 1);
+                }
+            }*/
+            updateList();
+            serialize();
+
+        }
+
+        // need to update list everytime you change the orders to ensure that it stays sorted
+        private void updateList(){
+            TreeSet<Page> temp = new TreeSet<Page>();
+            for (Page page : pages()) {
+                temp.add(page);
+            }
+            _pages = temp;
         }
 	
 }

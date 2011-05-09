@@ -37,11 +37,13 @@ public class XMLReader {
 				Element pageEl = (Element) j.next();
 				Attribute orderAtt = pageEl.attribute("order");
 				Attribute metafileAtt = pageEl.attribute("metafile");
+                                Attribute nameAtt = pageEl.attribute("name");
 				String metafile = metafileAtt.getStringValue();
+                                String name = nameAtt.getStringValue();
 				
 				int order = Integer.parseInt(orderAtt.getStringValue());
 				
-				Page p = parsePage(metafile, order, d);
+				Page p = parsePage(metafile, order, d, name);
 				d.addPage(p);
 			}
 		}
@@ -49,14 +51,16 @@ public class XMLReader {
 		return d;
 	}
 	
-	public Page parsePage(String path, int order, Document parent) throws FileNotFoundException, DocumentException {
-		Page p = new Page(parent, order);
+	public Page parsePage(String path, int order, Document parent, String name) throws FileNotFoundException, DocumentException {
+		Page p = new Page(parent, order, name);
 		p.setMetafile(path);
 		
 		SAXReader reader = new SAXReader();
 		org.dom4j.Document document = reader.read(new FileReader(path));
 		Element root = document.getRootElement();
-		
+
+                Attribute nameAttr = root.attribute("name");
+		p.setName(nameAttr.getStringValue());
 		
 		for (Iterator i = root.elementIterator("IMG"); i.hasNext();) {
 			Element element = (Element) i.next();
