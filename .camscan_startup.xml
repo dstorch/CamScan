@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <STARTUP>
-  <TESSERACT path="C:\Program Files (x86)\Tesseract-OCR\tesseract.exe"/>
-  </STARTUP>
+  <TESSERACT path="/usr/local/bin/tesseract"/>
+  <WORKINGDOC value="workspace/docs/myDoc/doc.xml"/>
+  <DOCLIST>
+    <DOC value="workspace/docs/myDoc/doc.xml"/>
+  </DOCLIST>
+</STARTUP>

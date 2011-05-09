@@ -69,6 +69,16 @@ public class ToolbarPanel extends JPanel {
 	 * The view radio button.
 	 */
 	private JRadioButton viewRButton;
+	
+	/**
+	 * The button for moving down to the next page
+	 */
+	private JButton nextPageDown;
+	
+	/**
+	 * The button for going up to the previous page
+	 */
+	private JButton nextPageUp;
 
 	/****************************************
 	 * 
@@ -88,14 +98,16 @@ public class ToolbarPanel extends JPanel {
 		this.centralPanel = centralPanel;
 
 		c.gridx = 0;
-		zoomInButton = new JButton("Zoom In");
+		zoomInButton = new JButton(new ImageIcon(Parameters.ZOOM_IN));
 		this.zoomInButton.addActionListener(new ZoomInListener());
+		this.zoomInButton.setToolTipText("Zoom In");
 		this.add(zoomInButton, c);
 
 		c.gridx = 1;
 		c.insets = new Insets(0,0,0,0);
-		zoomOutButton = new JButton("Zoom Out");
+		zoomOutButton = new JButton(new ImageIcon(Parameters.ZOOM_OUT));
 		this.zoomOutButton.addActionListener(new ZoomOutListener());
+		this.zoomOutButton.setToolTipText("Zoom In");
 		this.add(zoomOutButton, c);
 
 		// Setup the mode listener for the radio buttons
@@ -104,8 +116,8 @@ public class ToolbarPanel extends JPanel {
 
 		// the view mode magnifying glass icon
 		c.gridx = 2;
-		c.insets = new Insets(0,100,0,0);
-		JRadioButton viewIcon = new JRadioButton(new ImageIcon("libraries/icons/magnify.png"));
+		c.insets = new Insets(0,150,0,0);
+		JRadioButton viewIcon = new JRadioButton(new ImageIcon(Parameters.VIEW));
 		this.add(viewIcon, c);
 
 		// Setup the view mode radio button.
@@ -120,7 +132,7 @@ public class ToolbarPanel extends JPanel {
 		// the edit mode pencil icon
 		c.gridx = 4;
 		c.insets = new Insets(0,10,0,0);
-		JRadioButton editIcon = new JRadioButton(new ImageIcon("libraries/icons/pencil.png"));
+		JRadioButton editIcon = new JRadioButton(new ImageIcon(Parameters.EDIT));
 		this.add(editIcon, c);
 
 		// Setup the edit mode radio button.
@@ -131,6 +143,21 @@ public class ToolbarPanel extends JPanel {
 		editRButton.addActionListener(modeListener);
 		this.add(editRButton, c);
 
+		// the down arrow button
+		c.gridx = 6;
+		c.insets = new Insets(0,150,0,0);
+		this.nextPageUp = new JButton(new ImageIcon(Parameters.UP_ARROW));
+		this.nextPageUp.addActionListener(new NextPageUpListener());
+		this.add(this.nextPageUp, c);
+		
+		// the up arrow button
+		c.gridx = 7;
+		c.insets = new Insets(0,0,0,0);
+		this.nextPageDown = new JButton(new ImageIcon(Parameters.DOWN_ARROW));
+		this.nextPageDown.addActionListener(new NextPageDownListener());
+		this.add(this.nextPageDown, c);
+		
+		
 		// Group the view mode and edit mode radio buttons
 		// together.
 		this.modeButtonGroup = new ButtonGroup();
@@ -215,6 +242,34 @@ public class ToolbarPanel extends JPanel {
 			else if (centralPanel.getEditPanel().isVisible())
 				centralPanel.getEditPanel().zoomOut();
 		}	
+	}
+	
+	/**
+	 * The down arrow action listener.
+	 */
+	private class NextPageDownListener implements ActionListener {
+
+		/**
+		 * Handles switching to the next page down
+		 */
+		public void actionPerformed(ActionEvent arg0) {
+			Parameters.getPageExpPanel().incrementIndex();
+		}
+		
+	}
+	
+	/**
+	 * The down arrow action listener.
+	 */
+	private class NextPageUpListener implements ActionListener {
+
+		/**
+		 * Handles switching to the next page down
+		 */
+		public void actionPerformed(ActionEvent arg0) {
+			Parameters.getPageExpPanel().decrementIndex();
+		}
+		
 	}
 
 }
