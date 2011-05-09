@@ -24,7 +24,7 @@ import static com.googlecode.javacv.cpp.opencv_calib3d.*;
 
 public class VisionManager {
 	
-	private static final boolean OPENCV_ENABLED = false;
+	private static final boolean OPENCV_ENABLED = true;
 	
 	/*
 	 * Estimate good values for the configuration dictionary for a raw image.
@@ -227,7 +227,7 @@ public class VisionManager {
 	 * Return the best estimate of the four corners of a piece of paper in the image.
 	 */
 	public static Corners findCorners(BufferedImage img){
-		if (!OPENCV_ENABLED){return new Corners(new Point(0,0), new Point(img.getWidth(),0), new Point(0,img.getHeight()), new Point(img.getWidth(),img.getHeight()));}
+		if (true/*!OPENCV_ENABLED*/){return new Corners(new Point(0,0), new Point(img.getWidth(),0), new Point(0,img.getHeight()), new Point(img.getWidth(),img.getHeight()));}
 		
 		IplImage image = BufferedImageToIplImage(img);
 		
