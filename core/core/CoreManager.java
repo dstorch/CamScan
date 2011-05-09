@@ -526,6 +526,7 @@ public class CoreManager {
     public void flipImage(boolean isHorizontal, boolean isFlipped) {
     	if (isHorizontal){
     		try {
+    	    	//ConfigurationValue configVal = this.getWorkingPage().config().getKey(ConfigurationValue.ValueType.FlipHorizontal);
 				Parameters.getCoreManager().getWorkingPage().config().setKey(new ConfigurationValue(ConfigurationValue.ValueType.FlipHorizontal, true));
 			} catch (InvalidTypingException e) {
 				e.printStackTrace();
