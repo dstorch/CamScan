@@ -184,11 +184,7 @@ public class CentralPanel extends JPanel {
 	 */
 	public void switchToEditPanel() {
 	
-		try {
-			Parameters.getCoreManager().setProcessedImage(Parameters.getCoreManager().getWorkingPage().getRawImgFromDisk());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		Parameters.getCoreManager().setProcessedImage(Parameters.getCoreManager().getRawImage());
 		
 		if (this.viewPanel.getParent() != null) {
 			this.viewPanel.setVisible(false);

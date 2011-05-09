@@ -599,12 +599,8 @@ public class CoreManager {
         launchOcrThread(splitProduct);
         
         Parameters.getPageExpPanel().update();
-        
-    	try {
-			Parameters.getCoreManager().setProcessedImage(Parameters.getCoreManager().getWorkingPage().getRawImgFromDisk());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+        this.setProcessedImage(this.getRawImage());
+
     }
     
     private String removeExtension(String file) {
