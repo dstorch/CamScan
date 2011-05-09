@@ -178,7 +178,7 @@ public class ButtonPanel extends JPanel {
 	private class FlipHorizontallyListener implements ActionListener {
 
 		public void actionPerformed(ActionEvent e) {
-			Parameters.getCoreManager().flipImage(true, true);
+			Parameters.getCoreManager().flipImage(false);
 			Parameters.getCoreManager().getEditImageTransform();
 		}
 	}
@@ -190,9 +190,8 @@ public class ButtonPanel extends JPanel {
 
 		public void actionPerformed(ActionEvent e) {
 
-			Parameters.getCoreManager().flipImage(false, true);
+			Parameters.getCoreManager().flipImage(true);
 			Parameters.getCoreManager().getEditImageTransform();
-			Parameters.getCoreManager().updateProcessedImage();
 		}
 	}
 }

@@ -158,6 +158,7 @@ public class CentralPanel extends JPanel {
 	 */
 	public void switchToViewPanel() {
 
+		System.out.println((Parameters.getCoreManager().getWorkingPage().config().toString1()));
 		Parameters.getCoreManager().updateProcessedImage();
 		
 		this.toolbarPanel.selectViewRButton();

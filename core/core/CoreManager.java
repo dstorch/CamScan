@@ -523,17 +523,19 @@ public class CoreManager {
         }
     }
     
-    public void flipImage(boolean isHorizontal, boolean isFlipped) {
-    	if (isHorizontal){
+    public void flipImage(boolean isVertical) {
+    	
+    	if (isVertical){
     		try {
-    	    	//ConfigurationValue configVal = this.getWorkingPage().config().getKey(ConfigurationValue.ValueType.FlipHorizontal);
-				Parameters.getCoreManager().getWorkingPage().config().setKey(new ConfigurationValue(ConfigurationValue.ValueType.FlipHorizontal, true));
+    			ConfigurationValue configVal = this.getWorkingPage().config().getKey(ConfigurationValue.ValueType.FlipVertical);
+				Parameters.getCoreManager().getWorkingPage().config().setKey(new ConfigurationValue(ConfigurationValue.ValueType.FlipVertical, !(Boolean) configVal.value()));
 			} catch (InvalidTypingException e) {
 				e.printStackTrace();
 			}
     	}else{
-    		try {
-				Parameters.getCoreManager().getWorkingPage().config().setKey(new ConfigurationValue(ConfigurationValue.ValueType.FlipVertical, true));
+			try {
+    	    	ConfigurationValue configVal = this.getWorkingPage().config().getKey(ConfigurationValue.ValueType.FlipHorizontal);
+				Parameters.getCoreManager().getWorkingPage().config().setKey(new ConfigurationValue(ConfigurationValue.ValueType.FlipHorizontal, !(Boolean) configVal.value()));
 			} catch (InvalidTypingException e) {
 				e.printStackTrace();
 			}
