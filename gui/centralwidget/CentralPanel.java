@@ -6,6 +6,12 @@ import java.awt.event.AdjustmentListener;
 
 import javax.swing.JPanel;
 
+import search.SearchResults;
+
+import core.CoreManager;
+import core.Event;
+import core.History;
+import core.Mode;
 import core.Parameters;
 
 import westwidget.WestPanel;
@@ -62,6 +68,12 @@ public class CentralPanel extends JPanel {
 	 */
 	private WestPanel westPanel;
 	
+	/**
+	 * The current mode that the central
+	 * panel is displaying
+	 */
+	private Mode currentMode;
+	
 	/****************************************
 	 * 
 	 * Constructors.
@@ -103,6 +115,8 @@ public class CentralPanel extends JPanel {
 		this.buttonPanel = new ButtonPanel(this.editPanel, this);
 		this.buttonPanel.setComponentsVisible(false);
 		this.add(this.buttonPanel, BorderLayout.SOUTH);
+		
+		this.currentMode = Mode.VIEW;
 	}
 	
 	private class HorizontalScrollBarListener implements AdjustmentListener {
@@ -154,12 +168,38 @@ public class CentralPanel extends JPanel {
 	 ****************************************/
 	
 	/**
+	 * @return the current mode being displayed
+	 * by the CentralPanel
+	 */
+	public Mode getCurrentMode() {
+		return this.currentMode;
+	}
+	
+	/**
 	 * Switches to the view panel.
 	 */
-	public void switchToViewPanel() {
+	public void switchToViewPanel(boolean addToHist, Mode previousMode, SearchResults results) {
+		
+		CoreManager cm = Parameters.getCoreManager();
+		
+		// remember the last event before switching
+		if (addToHist) {
+			History history = cm.getHistory();
+			
+			Event lastEvent = null;
+			if (previousMode == Mode.SEARCH_RESULTS) {
+				lastEvent = new Event(Mode.SEARCH_RESULTS, null, null, results);
+			} else {
+				lastEvent = new Event(previousMode, cm.workingDocument(), cm.getWorkingPage(), null);
+			}
+			 
+			history.addEvent(lastEvent);
+		}
 
 		//System.out.println(Parameters.getCoreManager().getWorkingPage().config().toString());
-		Parameters.getCoreManager().updateProcessedImage();
+		cm.updateProcessedImage();
+		
+		this.currentMode = Mode.VIEW;
 		
 		this.toolbarPanel.selectViewRButton();
 		
@@ -176,13 +216,30 @@ public class CentralPanel extends JPanel {
 		this.add(this.viewPanel, BorderLayout.CENTER);
 		this.viewPanel.setVisible(true);
 		this.buttonPanel.setComponentsVisible(false);
-        this.toolbarPanel.showZoomButtons();
+     
 	}
 	
 	/**
 	 * Switches to the edit panel.
 	 */
-	public void switchToEditPanel() {
+	public void switchToEditPanel(boolean addToHist, Mode previousMode, SearchResults results) {
+		
+		// remember the last event before switching
+		CoreManager cm = Parameters.getCoreManager();
+		if (addToHist) {
+			History history = cm.getHistory();
+			
+			Event lastEvent = null;
+			if (previousMode == Mode.SEARCH_RESULTS) {
+				lastEvent = new Event(Mode.SEARCH_RESULTS, null, null, results);
+			} else {
+				lastEvent = new Event(previousMode, cm.workingDocument(), cm.getWorkingPage(), null);
+			}
+			 
+			history.addEvent(lastEvent);
+		}
+		
+		this.currentMode = Mode.EDIT;
 		
 		if (this.viewPanel.getParent() != null) {
 			this.viewPanel.setVisible(false);
@@ -207,6 +264,8 @@ public class CentralPanel extends JPanel {
 		
 		this.toolbarPanel.unselectModeButtons();
 
+		this.currentMode = Mode.SEARCH_RESULTS;
+		
 		if (this.viewPanel.getParent() != null) {
 			this.viewPanel.setVisible(false);
 			this.remove(this.viewPanel);
