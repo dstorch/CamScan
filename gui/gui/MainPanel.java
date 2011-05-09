@@ -70,6 +70,16 @@ public class MainPanel extends JPanel {
 		this.centralPanel.setWestPanel(westPanel);
 	}
 	
+	/****************************************
+	 * 
+	 * Public methods
+	 * 
+	 ****************************************/
+	
+	public CentralPanel getCentralPanel() {
+		return this.centralPanel;
+	}
+	
 	/**
 	 * To be called one the current page has changed.
 	 * It updates the UI to show that page.

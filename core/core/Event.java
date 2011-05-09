@@ -1,5 +1,7 @@
 package core;
 
+import search.SearchResults;
+
 /**
  * Modes an event that the user makes. The most
  * recent of them are stored in a data structure,
@@ -21,7 +23,7 @@ public class Event {
 	 * Keeps track of whether CamScan is in view mode.
 	 * If not, it will be in edit mode.
 	 */
-	private boolean isViewMode;
+	private Mode mode;
 	
 	/**
 	 * The working document when the event is recorded.
@@ -32,6 +34,12 @@ public class Event {
 	 * The working page when the event is recorded.
 	 */
 	private Page page;
+	
+	/**
+	 * The search results object; null if this is
+	 * not a search results page
+	 */
+	private SearchResults searchResults;
 	
 	/****************************************
 	 * 
@@ -46,10 +54,11 @@ public class Event {
 	 * @param document The working document
 	 * @param page The working page
 	 */
-	public Event(boolean isViewMode, Document document, Page page) {
-		this.isViewMode = isViewMode;
+	public Event(Mode mode, Document document, Page page, SearchResults results) {
+		this.mode = mode;
 		this.document = document;
 		this.page = page;
+		this.searchResults = results;
 	}
 	
 	/****************************************
@@ -59,14 +68,13 @@ public class Event {
 	 ****************************************/
 	
 	/**
-	 * Returns true if the event was recording
-	 * when CamScan was in view mode.
+	 * Get the mode for this event object.
 	 * 
-	 * @return True if the event was recording
-	 * when CamScan was in view mode.
+	 * @return the Mode enum determining
+	 * the view being displayed
 	 */
-	public boolean isViewMode() {
-		return this.isViewMode;
+	public Mode getMode() {
+		return this.mode;
 	}
 	
 	/**
@@ -85,5 +93,26 @@ public class Event {
 	 */
 	public Page getPage() {
 		return this.page;
+	}
+	
+	/**
+	 * @return the SearchResults object, null
+	 * if this is not a search results page
+	 * @return
+	 */
+	public SearchResults getSearchResults() {
+		return this.searchResults;
+	}
+	
+	/**
+	 * Returns this object as a String
+	 */
+	@Override
+	public String toString() {
+		String output = "Event:\n";
+		output += "\t"+this.mode+"\n";
+		output += "\t"+this.page.metafile()+"\n";
+		output += "\t"+this.document.name()+"\n";
+		return output;
 	}
 }
