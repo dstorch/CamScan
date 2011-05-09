@@ -1,8 +1,9 @@
 package centralwidget;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -10,6 +11,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
+
+import core.Parameters;
 
 /**
  * The button panel that contains basic tools for
@@ -49,19 +52,23 @@ public class ButtonPanel extends JPanel {
 		// Setup all the buttons
 		JButton hFlipButton = new JButton("Horizontal Split");
 		this.add(hFlipButton);
+		hFlipButton.addActionListener(new HorizontalSplitListener());
 		this.controls.add(hFlipButton);
 		
 		JButton vFlipButton = new JButton("Vertical Split");
 		this.add(vFlipButton);
+		vFlipButton.addActionListener(new VerticalSplitListener());
 		this.controls.add(vFlipButton);
 		
-		JButton rotateLeftButton = new JButton("Rotate Left");
-		this.add(rotateLeftButton);
-		this.controls.add(rotateLeftButton);
+		JButton flipHorizontally = new JButton("Flip Horizontally");
+		this.add(flipHorizontally);
+		flipHorizontally.addActionListener(new FlipHorizontallyListener());
+		this.controls.add(flipHorizontally);
 		
-		JButton rotateRightButton = new JButton("Rotate Right");
-		this.add(rotateRightButton);
-		this.controls.add(rotateRightButton);
+		JButton flipVertically = new JButton("Flip Vertically");
+		this.add(flipVertically);
+		flipVertically.addActionListener(new FlipVerticallyListener());
+		this.controls.add(flipVertically);
 		
 		JLabel contrastLabel = new JLabel("Contrast: ", SwingConstants.CENTER);
 		this.add(contrastLabel);
@@ -80,6 +87,12 @@ public class ButtonPanel extends JPanel {
 		this.controls.add(temperatureSlider);
 	}
 	
+	/****************************************
+	 * 
+	 * Public Methods
+	 * 
+	 ****************************************/
+	
 	/**
 	 * Sets the visibility of each individual component.
 	 * 
@@ -89,6 +102,57 @@ public class ButtonPanel extends JPanel {
 	public void setComponentsVisible(boolean visible) {
 		for (Component c : this.controls) {
 			c.setVisible(visible);
+		}
+	}
+	
+	/****************************************
+	 * 
+	 * Event Listeners
+	 * 
+	 ****************************************/
+	
+	/**
+	 * Listener for the Horizontal Split button.
+	 */
+	private class HorizontalSplitListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			
+		}
+	}
+	
+	/**
+	 * Listener for the Vertical Split button.
+	 */
+	private class VerticalSplitListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			
+		}
+	}
+	
+	/**
+	 * Listener for the Flip Horizontally button.
+	 */
+	private class FlipHorizontallyListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			Parameters.getCoreManager().flipImage(true, true);
+		}
+	}
+	
+	/**
+	 * Listener for the Flip Vertically button.
+	 */
+	private class FlipVerticallyListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+
+			Parameters.getCoreManager().flipImage(false, true);
 		}
 	}
 }
