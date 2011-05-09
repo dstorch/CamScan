@@ -194,6 +194,9 @@ public class VisionManager {
 	private static IplImage _imageGlobalTransforms(IplImage img, ConfigurationDictionary config){
 		if (config == null){return img;}
 		
+		System.out.println("In _imageGlobalTransform: ");
+		System.out.println(config);
+		
 		for(Object _name: config.getAllKeys()){
 			String name = (String)_name;
 			ConfigurationValue currentValue = config.getKeyWithName(name);
@@ -203,6 +206,7 @@ public class VisionManager {
 			}
 			else if (currentValue.type == ConfigurationValue.ValueType.FlipHorizontal ||
 					currentValue.type == ConfigurationValue.ValueType.FlipVertical){
+				System.out.println("Flipping is being called!");
 				img = applyFlipCorrection(img, currentValue);
 			}else if (currentValue.type == ConfigurationValue.ValueType.ContrastBoost){
 				img = applyContrastBoost(img, currentValue);
