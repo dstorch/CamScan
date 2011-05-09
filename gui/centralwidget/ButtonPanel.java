@@ -138,6 +138,7 @@ public class ButtonPanel extends JPanel {
 
 		public void actionPerformed(ActionEvent e) {
 			Parameters.getCoreManager().flipImage(true, true);
+			Parameters.getCoreManager().getEditImageTransform();
 		}
 	}
 	
@@ -149,6 +150,8 @@ public class ButtonPanel extends JPanel {
 		public void actionPerformed(ActionEvent e) {
 
 			Parameters.getCoreManager().flipImage(false, true);
+			Parameters.getCoreManager().getEditImageTransform();
+			Parameters.getCoreManager().updateProcessedImage();
 		}
 	}
 }

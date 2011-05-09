@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <STARTUP>
+  <TESSERACT path="C:\Program Files (x86)\Tesseract-OCR\tesseract.exe"/>
+  <WORKINGDOC value="workspace/docs/alice_1/doc.xml"/>
+  <DOCLIST>
+    <DOC value="workspace/docs/alice_1/doc.xml"/>
+  </DOCLIST>
 </STARTUP>
