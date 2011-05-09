@@ -540,6 +540,7 @@ public class CoreManager {
 				e.printStackTrace();
 			}
     	}	
+    	
     }
 //
 //	// called when user tries to place corner; tries to make a better point given the user's guess
