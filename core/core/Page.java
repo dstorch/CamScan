@@ -97,13 +97,13 @@ public class Page implements Comparable{
 	}
 
 	public BufferedImage getRawImgFromDisk() throws IOException {
-		return ImageIO.read(new File(raw()));
-		//return VisionManager.loadImage(raw());
+		//return ImageIO.read(new File(raw()));
+		return VisionManager.loadImage(raw());
 	}
 
 	public BufferedImage getProcessedImgFromDisk() throws IOException {
-		return ImageIO.read(new File(processed()));
-		//return VisionManager.loadImage(processed());
+		//return ImageIO.read(new File(processed()));
+		return VisionManager.loadImage(processed());
 	}
 
 	// sets corners and config file for the initial guesses of an imported document
@@ -285,11 +285,10 @@ public class Page implements Comparable{
 		if(!meta.delete()) System.out.println("METADTA file not deleted!!");
 	}
 
-	public int compareTo(Object t) {
-		if(order()< ((Page) t).order()) return -1;
-		else if (order() == ((Page) t).order()) return 0;
-		else return 1;
-	}
-
+    public int compareTo(Object t) {
+        if(order()< ((Page) t).order()) return -1;
+        else if (order() == ((Page) t).order()) return 0;
+        else return 1;
+    }
 
 }

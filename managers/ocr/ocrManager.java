@@ -8,7 +8,7 @@ import core.Position;
 public class ocrManager {
 
 	// absolute path to the tesseract executable
-	public static String TESS_PATH = "/usr/local/bin/tesseract";
+	public static String TESS_PATH = "C:\\Program Files (x86)\\Tesseract-OCR\\tesseract.exe";
 
 	// path to the python script for processing the tesseract output
 	private final static String EXTRACTBB_PATH = "managers/ocr/extractbb.py";
