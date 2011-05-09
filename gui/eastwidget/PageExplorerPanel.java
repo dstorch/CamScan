@@ -14,7 +14,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import core.Document;
-import core.Event;
 import core.Mode;
 import core.Page;
 import core.Parameters;
@@ -143,9 +142,10 @@ public class PageExplorerPanel extends JPanel {
 		    if (e.getValueIsAdjusting() == false) {
 		    	
 		    	// Serialize the previous page
-		    	if (Parameters.getCoreManager().getWorkingPage() != null) {
+		    	Page workingPage = Parameters.getCoreManager().getWorkingPage();
+		    	if (workingPage != null) {
 		    		try {
-						Parameters.getCoreManager().getWorkingPage().serialize();
+						workingPage.serialize();
 					} catch (IOException e1) {
 						e1.printStackTrace();
 					}
@@ -162,19 +162,12 @@ public class PageExplorerPanel extends JPanel {
 						e1.printStackTrace();
 					}
 					
-					//Parameters.getCoreManager().updateProcessedImage();
-					
+					Parameters.getCoreManager().updateProcessedImage();
 					Parameters.getCoreManager().setProcessedImage(Parameters.getCoreManager().getRawImage());
 					
 		        	mainPanel.updateCentralPanels(false);
 		        }
-		        
-		        // put the new page on the history stack
-		    	Page wp = Parameters.getCoreManager().getWorkingPage();
-		    	Document wd = Parameters.getCoreManager().workingDocument();
-		    	Mode mode = mainPanel.getCentralPanel().getCurrentMode();
-		    	Event event = new Event(mode, wd, wp, null);
-		    	Parameters.getCoreManager().getHistory().addEvent(event);
+		       
 		    }
 		}
 	}

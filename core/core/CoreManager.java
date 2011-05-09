@@ -28,26 +28,19 @@ public class CoreManager {
     private Page _workingPage;
     private BufferedImage _rawImage;
     private BufferedImage _processedImage;
-    
-    // keeps track of the past state of the edit panel
-    private History _history;
 
     public CoreManager() throws DocumentException, IOException {
         _xmlReader = new XMLReader();
         _exporter = Exporter.Factory.create();
         _searcher = Searcher.Factory.create();
         _allDocuments = new LinkedList<Document>();
-        _history = new History();
         startup();
     }
 
     public List<Document> getDocuments() {
         return _allDocuments;
     }
-    
-    public History getHistory() {
-    	return _history;
-    }
+
 
     // called from the constructor when the application launches
 	public void startup() throws DocumentException, IOException {
@@ -626,13 +619,6 @@ public class CoreManager {
     	System.out.println(file);
     	String[] pieces = file.split("[.]");
     	return pieces[pieces.length-1];
-    }
-    
-
-    public void setFromEvent(Event e) throws IOException {
-    	_workingDocument = e.getDocument();
-    	_workingPage = e.getPage();
-    	_rawImage = VisionManager.loadImage(_workingPage.raw());
     }
 
     

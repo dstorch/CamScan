@@ -6,5 +6,6 @@
   <WORKINGPAGE value="workspace/docs/myDoc/mexican_war_text.xml" order="1"/>
   <DOCLIST>
     <DOC value="workspace/docs/myDoc/doc.xml"/>
+    <DOC value="workspace/docs/phototest/doc.xml"/>
   </DOCLIST>
 </STARTUP>

@@ -10,8 +10,6 @@ import javax.swing.JPanel;
 import search.SearchResults;
 
 import core.CoreManager;
-import core.Event;
-import core.History;
 import core.Mode;
 import core.Parameters;
 
@@ -179,28 +177,13 @@ public class CentralPanel extends JPanel {
 	/**
 	 * Switches to the view panel.
 	 */
-	public void switchToViewPanel(boolean addToHist, Mode previousMode, SearchResults results) {
+	public void switchToViewPanel() {
 		
-		CoreManager cm = Parameters.getCoreManager();
-		
-		// remember the last event before switching
-		if (addToHist) {
-			History history = cm.getHistory();
-			
-			Event lastEvent = null;
-			if (previousMode == Mode.SEARCH_RESULTS) {
-				lastEvent = new Event(Mode.SEARCH_RESULTS, null, null, results);
-			} else {
-				lastEvent = new Event(previousMode, cm.workingDocument(), cm.getWorkingPage(), null);
-			}
-			 
-			history.addEvent(lastEvent);
-		}
+		this.currentMode = Mode.EDIT;
 
 		//System.out.println(Parameters.getCoreManager().getWorkingPage().config().toString());
+		CoreManager cm = Parameters.getCoreManager();
 		cm.updateProcessedImage();
-		
-		this.currentMode = Mode.VIEW;
 		
 		this.toolbarPanel.selectViewRButton();
 		
@@ -223,22 +206,7 @@ public class CentralPanel extends JPanel {
 	/**
 	 * Switches to the edit panel.
 	 */
-	public void switchToEditPanel(boolean addToHist, Mode previousMode, SearchResults results) {
-		
-		// remember the last event before switching
-		CoreManager cm = Parameters.getCoreManager();
-		if (addToHist) {
-			History history = cm.getHistory();
-			
-			Event lastEvent = null;
-			if (previousMode == Mode.SEARCH_RESULTS) {
-				lastEvent = new Event(Mode.SEARCH_RESULTS, null, null, results);
-			} else {
-				lastEvent = new Event(previousMode, cm.workingDocument(), cm.getWorkingPage(), null);
-			}
-			 
-			history.addEvent(lastEvent);
-		}
+	public void switchToEditPanel() {
 		
 		this.currentMode = Mode.EDIT;
 		
@@ -256,6 +224,7 @@ public class CentralPanel extends JPanel {
 		this.editPanel.setVisible(true);
 		this.buttonPanel.setComponentsVisible(true);
                 //this.toolbarPanel.hideZoomButtons();
+		
 	}
 	
 	/**
