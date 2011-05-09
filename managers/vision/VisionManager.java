@@ -193,7 +193,7 @@ public class VisionManager {
 		
 		for(Object _name: config.getAllKeys()){
 			String name = (String)_name;
-			ConfigurationValue currentValue = config.getKey(name);
+			ConfigurationValue currentValue = config.getKeyWithName(name);
 			
 			if (currentValue.type == ConfigurationValue.ValueType.ColorTemperature){
 				img = applyTemperatureCorrection(img, currentValue);
@@ -226,7 +226,7 @@ public class VisionManager {
 	 * Return the best estimate of the four corners of a piece of paper in the image.
 	 */
 	public static Corners findCorners(BufferedImage img){
-		if (!OPENCV_ENABLED){return img;}
+		if (!OPENCV_ENABLED){return new Corners(new Point(0,0), new Point(img.getWidth(),0), new Point(0,img.getHeight()), new Point(img.getWidth(),img.getHeight()));}
 		//TODO
 		System.out.println(img);
 		

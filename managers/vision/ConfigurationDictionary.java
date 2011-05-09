@@ -45,7 +45,10 @@ public class ConfigurationDictionary {
 			}
 		}
 	}
-	public ConfigurationValue getKey(String key){
+	public ConfigurationValue getKey(ConfigurationValue.ValueType key){
+		return this.map.get(ConfigurationValue.type2name(key));
+	}
+	public ConfigurationValue getKeyWithName(String key){
 		return this.map.get(key);
 	}
 	public void setKey(ConfigurationValue value){
@@ -68,7 +71,7 @@ public class ConfigurationDictionary {
 		
 		for(Object _key: this.getAllKeys()){
 			String key = (String)_key;
-			ConfigurationValue currentValue = this.getKey(key);
+			ConfigurationValue currentValue = this.getKeyWithName(key);
 			
 			Element e;
 			if (elementNames.containsKey(currentValue.type)){
@@ -101,7 +104,7 @@ public class ConfigurationDictionary {
 		LinkedList<String> repr = new LinkedList<String>();;
 		for(Object _key: this.getAllKeys()){
 			String key = (String)_key;
-			ConfigurationValue currentValue = this.getKey(key);
+			ConfigurationValue currentValue = this.getKeyWithName(key);
 			
 			repr.add( key + ": " + currentValue.value().toString() );
 		}
