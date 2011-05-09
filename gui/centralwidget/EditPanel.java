@@ -52,24 +52,31 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	 ****************************************/
 
 	/**
+	 * Stores the data for horizonal and vertical split
+	 */
+	private SplitMode horizontalSplit;
+	private SplitMode verticalSplit;
+	private EditPanelMode mode;
+	
+	/**
 	 * The upper-left corner.
 	 */
-	private Ellipse2D cornerUL;
+	private Point cornerUL;
 
 	/**
 	 * The upper-right corner.
 	 */
-	private Ellipse2D cornerUR;
+	private Point cornerUR;
 
 	/**
 	 * The down-right corner.
 	 */
-	private Ellipse2D cornerDR;
+	private Point cornerDR;
 
 	/**
 	 * The down-left corner.
 	 */
-	private Ellipse2D cornerDL;
+	private Point cornerDL;
 
 	/**
 	 * The line connecting the upper left
@@ -115,8 +122,8 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	private PointTransform transUL = new PointTransform();
 	private PointTransform transDR = new PointTransform();
 	private PointTransform transDL = new PointTransform();
-	private PointTransform transImage = new PointTransform();
-	private PointTransform transCanvas = new PointTransform();
+	protected PointTransform transImage = new PointTransform();
+	protected PointTransform transCanvas = new PointTransform();
 
 	/**
 	 * The scale factor.
@@ -164,10 +171,12 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 		this.setBackground(Color.LIGHT_GRAY);
 		this.setBorder(new LineBorder(Color.GRAY));
 
-		this.cornerUL = new Ellipse2D.Double();
-		this.cornerUR = new Ellipse2D.Double();
-		this.cornerDR = new Ellipse2D.Double();
-		this.cornerDL = new Ellipse2D.Double();
+		this.mode = EditPanelMode.STANDARD;
+		
+		this.cornerUL = new Point();
+		this.cornerUR = new Point();
+		this.cornerDR = new Point();
+		this.cornerDL = new Point();
 
 		this.drawableUL = new Ellipse2D.Double();
 		this.drawableUR = new Ellipse2D.Double();
@@ -216,16 +225,12 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 			if (page.corners() != null ) {
 
 				Corners corners = page.corners();
-
-				System.out.println("updating corners");
 				
 				// shift the original corners according to those in the working page
-				this.moveCornerTo(cornerUL, corners.upleft().getX(), corners.upleft().getY());
-				this.moveCornerTo(cornerUR, corners.upright().getX(), corners.upright().getY());
-				this.moveCornerTo(cornerDR, corners.downright().getX(), corners.downright().getY());
-				this.moveCornerTo(cornerDL, corners.downleft().getX(), corners.downleft().getY());
-
-				System.out.println(cornerUL.getCenterX()+", "+cornerUL.getCenterY());
+				cornerUL = new Point((int) corners.upleft().getX(), (int) corners.upleft().getY());
+				cornerUR = new Point((int) corners.upright().getX(), (int) corners.upright().getY());
+				cornerDR = new Point((int) corners.downright().getX(), (int) corners.downright().getY());
+				cornerDL = new Point((int) corners.downleft().getX(), (int) corners.downleft().getY());
 				
 				// reset translation to zero
 				this.transUL = new PointTransform();
@@ -289,9 +294,35 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 			double newY = this.scaleFactor * (cornerY - this.getHeight()/2 + transImage.dy + transCanvas.dy) + this.getHeight()/2;
 			this.imgPosition = new Point((int) newX, (int) newY);
 
-			g.drawImage(this.img, (int) newX, (int) newY, newW, newH, null);
+			brush.drawImage(this.img, (int) newX, (int) newY, newW, newH, null);
 			
 		}
+		
+		switch (this.mode) {
+			case STANDARD :
+				this.paintStandardMode(brush);
+				break;
+			case HSPLIT :
+				horizontalSplit.paint(brush);
+				break;
+			case VSPLIT :
+				verticalSplit.paint(brush);
+				break;
+		}
+
+	}
+
+
+	/****************************************
+	 * 
+	 * Private Methods
+	 * 
+	 ****************************************/
+
+	
+	private void paintStandardMode(Graphics2D brush) {
+
+		Page wp = Parameters.getCoreManager().getWorkingPage();
 
 		// apply the transforms to the corners
 		this.scaleAndTranslate(this.cornerUR, this.transUR, this.transCanvas, this.drawableUR);
@@ -329,16 +360,8 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 		setCornerColor(this.transDL, brush);
 		brush.draw(this.drawableDL);
 		brush.fill(this.drawableDL);
-
 	}
-
-
-	/****************************************
-	 * 
-	 * Private Methods
-	 * 
-	 ****************************************/
-
+	
 	/**
 	 * Set the corner color based on whether or not the
 	 * corner is currently being dragged.
@@ -363,13 +386,13 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	 * @param canvasTransform - gives the x and y translation of the canvas
 	 * @param drawable - the Ellipse2D object that will get drawn onscreen
 	 */
-	private void scaleAndTranslate(Ellipse2D corner, PointTransform pointTransform,
+	protected void scaleAndTranslate(Point corner, PointTransform pointTransform,
 			PointTransform canvasTransform, Ellipse2D drawable) {
 		
 		double marginX = (this.getWidth() - this.img.getWidth()) / 2;
 		double marginY = (this.getHeight() - this.img.getHeight()) / 2;
-		double cornerX = corner.getCenterX() + marginX;
-		double cornerY = corner.getCenterY() + marginY;
+		double cornerX = corner.x + marginX;
+		double cornerY = corner.y + marginY;
 		double x = this.scaleFactor * (cornerX - this.getWidth()/2 + pointTransform.dx + canvasTransform.dx) + this.getWidth()/2 ;
 		double y = this.scaleFactor * (cornerY - this.getHeight()/2 + pointTransform.dy + canvasTransform.dy) + this.getHeight()/2;
 		this.moveCornerTo(drawable, x, y);
@@ -379,7 +402,7 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	/**
 	 * Updates all lines connecting the corners.
 	 */
-	private void updateConnectingLines() {
+	protected void updateConnectingLines() {
 		this.moveLine(this.lineULUR, this.drawableUL, this.drawableUR);
 		this.moveLine(this.lineURDR, this.drawableUR, this.drawableDR);
 		this.moveLine(this.lineDRDL, this.drawableDR, this.drawableDL);
@@ -394,7 +417,7 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	 * @param x The new x-location of the corner
 	 * @param y The new y-location of the corner
 	 */
-	private void moveCornerTo(Ellipse2D corner, double x, double y) {
+	protected void moveCornerTo(Ellipse2D corner, double x, double y) {
 		corner.setFrame(x, y, ELLIPSE_RADIUS * this.scaleFactor, ELLIPSE_RADIUS * this.scaleFactor);
 	}
 
@@ -408,23 +431,23 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	 */
 	private void updateCorners(Corners c) {
 		// 1. top left
-		Point p = new Point((int) (this.cornerUL.getCenterX()+this.transUL.dx-transImage.dx),
-				(int) (this.cornerUL.getCenterY()+this.transUL.dy-transImage.dy));
+		Point p = new Point((int) (this.cornerUL.x+this.transUL.dx-transImage.dx),
+				(int) (this.cornerUL.y+this.transUL.dy-transImage.dy));
 		c.setUpLeft(p);
 		
 		// 2. top right
-		p = new Point((int) (this.cornerUR.getCenterX()+this.transUR.dx-transImage.dx),
-				(int) (this.cornerUR.getCenterY()+this.transUR.dy-transImage.dy));
+		p = new Point((int) (this.cornerUR.x+this.transUR.dx-transImage.dx),
+				(int) (this.cornerUR.y+this.transUR.dy-transImage.dy));
 		c.setUpRight(p);
 		
 		// 3. bottom right
-		p = new Point((int) (this.cornerDR.getCenterX()+this.transDR.dx-transImage.dx),
-				(int) (this.cornerDR.getCenterY()+this.transDR.dy-transImage.dy));
+		p = new Point((int) (this.cornerDR.x+this.transDR.dx-transImage.dx),
+				(int) (this.cornerDR.y+this.transDR.dy-transImage.dy));
 		c.setDownRight(p);
 		
 		// 4. bottom left
-		p = new Point((int) (this.cornerDL.getCenterX()+this.transDL.dx-transImage.dx),
-				(int) (this.cornerDL.getCenterY()+this.transDL.dy-transImage.dy));
+		p = new Point((int) (this.cornerDL.x+this.transDL.dx-transImage.dx),
+				(int) (this.cornerDL.y+this.transDL.dy-transImage.dy));
 		c.setDownLeft(p);
 	}
 	
@@ -435,7 +458,7 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	 * @param cornerA - one of the corners connected by the line
 	 * @param cornerB - the second corner connected by the line
 	 */
-	private void moveLine(Line2D line, Ellipse2D cornerA, Ellipse2D cornerB) {
+	protected void moveLine(Line2D line, Ellipse2D cornerA, Ellipse2D cornerB) {
 		line.setLine(cornerA.getCenterX(), cornerA.getCenterY(), cornerB.getCenterX(), cornerB.getCenterY());
 	}
 
@@ -449,7 +472,7 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	 * @return True if the mouse cursor (coordinates passed in as mX and mY)
 	 * is within a certain radius around the ellipse
 	 */
-	private boolean isWithinCornerEllipse(Ellipse2D ellipse, double mX, double mY) {
+	protected boolean isWithinCornerEllipse(Ellipse2D ellipse, double mX, double mY) {
 
 		int limit = (int) (75 * this.scaleFactor);
 		return (ellipse.getCenterX() - limit <= mX && mX <= ellipse.getCenterX() + limit &&
@@ -463,7 +486,7 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	 * @param mX The x-mouse-coordinate
 	 * @param mY The y-mouse-coordinate
 	 */
-	private boolean isWithinImage(double mX, double mY) {
+	protected boolean isWithinImage(double mX, double mY) {
 		int imgX = this.imgPosition.x;
 		int imgY = this.imgPosition.y;
 		return (mX > imgX && mX < (imgX + this.img.getWidth() * this.scaleFactor) &&
@@ -476,95 +499,51 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	 * 
 	 ****************************************/
 
+	private void mouseDraggedStandard(MouseEvent e) {
+
+		// move the image
+		if (this.transImage.dragging) this.dragPoint(transImage, e);
+		else if (this.transUL.dragging) this.dragPoint(this.transUL, e);
+		else if (this.transUR.dragging) this.dragPoint(this.transUR, e);
+		else if (this.transDL.dragging) this.dragPoint(this.transDL, e);
+		else if (this.transDR.dragging) this.dragPoint(this.transDR, e);
+		else if (this.transCanvas.dragging) this.dragPoint(this.transCanvas, e);
+
+	}
+	
+	protected void dragPoint(PointTransform point, MouseEvent e) {
+		
+		double newX = e.getX() - point.dragX;
+		double newY = e.getY() - point.dragY;
+
+		point.dragX += newX;
+		point.dragY += newY;
+
+		point.dx += newX / this.scaleFactor;
+		point.dy += newY / this.scaleFactor;
+	
+	}
+	
 	/**
 	 * Handles mouse dragging. If the user clicks on a corner,
 	 * they can drag it around.
 	 */
-	public void mouseDragged(MouseEvent arg0) {
+	public void mouseDragged(MouseEvent e) {
 
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-		// move the image
-		if (this.transImage.dragging) {
-
-			double newX = arg0.getX() - this.transImage.dragX;
-			double newY = arg0.getY() - this.transImage.dragY;
-
-			this.transImage.dragX += newX;
-			this.transImage.dragY += newY;
-
-			this.transImage.dx += newX / this.scaleFactor;
-			this.transImage.dy += newY / this.scaleFactor;
-
+		
+		switch (this.mode) {
+			case STANDARD :
+				this.mouseDraggedStandard(e);
+				break;
+			case HSPLIT :
+				horizontalSplit.mouseDragged(e);
+				break;
+			case VSPLIT :
+				verticalSplit.mouseDragged(e);
+				break;
 		}
-
-		// 1. move upper left ellipse during click and drag
-		else if (this.transUL.dragging) {
-
-			double newX = arg0.getX() - this.transUL.dragX;
-			double newY = arg0.getY() - this.transUL.dragY;
-
-			this.transUL.dragX += newX;
-			this.transUL.dragY += newY;
-
-			this.transUL.dx += newX / this.scaleFactor;
-			this.transUL.dy += newY / this.scaleFactor;
-
-		}
-
-		// 2. move upper right ellipse
-		else if (this.transUR.dragging) {
-
-			double newX = arg0.getX() - this.transUR.dragX;
-			double newY = arg0.getY() - this.transUR.dragY;
-
-			this.transUR.dragX += newX;
-			this.transUR.dragY += newY;
-
-			this.transUR.dx += newX / this.scaleFactor;
-			this.transUR.dy += newY / this.scaleFactor;
-
-		}
-
-		// 3. move lower left ellipse
-		else if (this.transDL.dragging) {
-
-			double newX = arg0.getX() - this.transDL.dragX;
-			double newY = arg0.getY() - this.transDL.dragY;
-
-			this.transDL.dragX += newX;
-			this.transDL.dragY += newY;
-
-			this.transDL.dx += newX / this.scaleFactor;
-			this.transDL.dy += newY / this.scaleFactor;
-
-		}
-
-		// 4. move lower right ellipse
-		else if (this.transDR.dragging) {
-
-			double newX = arg0.getX() - this.transDR.dragX;
-			double newY = arg0.getY() - this.transDR.dragY;
-
-			this.transDR.dragX += newX;
-			this.transDR.dragY += newY;
-
-			this.transDR.dx += newX / this.scaleFactor;
-			this.transDR.dy += newY / this.scaleFactor;
-		}
-
-		else if (this.transCanvas.dragging) {
-
-			double newX = arg0.getX() - this.transCanvas.dragX;
-			double newY = arg0.getY() - this.transCanvas.dragY;
-
-			this.transCanvas.dragX += newX;
-			this.transCanvas.dragY += newY;
-
-			this.transCanvas.dx += newX / this.scaleFactor;
-			this.transCanvas.dy += newY / this.scaleFactor;
-		}
-
+		
 		this.repaint();
 	}
 
@@ -586,6 +565,22 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 		this.repaint();
 	}
 
+	
+	public void mousePressed(MouseEvent e) {
+
+		switch (this.mode) {
+			case STANDARD :
+				this.mousePressedStandard(e);
+				break;
+			case HSPLIT :
+				horizontalSplit.mousePressed(e);
+				break;
+			case VSPLIT :
+				verticalSplit.mousePressed(e);
+				break;
+		}
+	}
+	
 	/**
 	 * On mouse press, set the initial location for 
 	 * a draw event, if the mouse press is within
@@ -593,47 +588,55 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	 * 
 	 * Also set the cursor to a hand.
 	 */
-	public void mousePressed(MouseEvent e) {
+	public void mousePressedStandard(MouseEvent e) {
 
 		// set the hand cursor
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
 		// upper left corner
 		if (this.isWithinCornerEllipse(this.drawableUL, e.getX(), e.getY())) {
-			transUL.dragX = e.getX(); transUL.dragY = e.getY();
-			transUL.dragging = true;
+			this.registerMousePress(this.transUL, e);
 		}
 
 		// upper right corner
 		else if (this.isWithinCornerEllipse(this.drawableUR, e.getX(), e.getY())) {
-			transUR.dragX = e.getX(); transUR.dragY = e.getY();
-			transUR.dragging = true;
+			this.registerMousePress(this.transUR, e);
 		}
 
 		// lower left corner
 		else if (this.isWithinCornerEllipse(this.drawableDL, e.getX(), e.getY())) {
-			transDL.dragX = e.getX(); transDL.dragY = e.getY();
-			transDL.dragging = true;
+			this.registerMousePress(this.transDL, e);
 		}
 
 		// lower right corner
 		else if (this.isWithinCornerEllipse(this.drawableDR, e.getX(), e.getY())) {
-			transDR.dragX = e.getX(); transDR.dragY = e.getY();
-			transDR.dragging = true;
+			this.registerMousePress(this.transDR, e);
 		}
 
 		// the image
 		else if (this.isWithinImage(e.getX(), e.getY())) {
-			transImage.dragX = e.getX(); transImage.dragY = e.getY();
-			transImage.dragging = true;
+			this.registerMousePress(this.transImage, e);
 		}
 
 		// otherwise drag the canvas
 		else {
-			transCanvas.dragX = e.getX(); transCanvas.dragY = e.getY();
-			transCanvas.dragging = true;
+			this.registerMousePress(this.transCanvas, e);
 		}
 
+	}
+	
+	/**
+	 * Mutates the PointTransform data in order to
+	 * register the beginning of a drag event.
+	 * 
+	 * @param point - the PointTransform to update
+	 * @param e - the MouseEvent giving the coordinates where
+	 * 	the drag event has begun
+	 */
+	protected void registerMousePress(PointTransform point, MouseEvent e) {
+		point.dragX = e.getX();
+		point.dragY = e.getY();
+		point.dragging = true;
 	}
 
 	/**
@@ -649,7 +652,10 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 		this.transDL.dragging = false;
 		this.transImage.dragging = false;
 		this.transCanvas.dragging = false;
-
+		
+		if (this.verticalSplit != null) verticalSplit.mouseReleased();
+		if (this.horizontalSplit != null) horizontalSplit.mouseReleased();
+		
 		this.repaint();
 	}
 
@@ -660,4 +666,10 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	public void mouseEntered(MouseEvent e) {}
 	public void mouseExited(MouseEvent e) {}
 	public void mouseMoved(MouseEvent arg0) {}
+	
+	/****************************************
+	 * 
+	 * SPLIT HORIZONTAL AND SPLIT VERTICAL
+	 * 
+	 ****************************************/
 }

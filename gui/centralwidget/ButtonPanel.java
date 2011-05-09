@@ -116,7 +116,6 @@ public class ButtonPanel extends JPanel {
 	 */
 	private class HorizontalSplitListener implements ActionListener {
 
-		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			
 		}
@@ -127,7 +126,6 @@ public class ButtonPanel extends JPanel {
 	 */
 	private class VerticalSplitListener implements ActionListener {
 
-		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			
 		}
@@ -138,7 +136,6 @@ public class ButtonPanel extends JPanel {
 	 */
 	private class FlipHorizontallyListener implements ActionListener {
 
-		@Override
 		public void actionPerformed(ActionEvent e) {
 			Parameters.getCoreManager().flipImage(true, true);
 		}
@@ -149,7 +146,6 @@ public class ButtonPanel extends JPanel {
 	 */
 	private class FlipVerticallyListener implements ActionListener {
 
-		@Override
 		public void actionPerformed(ActionEvent e) {
 
 			Parameters.getCoreManager().flipImage(false, true);
