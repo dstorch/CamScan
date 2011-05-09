@@ -165,6 +165,12 @@ public class PageExplorerPanel extends JPanel {
 					Parameters.getCoreManager().updateProcessedImage();
 					Parameters.getCoreManager().setProcessedImage(Parameters.getCoreManager().getRawImage());
 					
+					if (Parameters.isInEditMode()) {
+						Parameters.getCoreManager().updateProcessedImageWithRawDimensions();
+					} else {
+						Parameters.getCoreManager().updateProcessedImage();
+					}
+					
 		        	mainPanel.updateCentralPanels(false);
 		        }
 		       

@@ -107,6 +107,11 @@ public class Parameters {
 	 * Reference to the main panel
 	 */
 	private static MainPanel mainPanel;
+
+	/**
+	 * Keeps track of whether the app is in edit mode.
+	 */
+	private static boolean isInEditMode;
 	
 	/****************************************
 	 * 
@@ -166,6 +171,16 @@ public class Parameters {
 	 */
 	public static MainPanel getMainPanel() {
 		return mainPanel;
+	}
+	
+	/**
+	 * Returns whether the app is in edit mode.
+	 * 
+	 * @return True if it is in edit mode; false if
+	 * otherwise
+	 */
+	public static boolean isInEditMode() {
+		return isInEditMode;
 	}
 	
 	/****************************************
@@ -236,6 +251,16 @@ public class Parameters {
 		
 		if (mainPanel == null) 
 			mainPanel = p;
+	}
+	
+	
+	/**
+	 * Sets whether the app is in edit mode.
+	 * 
+	 * @param b The boolean to set
+	 */
+	public static void setIsInEditMode(boolean b) {
+		isInEditMode = b;
 	}
 	
 	

@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import core.Mode;
+import javax.swing.JRadioButton;
 import core.Parameters;
 
 /**
@@ -173,10 +174,13 @@ public class ToolbarPanel extends JPanel {
 		 */
 		public void actionPerformed(ActionEvent e) {
 			Mode lastMode = centralPanel.getCurrentMode();
+
 			if (e.getActionCommand().equals("VIEW")) {
 				centralPanel.switchToViewPanel();
+				Parameters.setIsInEditMode(false);
 			} else {
 				centralPanel.switchToEditPanel();
+				Parameters.setIsInEditMode(true);
 			}
 		}
 	}

@@ -523,6 +523,60 @@ public class VisionManager {
 		return merged;
 	}
 	
+	private static IplImage optimalGrayImage(IplImage color, int power){
+		final ByteBuffer colorbuf = color.getByteBuffer();
+		int width = color.width();
+		int height = color.height();
+		
+		double mu_r = 0;
+		double mu_g = 0;
+		double mu_b = 0;
+		int c = 0;
+		
+		for(int x=0;x<width;x++){
+			for(int y=0;y<height;y++){
+				mu_r += colorbuf.get(y*width*3 + x*3 + 0)&0xff;
+				mu_g += colorbuf.get(y*width*3 + x*3 + 1)&0xff;
+				mu_b += colorbuf.get(y*width*3 + x*3 + 2)&0xff;
+				c++;
+			}
+		}
+		mu_r /= c;
+		mu_g /= c;
+		mu_b /= c;
+		
+		double var_r = 0;
+		double var_g = 0;
+		double var_b = 0;
+		
+		for(int x=0;x<width;x++){
+			for(int y=0;y<height;y++){
+				var_r += Math.pow((colorbuf.get(y*width*3 + x*3 + 0)&0xff) - mu_r, power);
+				var_g += Math.pow((colorbuf.get(y*width*3 + x*3 + 1)&0xff) - mu_g, power);
+				var_b += Math.pow((colorbuf.get(y*width*3 + x*3 + 2)&0xff) - mu_b, power);
+			}
+		}
+		var_r /= c;
+		var_g /= c;
+		var_b /= c;
+		
+		System.out.println("Averages:");
+		System.out.println(mu_r);
+		System.out.println(mu_g);
+		System.out.println(mu_b);
+		System.out.println("Variances:");
+		System.out.println(var_r);
+		System.out.println(var_g);
+		System.out.println(var_b);
+		
+		double tt = var_r + var_g + var_b;
+		IplImage gray = customGrayTransform(color, var_r/tt, var_g/tt, var_b/tt);
+		return gray;
+	}
+	private static IplImage optimalGrayImage(IplImage color){
+		return optimalGrayImage(color, 2);
+	}
+	
 	@SuppressWarnings("unused")
 	public static void main(String[] args) throws IOException{
 		
@@ -572,49 +626,8 @@ public class VisionManager {
         		int width = nw;
         		int height = nh;
         		
-        		double mu_r = 0;
-        		double mu_g = 0;
-        		double mu_b = 0;
-        		int c = 0;
         		
-        		for(int x=0;x<width;x++){
-        			for(int y=0;y<height;y++){
-        				mu_r += minibuf.get(y*width*3 + x*3 + 0)&0xff;
-        				mu_g += minibuf.get(y*width*3 + x*3 + 1)&0xff;
-        				mu_b += minibuf.get(y*width*3 + x*3 + 2)&0xff;
-        				c++;
-        			}
-        		}
-        		mu_r /= c;
-        		mu_g /= c;
-        		mu_b /= c;
-        		
-        		System.out.println(mu_r);
-        		System.out.println(mu_g);
-        		System.out.println(mu_b);
-        		
-        		double var_r = 0;
-        		double var_g = 0;
-        		double var_b = 0;
-        		
-        		for(int x=0;x<width;x++){
-        			for(int y=0;y<height;y++){
-        				var_r += Math.pow((minibuf.get(y*width*3 + x*3 + 0)&0xff) - mu_r, 2);
-        				var_g += Math.pow((minibuf.get(y*width*3 + x*3 + 1)&0xff) - mu_g, 2);
-        				var_b += Math.pow((minibuf.get(y*width*3 + x*3 + 2)&0xff) - mu_b, 2);
-        			}
-        		}
-        		var_r /= c;
-        		var_g /= c;
-        		var_b /= c;
-        		
-        		System.out.println(var_r);
-        		System.out.println(var_g);
-        		System.out.println(var_b);
-        		
-        		double tt = var_r + var_g + var_b;
-        		//IplImage gray = customGrayTransform(mini, var_r/tt, var_g/tt, var_b/tt);
-        		IplImage gray = customGrayTransform(mini, 1, 0, 0);
+        		IplImage gray = optimalGrayImage(mini, 1);
         		IplImage gray_original = cvCloneImage(gray);
         		
         		ArrayList<MergeZone> merged = findPotentialZones(gray);
