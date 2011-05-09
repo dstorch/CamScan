@@ -101,6 +101,18 @@ public class PageExplorerPanel extends JPanel {
 		this.mainPanel.updateCentralPanels(false);
 	}
 	
+	public void incrementIndex() {
+		int order = this.pageList.getSelectedIndex();
+		order++;
+		this.pageList.setSelectedIndex(order);
+	}
+	
+	public void decrementIndex() {
+		int order = this.pageList.getSelectedIndex();
+		order--;
+		this.pageList.setSelectedIndex(order);
+	}
+	
 	/****************************************
 	 * 
 	 * Private Methods
