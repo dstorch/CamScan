@@ -3,6 +3,7 @@ package centralwidget;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
@@ -13,8 +14,13 @@ public class SplitMode extends EditPanel {
 	
 	private EditPanel editPanel;
 	
+	// the original corners
 	private Corners box1;
 	private Corners box2;
+	
+	// the translated corners
+	private Corners box1updated;
+	private Corners box2updated;
 	
 	/**
 	 * the color to display points when they are
@@ -83,6 +89,9 @@ public class SplitMode extends EditPanel {
 		this.box2 = box2;
 		this.editPanel = panel;
 		
+		this.box1updated = new Corners();
+		this.box2updated = new Corners();
+		
 		this.drawableUL1 = new Ellipse2D.Double();
 		this.drawableUR1 = new Ellipse2D.Double();
 		this.drawableDR1 = new Ellipse2D.Double();
@@ -134,6 +143,10 @@ public class SplitMode extends EditPanel {
 
 		// make the lines connect to the new point location
 		this.updateConnectingLinesSplitMode();
+		
+		// update the corners so that they will be correct
+		// when the "apply split" function is called
+		this.updateCorners(box1updated, box2updated);
 		
 		// draw lines
 		brush.setColor(Color.BLACK);
@@ -250,4 +263,62 @@ public class SplitMode extends EditPanel {
 		this.transDL2.dragging = false;
 	}
 	
+	
+	/**
+	 * Update the corner locations, in pixel coordinates of the actual
+	 * image (not the display canvas), based on the user's dragging of
+	 * the corner point
+	 * 
+	 * @param c - the Corners instance to update
+	 */
+	private void updateCorners(Corners c1, Corners c2) {
+		// 1. top left
+		Point p = new Point((int) (this.box1.downleft().x+this.transUL1.dx-transImage.dx),
+				(int) (this.box1.upleft().y+this.transUL1.dy-transImage.dy));
+		c1.setUpLeft(p);
+		
+		// 2. top right
+		p = new Point((int) (this.box1.upright().x+this.transUR1.dx-transImage.dx),
+				(int) (this.box1.upright().y+this.transUR1.dy-transImage.dy));
+		c1.setUpRight(p);
+		
+		// 3. bottom right
+		p = new Point((int) (this.box1.downright().x+this.transDR1.dx-transImage.dx),
+				(int) (this.box1.downright().y+this.transDR1.dy-transImage.dy));
+		c1.setDownRight(p);
+		
+		// 4. bottom left
+		p = new Point((int) (this.box1.downleft().x+this.transDL1.dx-transImage.dx),
+				(int) (this.box1.downleft().y+this.transDL1.dy-transImage.dy));
+		c1.setDownLeft(p);
+		
+		
+		// 1. top left
+		p = new Point((int) (this.box2.downleft().x+this.transUL2.dx-transImage.dx),
+				(int) (this.box2.upleft().y+this.transUL2.dy-transImage.dy));
+		c2.setUpLeft(p);
+		
+		// 2. top right
+		p = new Point((int) (this.box2.upright().x+this.transUR2.dx-transImage.dx),
+				(int) (this.box2.upright().y+this.transUR2.dy-transImage.dy));
+		c2.setUpRight(p);
+		
+		// 3. bottom right
+		p = new Point((int) (this.box2.downright().x+this.transDR2.dx-transImage.dx),
+				(int) (this.box2.downright().y+this.transDR2.dy-transImage.dy));
+		c2.setDownRight(p);
+		
+		// 4. bottom left
+		p = new Point((int) (this.box2.downleft().x+this.transDL2.dx-transImage.dx),
+				(int) (this.box2.downleft().y+this.transDL2.dy-transImage.dy));
+		c2.setDownLeft(p);
+	}
+	
+	public Corners getFirstPageCorners() {
+		return this.box1updated;
+	}
+	
+	public Corners getSecondPageCorners() {
+		return this.box2updated;
+	}
 }

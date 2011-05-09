@@ -143,8 +143,12 @@ public class ButtonPanel extends JPanel {
 			
 			if (mode == EditPanelMode.HSPLIT) {
 				hSplitButton.setText("Horizontal Split");
-			} else {
-				hSplitButton.setText("Cancel Split");
+				vSplitButton.setText("Vertical Split");
+			} else if (mode == EditPanelMode.STANDARD){
+				vSplitButton.setText("Cancel Split");
+				hSplitButton.setText("Apply Split");
+			} else if (mode == EditPanelMode.VSPLIT) {
+				hSplitButton.setText("Horizontal Split");
 				vSplitButton.setText("Vertical Split");
 			}
 			
@@ -162,10 +166,14 @@ public class ButtonPanel extends JPanel {
 			EditPanelMode mode = editPanel.getEditPanelMode();
 			
 			if (mode == EditPanelMode.VSPLIT) {
-				vSplitButton.setText("Vertical Split");
-			} else {
-				vSplitButton.setText("Cancel Split");
 				hSplitButton.setText("Horizontal Split");
+				vSplitButton.setText("Vertical Split");
+			} else if (mode == EditPanelMode.STANDARD) {
+				vSplitButton.setText("Cancel Split");
+				hSplitButton.setText("Apply Split");
+			} else if (mode == EditPanelMode.HSPLIT) {
+				hSplitButton.setText("Horizontal Split");
+				vSplitButton.setText("Vertical Split");
 			}
 			
 			editPanel.toggleVerticalFlipMode();

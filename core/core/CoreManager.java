@@ -404,7 +404,7 @@ public class CoreManager {
         // put this document in workspace/docs by default
         // get the image file name without a ".tiff" extension
         String imageFile = sourceLocation.getName();
-        String noExt = imageFile.substring(0, imageFile.length() - 5);
+        String noExt = removeExtension(imageFile);
         String directory = Parameters.DOC_DIRECTORY + "/" + noExt;
         File dirFile = new File(directory);
         if (!dirFile.mkdir()) {
@@ -538,6 +538,72 @@ public class CoreManager {
 			}
     	}
     }
+    
+    /**
+     * Given two Corners objects giving corner locations in image
+     * coordinates, converts a single Page object into two, and
+     * updates all Document attributes accordingly.
+     * 
+     * @param box1 - one of the bounding box on which to do the split
+     * @param box2 - the second bounding box on which to do the split
+     */
+    public void applySplit(Corners box1, Corners box2) {
+    	
+    	int order = _workingPage.order();
+    	String processed = _workingPage.processed();
+    	String metafile = _workingPage.metafile();
+    	
+    	_workingPage.setCorners(box1);
+
+    	// construct the page and add it to the document
+        Page splitProduct = new Page(_workingDocument, ++order);
+        splitProduct.setCorners(box2);
+    	
+    	// rename the processed file for the split product
+        String newName = removeExtension(processed) + "_split." + getExtension(processed);
+        splitProduct.setProcessedFile(newName);
+        
+        // rename the metafile for the split product
+        String newMetafile = removeExtension(metafile) + "_split.xml";
+        splitProduct.setMetafile(newMetafile);
+        splitProduct.setConfig(_workingPage.config());
+        splitProduct.setRawFile(_workingPage.raw());
+        
+        _workingDocument.addPage(splitProduct);
+        
+        // attempt to serialize
+        try {
+			_workingDocument.serialize();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		System.out.println("working page: "+_workingPage.processed());
+		System.out.println("split product: "+splitProduct.processed());
+        
+    	// do OCR!
+        launchOcrThread(_workingPage);
+        launchOcrThread(splitProduct);
+    }
+    
+    private String removeExtension(String file) {
+    	String[] pieces = file.split("[.]");
+    	
+    	String result = "";
+    	for (int i = 0; i < pieces.length-1; i++) {
+    		result += pieces[i];
+    	}
+    	
+    	return result;
+    }
+    
+    private String getExtension(String file) {
+    	System.out.println(file);
+    	String[] pieces = file.split("[.]");
+    	return pieces[pieces.length-1];
+    }
+    
+    
 //
 //	// called when user tries to place corner; tries to make a better point given the user's guess
 //    // writes the current process image to workspace/processed (as Tiff file)
