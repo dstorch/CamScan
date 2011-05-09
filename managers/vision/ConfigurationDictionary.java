@@ -97,7 +97,7 @@ public class ConfigurationDictionary {
 		  return out.toString();
 	}
 	
-	public String toString(){
+	public String toString1(){
 		LinkedList<String> repr = new LinkedList<String>();;
 		for(Object _key: this.getAllKeys()){
 			String key = (String)_key;
