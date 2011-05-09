@@ -16,6 +16,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import core.Document;
+import core.Mode;
 import core.Page;
 import core.Parameters;
 import java.awt.datatransfer.DataFlavor;
@@ -383,4 +384,5 @@ public class PageExplorerPanel extends JPanel {
             }
         });
     } */
+
 }

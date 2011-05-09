@@ -3,8 +3,15 @@ package centralwidget;
 import java.awt.BorderLayout;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.io.IOException;
 
 import javax.swing.JPanel;
+
+import search.SearchResults;
+
+import core.CoreManager;
+import core.Mode;
+import core.Parameters;
 
 import westwidget.WestPanel;
 
@@ -60,6 +67,12 @@ public class CentralPanel extends JPanel {
 	 */
 	private WestPanel westPanel;
 	
+	/**
+	 * The current mode that the central
+	 * panel is displaying
+	 */
+	private Mode currentMode;
+	
 	/****************************************
 	 * 
 	 * Constructors.
@@ -98,9 +111,11 @@ public class CentralPanel extends JPanel {
 		this.searchResultsPanel.setSize(this.getSize());
 		
 		// Add the button panel.
-		this.buttonPanel = new ButtonPanel();
+		this.buttonPanel = new ButtonPanel(this.editPanel, this);
 		this.buttonPanel.setComponentsVisible(false);
 		this.add(this.buttonPanel, BorderLayout.SOUTH);
+		
+		this.currentMode = Mode.VIEW;
 	}
 	
 	private class HorizontalScrollBarListener implements AdjustmentListener {
@@ -152,9 +167,23 @@ public class CentralPanel extends JPanel {
 	 ****************************************/
 	
 	/**
+	 * @return the current mode being displayed
+	 * by the CentralPanel
+	 */
+	public Mode getCurrentMode() {
+		return this.currentMode;
+	}
+	
+	/**
 	 * Switches to the view panel.
 	 */
 	public void switchToViewPanel() {
+		
+		this.currentMode = Mode.EDIT;
+
+		//System.out.println(Parameters.getCoreManager().getWorkingPage().config().toString());
+		CoreManager cm = Parameters.getCoreManager();
+		cm.updateProcessedImage();
 		
 		this.toolbarPanel.selectViewRButton();
 		
@@ -171,13 +200,15 @@ public class CentralPanel extends JPanel {
 		this.add(this.viewPanel, BorderLayout.CENTER);
 		this.viewPanel.setVisible(true);
 		this.buttonPanel.setComponentsVisible(false);
-                this.toolbarPanel.showZoomButtons();
+     
 	}
 	
 	/**
 	 * Switches to the edit panel.
 	 */
 	public void switchToEditPanel() {
+		
+		this.currentMode = Mode.EDIT;
 		
 		if (this.viewPanel.getParent() != null) {
 			this.viewPanel.setVisible(false);
@@ -193,6 +224,7 @@ public class CentralPanel extends JPanel {
 		this.editPanel.setVisible(true);
 		this.buttonPanel.setComponentsVisible(true);
                 //this.toolbarPanel.hideZoomButtons();
+		
 	}
 	
 	/**
@@ -202,6 +234,8 @@ public class CentralPanel extends JPanel {
 		
 		this.toolbarPanel.unselectModeButtons();
 
+		this.currentMode = Mode.SEARCH_RESULTS;
+		
 		if (this.viewPanel.getParent() != null) {
 			this.viewPanel.setVisible(false);
 			this.remove(this.viewPanel);

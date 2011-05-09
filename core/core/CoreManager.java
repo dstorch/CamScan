@@ -26,7 +26,7 @@ public class CoreManager {
     // instance variables telling the GUI which page to display
     private Document _workingDocument;
     private Page _workingPage;
-    private BufferedImage _workingImage;
+    private BufferedImage _rawImage;
     private BufferedImage _processedImage;
 
     public CoreManager() throws DocumentException, IOException {
@@ -40,6 +40,7 @@ public class CoreManager {
     public List<Document> getDocuments() {
         return _allDocuments;
     }
+
 
     // called from the constructor when the application launches
 	public void startup() throws DocumentException, IOException {
@@ -166,7 +167,7 @@ public class CoreManager {
 	
 	public void setWorkingPageAndImage(Page page) throws IOException {
 		_workingPage = page;
-		_workingImage = page.getRawImgFromDisk();
+		_rawImage = page.getRawImgFromDisk();
 	}
 	
 	// when a working document is "closed" it is serialized
@@ -189,7 +190,7 @@ public class CoreManager {
 		d.rename(newName);
 		d.serialize();
 		writeStartupFile();
-                setWorkingDocumentFromName(newName);
+        setWorkingDocumentFromName(newName);
 	}
 
         public void renamePage(Document d, int order, String newName) throws IOException{
@@ -231,7 +232,7 @@ public class CoreManager {
                             }else{ // there are no Documents
                                 _workingDocument = null;
                                 _workingPage = null;
-                                _workingImage = null;
+                                _rawImage = null;
                             }
                         }
 		}
@@ -426,9 +427,7 @@ public class CoreManager {
                 // do OCR!
                 launchOcrThread(p);
             }
-
         }
-
     }
 
     private void launchOcrThread(Page page) {
@@ -443,7 +442,7 @@ public class CoreManager {
         // put this document in workspace/docs by default
         // get the image file name without a ".tiff" extension
         String imageFile = sourceLocation.getName();
-        String noExt = imageFile.substring(0, imageFile.length() - 5);
+        String noExt = removeExtension(imageFile);
         String directory = Parameters.DOC_DIRECTORY + "/" + noExt;
         File dirFile = new File(directory);
         if (!dirFile.mkdir()) {
@@ -521,9 +520,13 @@ public class CoreManager {
 		return _workingPage;
 	}
     
-    public BufferedImage getWorkingImage() {
-    	return _workingImage;
+    public BufferedImage getRawImage() {
+    	return _rawImage;
     }
+    
+    public void setProcessedImage(BufferedImage img) {
+    	_processedImage = img;
+	}
     
     public BufferedImage getProcessedImage() {
     	return _processedImage;
@@ -550,13 +553,123 @@ public class CoreManager {
 
     // called when changing from edit mode to view mode
     // uses changes made in edit mode and rerenders the image
-    public void updateWorkingImage() {
+    public void updateProcessedImage() {
         Page curr = getWorkingPage();
-        BufferedImage img = getWorkingImage();
+        BufferedImage img = getRawImage();
         if (curr != null && img != null) {
-        	_processedImage = VisionManager.rerenderImage(getWorkingImage(), curr.corners(), curr.config());
+        	_processedImage = VisionManager.rerenderImage(getRawImage(), curr.corners(), curr.config());
         }
     }
+    
+    public void updateProcessedImageWithRawDimensions() {
+    	Page curr = getWorkingPage();
+        BufferedImage img = getRawImage();
+        if (curr != null && img != null) {
+        	_processedImage = VisionManager.rerenderImage(getRawImage(), VisionManager.findCorners(getRawImage()), curr.config());
+        }
+    }
+    
+    public void flipImage(boolean isVertical) {
+    	
+    	if (isVertical){
+    		try {
+    			ConfigurationValue configVal = this.getWorkingPage().config().getKey(ConfigurationValue.ValueType.FlipVertical);
+				Parameters.getCoreManager().getWorkingPage().config().setKey(new ConfigurationValue(ConfigurationValue.ValueType.FlipVertical, !(Boolean) configVal.value()));
+			} catch (InvalidTypingException e) {
+				e.printStackTrace();
+			}
+    	}else{
+			try {
+    	    	ConfigurationValue configVal = this.getWorkingPage().config().getKey(ConfigurationValue.ValueType.FlipHorizontal);
+				Parameters.getCoreManager().getWorkingPage().config().setKey(new ConfigurationValue(ConfigurationValue.ValueType.FlipHorizontal, !(Boolean) configVal.value()));
+			} catch (InvalidTypingException e) {
+				e.printStackTrace();
+			}
+    	}
+    }
+
+    public void boostConstrast(boolean boost) {
+    	ConfigurationValue configVal = this.getWorkingPage().config().getKey(ConfigurationValue.ValueType.ContrastBoost);
+    	
+    	try {
+			Parameters.getCoreManager().getWorkingPage().config().setKey(new ConfigurationValue(ConfigurationValue.ValueType.ContrastBoost, !(Boolean) configVal.value()));
+		} catch (InvalidTypingException e) {
+			e.printStackTrace();
+		}
+    }
+
+    /**
+     * Given two Corners objects giving corner locations in image
+     * coordinates, converts a single Page object into two, and
+     * updates all Document attributes accordingly.
+     * 
+     * @param box1 - one of the bounding box on which to do the split
+     * @param box2 - the second bounding box on which to do the split
+     */
+    public void applySplit(Corners box1, Corners box2) {
+
+        Page p = this._workingPage;
+
+    	int order = _workingPage.order();
+    	String processed = _workingPage.processed();
+    	String metafile = _workingPage.metafile();
+    	
+    	_workingPage.setCorners(box1);
+
+    	// construct the page and add it to the document
+        Page splitProduct = new Page(_workingDocument, ++order, p.name()+"_split");
+        splitProduct.setCorners(box2);
+    	
+    	// rename the processed file for the split product
+        String newName = removeExtension(processed) + "_split." + getExtension(processed);
+        splitProduct.setProcessedFile(newName);
+        
+        // rename the metafile for the split product
+        String newMetafile = removeExtension(metafile) + "_split.xml";
+        splitProduct.setMetafile(newMetafile);
+        splitProduct.setConfig(_workingPage.config().getCopy());
+        splitProduct.setRawFile(_workingPage.raw());
+        
+        _workingDocument.addPage(splitProduct);
+        
+        // attempt to serialize
+        try {
+			_workingDocument.serialize();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		System.out.println("working page: "+_workingPage.processed());
+		System.out.println("split product: "+splitProduct.processed());
+        
+    	// do OCR!
+        launchOcrThread(_workingPage);
+        launchOcrThread(splitProduct);
+        
+        Parameters.getPageExpPanel().update();
+        this.setProcessedImage(this.getRawImage());
+        Parameters.getCoreManager().updateProcessedImageWithRawDimensions();
+
+    }
+    
+    private String removeExtension(String file) {
+    	String[] pieces = file.split("[.]");
+    	
+    	String result = "";
+    	for (int i = 0; i < pieces.length-1; i++) {
+    		result += pieces[i];
+    	}
+    	
+    	return result;
+    }
+    
+    private String getExtension(String file) {
+    	System.out.println(file);
+    	String[] pieces = file.split("[.]");
+    	return pieces[pieces.length-1];
+    }
+
+    
 //
 //	// called when user tries to place corner; tries to make a better point given the user's guess
 //    // writes the current process image to workspace/processed (as Tiff file)
@@ -578,8 +691,8 @@ public class CoreManager {
 //
     // Called every time entering Edit Mode or Configuration Dictionary is changed
     public void getEditImageTransform() {
-       _workingImage = (VisionManager.imageGlobalTransforms(_processedImage,
-        		getWorkingPage().config()));
+        _processedImage = VisionManager.imageGlobalTransforms(_rawImage,
+        		Parameters.getCoreManager().getWorkingPage().config());
     }
 //
 //    // sets corners and config file for the initial guesses of an imported document

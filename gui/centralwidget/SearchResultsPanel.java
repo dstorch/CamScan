@@ -22,6 +22,7 @@ import javax.swing.event.ListSelectionListener;
 import search.SearchHit;
 import search.SearchResults;
 
+import core.Mode;
 import core.Page;
 import core.Parameters;
 
@@ -60,6 +61,11 @@ public class SearchResultsPanel extends JPanel implements ActionListener {
 	 * The index of the result selection.
 	 */
 	private int selectedOrder;
+	
+	/**
+	 * The SearchResults object associated with this panel
+	 */
+	private SearchResults results;
 
 	/****************************************
 	 * 
@@ -153,7 +159,7 @@ public class SearchResultsPanel extends JPanel implements ActionListener {
 	 */
 	public void updateSearchResults() {
 		
-		SearchResults results = Parameters.getSearchResults();
+		this.results = Parameters.getSearchResults();
 		
 		Vector<String> upperResults = new Vector<String>();
 		Vector<String> lowerResults = new Vector<String>();
@@ -161,13 +167,13 @@ public class SearchResultsPanel extends JPanel implements ActionListener {
 		// The first time this is called, the search
 		// method hasn't been called yet, and hence
 		// there are no results to display.
-		if (results == null) return;
+		if (this.results == null) return;
 
 		/*
 		 * Get results from the working document.
 		 */
-		if (!results.inWorkingDoc().isEmpty()) {
-			for (SearchHit searchHit : results.inWorkingDoc()) {
+		if (!this.results.inWorkingDoc().isEmpty()) {
+			for (SearchHit searchHit : this.results.inWorkingDoc()) {
 				upperResults.add("Page " + searchHit.link().order() + ": " + searchHit.snippet());
 			}
 		} else {
@@ -179,8 +185,8 @@ public class SearchResultsPanel extends JPanel implements ActionListener {
 		/*
 		 * Get results from the other documents.
 		 */
-		if (!results.elsewhere().isEmpty()) {
-			for (SearchHit searchHit : results.elsewhere()) {
+		if (!this.results.elsewhere().isEmpty()) {
+			for (SearchHit searchHit : this.results.elsewhere()) {
 				lowerResults.add("Document " + searchHit.link().getContainingDocument().name() + ", Page " + searchHit.link().order() + ": " + searchHit.snippet());
 			}
 		} else {

@@ -21,7 +21,7 @@ public class MergeZone implements Comparable{
 		return Math.sqrt( (this.point.x-p.x)*(this.point.x-p.x) + (this.point.y-p.y)*(this.point.y-p.y) );
 	}
 	
-	@Override
+	
 	public int compareTo(Object a) {
 		if (a instanceof MergeZone){
 			MergeZone other = (MergeZone)a;

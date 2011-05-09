@@ -9,6 +9,8 @@ import javax.swing.JFrame;
 
 import search.SearchResults;
 import westwidget.DocExplorerPanel;
+import eastwidget.PageExplorerPanel;
+import gui.MainPanel;
 
 public class Parameters {
 
@@ -96,6 +98,21 @@ public class Parameters {
 	 */
 	private static DocExplorerPanel docExpPanel;
 	
+	/**
+	 * Reference to the page explorer panel
+	 */
+	private static PageExplorerPanel pageExpPanel;
+	
+	/**
+	 * Reference to the main panel
+	 */
+	private static MainPanel mainPanel;
+
+	/**
+	 * Keeps track of whether the app is in edit mode.
+	 */
+	private static boolean isInEditMode;
+	
 	/****************************************
 	 * 
 	 * Getters for the Mutable Parameters
@@ -136,6 +153,34 @@ public class Parameters {
 	 */
 	public static DocExplorerPanel getDocExpPanel() {
 		return docExpPanel;
+	}
+	
+	/**
+	 * Returns the reference to the page explorer panel.
+	 * 
+	 * @return The reference to the page explorer panel
+	 */
+	public static PageExplorerPanel getPageExpPanel() {
+		return pageExpPanel;
+	}
+	
+	/**
+	 * Returns the reference to the main panel.
+	 * 
+	 * @return The reference to the main panel
+	 */
+	public static MainPanel getMainPanel() {
+		return mainPanel;
+	}
+	
+	/**
+	 * Returns whether the app is in edit mode.
+	 * 
+	 * @return True if it is in edit mode; false if
+	 * otherwise
+	 */
+	public static boolean isInEditMode() {
+		return isInEditMode;
 	}
 	
 	/****************************************
@@ -184,6 +229,38 @@ public class Parameters {
 		
 		if (docExpPanel == null) 
 			docExpPanel = p;
+	}
+	
+	/**
+	 * Sets the page explorer panel reference.
+	 * 
+	 * @param p The page explorer panel references
+	 */
+	public static void setPageExplorerPanel(PageExplorerPanel p) {
+		
+		if (pageExpPanel == null) 
+			pageExpPanel = p;
+	}
+	
+	/**
+	 * Sets the main panel reference.
+	 * 
+	 * @param p The main panel references
+	 */
+	public static void setMainPanel(MainPanel p) {
+		
+		if (mainPanel == null) 
+			mainPanel = p;
+	}
+	
+	
+	/**
+	 * Sets whether the app is in edit mode.
+	 * 
+	 * @param b The boolean to set
+	 */
+	public static void setIsInEditMode(boolean b) {
+		isInEditMode = b;
 	}
 	
 	

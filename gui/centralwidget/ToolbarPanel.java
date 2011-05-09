@@ -6,12 +6,18 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+
+import core.Mode;
+import javax.swing.JRadioButton;
+import core.Parameters;
 
 /**
  * The Toolbal Panel contains basic tools for the Central Panel,
@@ -22,18 +28,18 @@ import javax.swing.JRadioButton;
  *
  */
 public class ToolbarPanel extends JPanel {
-	
+
 	/****************************************
 	 * 
 	 * Private Instance Variables
 	 * 
 	 ****************************************/
-	
+
 	/**
 	 * Reference to the central panel.
 	 */
 	private CentralPanel centralPanel;
-	
+
 	/**
 	 * The mode button group.
 	 */
@@ -42,50 +48,51 @@ public class ToolbarPanel extends JPanel {
 	/**
 	 * The zoom-in button.
 	 */
-    private JButton zoomInButton;
+	private JButton zoomInButton;
 
-    /**
-     * The zoom-out button.
-     */
-    private JButton zoomOutButton;
-	
+	/**
+	 * The zoom-out button.
+	 */
+	private JButton zoomOutButton;
+
+	/**
+	 * The back button
+	 */
+	private JButton backButton;
+
+	/**
+	 * The next button
+	 */
+	private JButton nextButton;
+
 	/**
 	 * The view radio button.
 	 */
 	private JRadioButton viewRButton;
-	
+
 	/****************************************
 	 * 
 	 * Constants
 	 * 
 	 ****************************************/
-	
+
 	/**
 	 * Constructor.
 	 */
 	public ToolbarPanel(CentralPanel centralPanel) {
 		super();
-		
+
 		this.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
-		
-		this.centralPanel = centralPanel;
-		
-		c.gridx = 0;
-		JButton backButton = new JButton("Back");
-		this.add(backButton, c);
-		
-		c.gridx = 1;
-		JButton nextButton = new JButton("Next");
-		this.add(nextButton, c);
 
-        c.gridx = 2;
-        c.insets = new Insets(0,125,0,0);
+		this.centralPanel = centralPanel;
+
+		c.gridx = 0;
 		zoomInButton = new JButton("Zoom In");
 		this.zoomInButton.addActionListener(new ZoomInListener());
 		this.add(zoomInButton, c);
 
-		c.gridx = 3;
+		c.gridx = 1;
 		c.insets = new Insets(0,0,0,0);
 		zoomOutButton = new JButton("Zoom Out");
 		this.zoomOutButton.addActionListener(new ZoomOutListener());
@@ -94,49 +101,49 @@ public class ToolbarPanel extends JPanel {
 		// Setup the mode listener for the radio buttons
 		// for switching between the view and edit modes.
 		ModeListener modeListener = new ModeListener();
-		
+
 		// the view mode magnifying glass icon
-		c.gridx = 4;
-		c.insets = new Insets(0,125,0,0);
+		c.gridx = 2;
+		c.insets = new Insets(0,100,0,0);
 		JRadioButton viewIcon = new JRadioButton(new ImageIcon("libraries/icons/magnify.png"));
 		this.add(viewIcon, c);
-		
+
 		// Setup the view mode radio button.
-		c.gridx = 5;
+		c.gridx = 3;
 		c.insets = new Insets(0,0,0,0);
 		this.viewRButton = new JRadioButton("View Mode");
 		this.viewRButton.setActionCommand("VIEW");
 		this.viewRButton.setSelected(true);
 		this.viewRButton.addActionListener(modeListener);
 		this.add(this.viewRButton, c);
-		
+
 		// the edit mode pencil icon
-		c.gridx = 6;
+		c.gridx = 4;
 		c.insets = new Insets(0,10,0,0);
 		JRadioButton editIcon = new JRadioButton(new ImageIcon("libraries/icons/pencil.png"));
 		this.add(editIcon, c);
-		
+
 		// Setup the edit mode radio button.
-		c.gridx = 7;
+		c.gridx = 5;
 		c.insets = new Insets(0,0,0,0);
 		JRadioButton editRButton = new JRadioButton("Edit Mode");
 		editRButton.setActionCommand("EDIT");
 		editRButton.addActionListener(modeListener);
 		this.add(editRButton, c);
-		
+
 		// Group the view mode and edit mode radio buttons
 		// together.
 		this.modeButtonGroup = new ButtonGroup();
 		this.modeButtonGroup.add(this.viewRButton);
 		this.modeButtonGroup.add(editRButton);
 	}
-	
+
 	/****************************************
 	 * 
 	 * Public Methods
 	 * 
 	 ****************************************/
-	
+
 	/**
 	 * Unselects both mode radio buttons.
 	 */
@@ -144,30 +151,19 @@ public class ToolbarPanel extends JPanel {
 		//this.modeButtonGroup.clearSelection();
 	}
 
-        public void showZoomButtons(){
-            zoomInButton.setVisible(true);
-            zoomOutButton.setVisible(true);
-        }
-
-        public void hideZoomButtons(){
-             zoomInButton.setVisible(false);
-             zoomOutButton.setVisible(false);
-            
-        }
-	
 	/**
 	 * Selects the view radio button.
 	 */
 	public void selectViewRButton() {
 		this.viewRButton.setSelected(true);
 	}
-	
+
 	/****************************************
 	 * 
 	 * Event Listener Classes
 	 * 
 	 ****************************************/
-	
+
 	/**
 	 * The Mode Listener class for the mode radio buttons.
 	 */
@@ -177,14 +173,18 @@ public class ToolbarPanel extends JPanel {
 		 * Handles the switch of radio buttons.
 		 */
 		public void actionPerformed(ActionEvent e) {
+			Mode lastMode = centralPanel.getCurrentMode();
+
 			if (e.getActionCommand().equals("VIEW")) {
 				centralPanel.switchToViewPanel();
+				Parameters.setIsInEditMode(false);
 			} else {
 				centralPanel.switchToEditPanel();
+				Parameters.setIsInEditMode(true);
 			}
 		}
 	}
-	
+
 	/**
 	 * The ZoomIn action listener.
 	 */
@@ -200,7 +200,7 @@ public class ToolbarPanel extends JPanel {
 				centralPanel.getEditPanel().zoomIn();
 		}		
 	}
-	
+
 	/**
 	 * The ZoomOut action listener.
 	 */
@@ -216,4 +216,5 @@ public class ToolbarPanel extends JPanel {
 				centralPanel.getEditPanel().zoomOut();
 		}	
 	}
+
 }

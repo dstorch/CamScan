@@ -95,9 +95,10 @@ public class ViewPanel extends JPanel {
 		
 		// When the page has changed, set the new img instance variable
 		// and modify the scale factor.
-		if (this.img != Parameters.getCoreManager().getWorkingImage() && Parameters.getCoreManager().getWorkingImage() != null) {
+		if (this.img != Parameters.getCoreManager().getProcessedImage() && Parameters.getCoreManager().getProcessedImage() != null) {
 
-			this.img = Parameters.getCoreManager().getWorkingImage();
+			this.img = Parameters.getCoreManager().getProcessedImage();
+			
 
 			double xSideRatio = ((double) this.getWidth())/((double) this.imageLabel.getWidth());
 			double ySideRatio = ((double) this.getHeight())/((double) this.imageLabel.getHeight());

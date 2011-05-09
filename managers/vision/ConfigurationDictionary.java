@@ -2,6 +2,8 @@ package vision;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.dom4j.DocumentHelper;
@@ -43,7 +45,15 @@ public class ConfigurationDictionary {
 			}
 		}
 	}
-	public ConfigurationValue getKey(String key){
+	
+	public ConfigurationDictionary(HashMap<String, ConfigurationValue> map) {
+		this.map = map;
+	}
+	
+	public ConfigurationValue getKey(ConfigurationValue.ValueType key){
+		return this.map.get(ConfigurationValue.type2name(key));
+	}
+	public ConfigurationValue getKeyWithName(String key){
 		return this.map.get(key);
 	}
 	public void setKey(ConfigurationValue value){
@@ -66,7 +76,7 @@ public class ConfigurationDictionary {
 		
 		for(Object _key: this.getAllKeys()){
 			String key = (String)_key;
-			ConfigurationValue currentValue = this.getKey(key);
+			ConfigurationValue currentValue = this.getKeyWithName(key);
 			
 			Element e;
 			if (elementNames.containsKey(currentValue.type)){
@@ -79,5 +89,35 @@ public class ConfigurationDictionary {
 			config.add(e);
 		}
 		
+	}
+	
+	private String join(List<String> s, String seperator){
+		  if (s == null || seperator == null){return null;}
+		  if (s.size() == 0){return "";}
+		  
+		  StringBuilder out=new StringBuilder();
+		  
+		  out.append(s.get(0));
+		  for(int i=1;i<s.size();i++){
+			  out.append(seperator).append(s.get(i));
+		  }
+		  
+		  return out.toString();
+	}
+	
+	@Override
+	public String toString(){
+		LinkedList<String> repr = new LinkedList<String>();;
+		for(Object _key: this.getAllKeys()){
+			String key = (String)_key;
+			ConfigurationValue currentValue = this.getKeyWithName(key);
+			
+			repr.add( key + ": " + currentValue.value().toString() );
+		}
+		return join(repr, "\n");
+	}
+	
+	public ConfigurationDictionary getCopy() {
+		return new ConfigurationDictionary((HashMap<String, ConfigurationValue>) this.map.clone());
 	}
 }

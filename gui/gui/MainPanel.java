@@ -55,6 +55,8 @@ public class MainPanel extends JPanel {
 		
 		Parameters.setCoreManager(new CoreManager());
 		
+		Parameters.setMainPanel(this);
+		
 		// Setup the east panel
 		EastPanel eastPanel = new EastPanel(this);
 		this.add(eastPanel, BorderLayout.EAST);
@@ -68,6 +70,16 @@ public class MainPanel extends JPanel {
 		this.add(westPanel, BorderLayout.WEST);
 		
 		this.centralPanel.setWestPanel(westPanel);
+	}
+	
+	/****************************************
+	 * 
+	 * Public methods
+	 * 
+	 ****************************************/
+	
+	public CentralPanel getCentralPanel() {
+		return this.centralPanel;
 	}
 	
 	/**

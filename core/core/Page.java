@@ -15,10 +15,10 @@ import vision.ConfigurationDictionary;
 import vision.VisionManager;
 
 public class Page implements Comparable{
-	
+
 	// used for searching the text of the page
 	private static final int GREP_WINDOW = 10;
-	
+
 	// major attributes
 	private PageText _text;
 	private ConfigurationDictionary _config;
@@ -31,15 +31,16 @@ public class Page implements Comparable{
 	private String _raw;
 	private String _processed;
 	private String _metafile;
-	
+
 	// reference to the containing document
 	private Document _parentDoc;
-	
+
 	// the placement of the page relative to other
 	// pages in the document
 	private int _order;
-	
+
 	public Page(Document parent, int order, String name) {
+
 		_parentDoc = parent;
 		_order = order;
                 _name = name;
@@ -47,9 +48,11 @@ public class Page implements Comparable{
 		_corners = new Corners();
 		_text = new PageText();
 	}
+
 	public String name(){
             return _name;
         }
+
 	public int order() {
 		return _order;
 	}
@@ -104,16 +107,17 @@ public class Page implements Comparable{
 	public void setContainingDocument(Document parent) {
 		_parentDoc = parent;
 	}
-	
+
 	public BufferedImage getRawImgFromDisk() throws IOException {
 		return ImageIO.read(new File(raw()));
 		//return VisionManager.loadImage(raw());
 	}
-	
+
 	public BufferedImage getProcessedImgFromDisk() throws IOException {
 		return ImageIO.read(new File(processed()));
 		//return VisionManager.loadImage(processed());
 	}
+
 	
     // sets corners and config file for the initial guesses of an imported document
     public void initGuesses() throws IOException {
@@ -165,17 +169,17 @@ public class Page implements Comparable{
 			serialize();
 		}
 	}
-	
+
 	public void launchOcrThread() {
 		OCRThread t = new OCRThread(this);
 		t.start();
 	}
-	
-	
+
+
 	public void serialize() throws IOException {
 		OutputFormat pretty = OutputFormat.createPrettyPrint();
 		XMLWriter filewriter = new XMLWriter(new FileWriter(metafile()), pretty);
-		
+
 		try {
 			org.dom4j.Document xmlDoc = DocumentHelper.createDocument();
 			Element root = DocumentHelper.createElement("PAGE");
@@ -183,28 +187,29 @@ public class Page implements Comparable{
 
                         root.addAttribute("name", name());
 
+
 			Element image = DocumentHelper.createElement("IMG");
 			image.addAttribute("path", raw());
 			image.addAttribute("processed", processed());
 			root.add(image);
-			
+
 			corners().serialize(root);
 			pageText().serialize(root);
 			config().serialize(root);
-			
+
 			filewriter.write(xmlDoc);
 		} finally {
 			filewriter.close();
 		}
-		
+
 	}
 
 	public List<SearchHit> search(Set<Term> query, Searcher searcher) {
 		LinkedList<SearchHit> hits = new LinkedList<SearchHit>();
 		String fullText = fullText();
-		
+
 		List<Term> fullTextTerms = searcher.sanitize(fullText);
-		
+
 		// build the initial "grepping window"
 		HashSet<Term> windowSet = new HashSet<Term>();
 		for (int i = 0; i < GREP_WINDOW; i++) {
@@ -212,7 +217,7 @@ public class Page implements Comparable{
 				windowSet.add(fullTextTerms.get(i));
 			}
 		}
-		
+
 		boolean resultInWindow = false;
 		float scoreInWindow = 0;
 		SearchHit lastHit = null;
@@ -220,7 +225,7 @@ public class Page implements Comparable{
 			// increment the "grepping window"
 			windowSet.remove(fullTextTerms.get(i - GREP_WINDOW));
 			windowSet.add(fullTextTerms.get(i));
-			
+
 			// determine the amount of intersection between the grepping
 			// window and the query set
 			int score = 0;
@@ -231,7 +236,7 @@ public class Page implements Comparable{
 					position = t.pos;
 				}
 			}
-			
+
 			// if there is an intersection, find the snippet and
 			// create a new search hit
 			if (!resultInWindow) {
@@ -253,19 +258,19 @@ public class Page implements Comparable{
 				}
 			}
 		}
-		
+
 		// if you exit the loop and there is still a hit, then add it
 		if (resultInWindow) hits.add(lastHit);
-		
+
 		return hits;
 	}
-	
+
 
 	private String getSearchSnippet(Set<Term> grepWindow, String fullText, int midPosition) {
-		
+
 		// collapse the full text into an array of strings
 		String[] fullTextArr = 	fullText.split("[^a-zA-Z0-9.,/-]+");
-		
+
 		// get the minimum position out of the terms
 		int minPosition = Integer.MAX_VALUE;
 		for (Term t : grepWindow) {
@@ -273,23 +278,23 @@ public class Page implements Comparable{
 				minPosition = t.pos;
 			}
 		}
-		
+
 		// get the snippet
 		LinkedList<String> snippetList = new LinkedList<String>();
 		for (int i = (midPosition - GREP_WINDOW); i < (midPosition + GREP_WINDOW); i++) {
 			if (i < fullTextArr.length && i > 0) snippetList.add(fullTextArr[i]);
 		}
-		
+
 		// get the snippet from the list
 		String snippet = "";
 		for (String s : snippetList) {
 			snippet += s + " ";
 		}
-		
+
 		return snippet.trim();
 	}
-	
-	
+
+
 	// DEBUGGING METHOD ONLY
 	private void printWindowSet(Set<Term> windowSet) {
 		System.out.print("set: "+_metafile+" ");
@@ -300,17 +305,17 @@ public class Page implements Comparable{
 	}
 
 
-        // deletes image file in the workspace/raw directory
-        public void deleteRawFile(){
-            File raw = new File(raw());
-            if(!raw.delete()) System.out.println("RAW file not deleted!!");
-        }
+	// deletes image file in the workspace/raw directory
+	public void deleteRawFile(){
+		File raw = new File(raw());
+		if(!raw.delete()) System.out.println("RAW file not deleted!!");
+	}
 
-        // deletes image file in the workspace/processed directory
-        public void deleteProcessedFile(){
-            File processed = new File(processed());
-            if(!processed.delete()) System.out.println("PROCESSED file not deleted!!");
-        }
+	// deletes image file in the workspace/processed directory
+	public void deleteProcessedFile(){
+		File processed = new File(processed());
+		if(!processed.delete()) System.out.println("PROCESSED file not deleted!!");
+	}
 
         // deletes metadata file
         public void deleteMetadataFile(){
@@ -319,6 +324,7 @@ public class Page implements Comparable{
             if(!meta.delete()) System.out.println("******METADTA file not deleted!!");
         }
     
+
     public int compareTo(Object t) {
         if(order()< ((Page) t).order()) return -1;
         else if (order() == ((Page) t).order()) return 0;
