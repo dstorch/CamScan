@@ -91,6 +91,9 @@ public class VisionManager {
 	public static BufferedImage rerenderImage(BufferedImage img, Corners corners, ConfigurationDictionary config){
 		if (!OPENCV_ENABLED){return img;}
 		
+		System.out.println("In rerenderImage: ");
+		System.out.println(config);
+		
 		IplImage image = BufferedImageToIplImage(img);
 		image = _imageGlobalTransforms(image, config);
 		
