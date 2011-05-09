@@ -256,7 +256,9 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 
 		CoreManager cm = Parameters.getCoreManager();
 		Page wp = null;
-		if (cm != null) wp = cm.getWorkingPage();
+		if (cm != null) {
+			wp = cm.getWorkingPage();
+		}
 
 		// break if anything is null
 		if (cm == null || wp == null) return;

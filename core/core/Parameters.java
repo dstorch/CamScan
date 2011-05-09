@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 
 import search.SearchResults;
 import westwidget.DocExplorerPanel;
+import eastwidget.PageExplorerPanel;
 
 public class Parameters {
 
@@ -96,6 +97,11 @@ public class Parameters {
 	 */
 	private static DocExplorerPanel docExpPanel;
 	
+	/**
+	 * Reference to the page explorer panel
+	 */
+	private static PageExplorerPanel pageExpPanel;
+	
 	/****************************************
 	 * 
 	 * Getters for the Mutable Parameters
@@ -136,6 +142,15 @@ public class Parameters {
 	 */
 	public static DocExplorerPanel getDocExpPanel() {
 		return docExpPanel;
+	}
+	
+	/**
+	 * Returns the reference to the page explorer panel.
+	 * 
+	 * @return The reference to the page explorer panel
+	 */
+	public static PageExplorerPanel getPageExpPanel() {
+		return pageExpPanel;
 	}
 	
 	/****************************************
@@ -184,6 +199,17 @@ public class Parameters {
 		
 		if (docExpPanel == null) 
 			docExpPanel = p;
+	}
+	
+	/**
+	 * Sets the page explorer panel reference.
+	 * 
+	 * @param p The page explorer panel references
+	 */
+	public static void setPageExplorerPanel(PageExplorerPanel p) {
+		
+		if (pageExpPanel == null) 
+			pageExpPanel = p;
 	}
 	
 	

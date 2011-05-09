@@ -62,6 +62,7 @@ public class PageExplorerPanel extends JPanel {
 	 * Constructor.
 	 */
 	public PageExplorerPanel(MainPanel mainPanel) {
+		Parameters.setPageExplorerPanel(this);
 		
 		this.mainPanel = mainPanel;
 		this.pageList = new JList(this.getPageNames());
@@ -160,7 +161,11 @@ public class PageExplorerPanel extends JPanel {
 					} catch (IOException e1) {
 						e1.printStackTrace();
 					}
-					Parameters.getCoreManager().updateProcessedImage();
+					
+					//Parameters.getCoreManager().updateProcessedImage();
+					
+					Parameters.getCoreManager().setProcessedImage(Parameters.getCoreManager().getRawImage());
+					
 		        	mainPanel.updateCentralPanels(false);
 		        }
 		        

@@ -3,6 +3,7 @@ package centralwidget;
 import java.awt.BorderLayout;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.io.IOException;
 
 import javax.swing.JPanel;
 

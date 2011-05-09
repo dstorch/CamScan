@@ -498,6 +498,10 @@ public class CoreManager {
     	return _rawImage;
     }
     
+    public void setProcessedImage(BufferedImage img) {
+    	_processedImage = img;
+	}
+    
     public BufferedImage getProcessedImage() {
     	return _processedImage;
     }
@@ -549,7 +553,13 @@ public class CoreManager {
 			}
     	}
     }
-    
+
+    public void boostConstrast(boolean boost) {
+    //TODO: Write me!
+//    	ConfigurationValue configVal = this.getWorkingPage().config().getKey(ConfigurationValue.ValueType.ContrastBoost);
+//    	Parameters.getCoreManager().getWorkingPage().config().setKey(new ConfigurationValue(ConfigurationValue.ValueType.ContrastBoost, !(Boolean) configVal.value()));
+    }
+
     /**
      * Given two Corners objects giving corner locations in image
      * coordinates, converts a single Page object into two, and
@@ -595,6 +605,10 @@ public class CoreManager {
     	// do OCR!
         launchOcrThread(_workingPage);
         launchOcrThread(splitProduct);
+        
+        Parameters.getPageExpPanel().update();
+        this.setProcessedImage(this.getRawImage());
+
     }
     
     private String removeExtension(String file) {
@@ -614,11 +628,13 @@ public class CoreManager {
     	return pieces[pieces.length-1];
     }
     
+
     public void setFromEvent(Event e) throws IOException {
     	_workingDocument = e.getDocument();
     	_workingPage = e.getPage();
     	_rawImage = VisionManager.loadImage(_workingPage.raw());
     }
+
     
 //
 //	// called when user tries to place corner; tries to make a better point given the user's guess
