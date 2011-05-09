@@ -280,7 +280,7 @@ public class VisionManager {
 		
 		int i=0;
 		for(MergeZone pp: merged){
-			System.out.println((++i) + ": " + merged.weight);
+			System.out.println((++i) + ": " + pp.weight);
 		}
 		
 		return new Corners(merged.get(0).point, merged.get(1).point, merged.get(3).point, merged.get(2).point);
