@@ -276,7 +276,7 @@ public class VisionManager {
 		}
 		Collections.sort(merged);
 		
-		return new Corners(merged.get(0).point, merged.get(1).point, merged.get(2).point, merged.get(3).point);
+		return new Corners(merged.get(0).point, merged.get(1).point, merged.get(3).point, merged.get(2).point);
 	}
 	
 	
