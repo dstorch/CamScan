@@ -517,7 +517,7 @@ public class CoreManager {
 
     // called when changing from edit mode to view mode
     // uses changes made in edit mode and rerenders the image
-    public void updateWorkingImage() {
+    public void updateProcessedImage() {
         Page curr = getWorkingPage();
         BufferedImage img = getWorkingImage();
         if (curr != null && img != null) {
