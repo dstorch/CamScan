@@ -2,6 +2,8 @@ package vision;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.dom4j.DocumentHelper;
@@ -79,5 +81,30 @@ public class ConfigurationDictionary {
 			config.add(e);
 		}
 		
+	}
+	
+	private String join(List<String> s, String seperator){
+		  if (s == null || seperator == null){return null;}
+		  if (s.size() == 0){return "";}
+		  
+		  StringBuilder out=new StringBuilder();
+		  
+		  out.append(s.get(0));
+		  for(int i=1;i<s.size();i++){
+			  out.append(seperator).append(s.get(i));
+		  }
+		  
+		  return out.toString();
+	}
+	
+	public String toString(){
+		LinkedList<String> repr = new LinkedList<String>();;
+		for(Object _key: this.getAllKeys()){
+			String key = (String)_key;
+			ConfigurationValue currentValue = this.getKey(key);
+			
+			repr.add( key + ": " + currentValue.value().toString() );
+		}
+		return join(repr, "\n");
 	}
 }
