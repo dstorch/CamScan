@@ -23,6 +23,8 @@ import static com.googlecode.javacv.cpp.opencv_calib3d.*;
 
 public class VisionManager {
 	
+	private static final boolean OPENCV_ENABLED = true;
+	
 	/*
 	 * Estimate good values for the configuration dictionary for a raw image.
 	 * Only call once on import.
@@ -86,7 +88,9 @@ public class VisionManager {
 	 * Return the image after applying global transformations and the homography implicit in the four corners.
 	 * The result will be a flat, pretty page.
 	 */
-	public static BufferedImage rerenderImage(BufferedImage img, Corners corners, ConfigurationDictionary config){		
+	public static BufferedImage rerenderImage(BufferedImage img, Corners corners, ConfigurationDictionary config){
+		if (!OPENCV_ENABLED){return img;}
+		
 		IplImage image = BufferedImageToIplImage(img);
 		image = _imageGlobalTransforms(image, config);
 		
@@ -189,7 +193,7 @@ public class VisionManager {
 		
 		for(Object _name: config.getAllKeys()){
 			String name = (String)_name;
-			ConfigurationValue currentValue = config.getKey(name);
+			ConfigurationValue currentValue = config.getKeyWithName(name);
 			
 			if (currentValue.type == ConfigurationValue.ValueType.ColorTemperature){
 				img = applyTemperatureCorrection(img, currentValue);
@@ -214,6 +218,7 @@ public class VisionManager {
 	 * calling rerenderImage (as rerender does it interally.)
 	 */
 	public static BufferedImage imageGlobalTransforms(BufferedImage img, ConfigurationDictionary config){
+		if (!OPENCV_ENABLED){return img;}
 		return IplImageToBufferedImage( _imageGlobalTransforms(BufferedImageToIplImage(img), config) );
 	}
 	
@@ -221,6 +226,7 @@ public class VisionManager {
 	 * Return the best estimate of the four corners of a piece of paper in the image.
 	 */
 	public static Corners findCorners(BufferedImage img){
+		if (!OPENCV_ENABLED){return new Corners(new Point(0,0), new Point(img.getWidth(),0), new Point(0,img.getHeight()), new Point(img.getWidth(),img.getHeight()));}
 		//TODO
 		System.out.println(img);
 		
@@ -241,17 +247,24 @@ public class VisionManager {
 	
 	
 	private static void writeImageToFile(BufferedImage img, String path) throws IOException{
-		//ImageIO is slow and clunky, switch to cvSave?
-		//File output = new File(path);;
-		//ImageIO.write(img, "png", output);
-		cvSaveImage(path, BufferedImageToIplImage(img));
+		if (!OPENCV_ENABLED){
+			File output = new File(path);
+			ImageIO.write(img, "png", output);
+		}else{
+			cvSaveImage(path, BufferedImageToIplImage(img));
+		}
 	}
 	
 	/*
 	 * Write an image out to a path as a TIFF
 	 */
-	public static void writeTIFF(BufferedImage img, String path){
-		cvSaveImage(path, BufferedImageToIplImage(img));
+	public static void writeTIFF(BufferedImage img, String path) throws IOException{
+		if (!OPENCV_ENABLED){
+			File output = new File(path);
+			ImageIO.write(img, "tiff", output);
+		}else{
+			cvSaveImage(path, BufferedImageToIplImage(img));
+		}
 	}
 	
 	/*
@@ -279,8 +292,13 @@ public class VisionManager {
 		return IplImage.createFrom(bufferedImage);
 	}
 	
-	public static BufferedImage loadImage(String path){
-		return IplImageToBufferedImage(cvLoadImage(path));
+	public static BufferedImage loadImage(String path) throws IOException{
+		if (!OPENCV_ENABLED){
+			File input = new File(path);
+			return ImageIO.read(input);
+		}else{
+			return IplImageToBufferedImage(cvLoadImage(path));
+		}
 	}
 	
 	private static CvMat cornersToMat(Corners c){

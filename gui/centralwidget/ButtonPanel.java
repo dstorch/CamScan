@@ -145,6 +145,7 @@ public class ButtonPanel extends JPanel {
 				hSplitButton.setText("Horizontal Split");
 			} else {
 				hSplitButton.setText("Cancel Split");
+				vSplitButton.setText("Vertical Split");
 			}
 			
 			editPanel.toggleHorizontalFlipMode();
@@ -164,6 +165,7 @@ public class ButtonPanel extends JPanel {
 				vSplitButton.setText("Vertical Split");
 			} else {
 				vSplitButton.setText("Cancel Split");
+				hSplitButton.setText("Horizontal Split");
 			}
 			
 			editPanel.toggleVerticalFlipMode();
