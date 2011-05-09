@@ -160,7 +160,7 @@ public class VisionManager {
 		
 		cvCvtColor(hsl, img, CV_HLS2RGB);
 		
-		//alternate algorithm balancing each channel seperately. leads to weird chroma artifacts.
+		//alternate algorithm balancing each channel separately. leads to weird chroma artifacts.
 		/*IplImage ch1 = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
 		IplImage ch2 = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
 		IplImage ch3 = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
