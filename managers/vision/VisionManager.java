@@ -127,6 +127,9 @@ public class VisionManager {
 		int flipmode = 1;
 		if (flip.type == ConfigurationValue.ValueType.FlipVertical){
 			flipmode = 0;
+			System.out.println("Flipping vertical");
+		}else{
+			System.out.println("Flipping horizontal");
 		}
 		cvFlip(img, img, flipmode);
 		return img;
