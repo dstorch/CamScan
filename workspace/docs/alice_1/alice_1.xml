@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<PAGE>
+  <IMG path="workspace\raw\alice_1.tiff" processed="workspace/processed/alice_1.tiff"/>
+  <CORNERS>
+    <UPRIGHT x="2493" y="5"/>
+    <DOWNRIGHT x="2493" y="3512"/>
+    <UPLEFT x="5" y="5"/>
+    <DOWNLEFT x="5" y="3512"/>
+  </CORNERS>
+  <TEXT>
+    <FULLTEXT></FULLTEXT>
+    <POSITIONS/>
+  </TEXT>
+  <CONFIG>
+    <CONTRASTBOOST value="false"/>
+    <FLIPV value="false"/>
+    <FLIPH value="false"/>
+    <BILATERAL value="false"/>
+  </CONFIG>
+</PAGE>

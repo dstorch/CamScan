@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <STARTUP>
- <WORKINGDOC value="workspace/docs/IMG_148/doc.xml"/>
-  <WORKINGPAGE value="workspace/docs/alice_1/alice_1.xml" order="0"/>
+  <TESSERACT path="C:\Program Files (x86)\Tesseract-OCR\tesseract.exe"/>
+  <WORKINGDOC value="workspace/docs/IMG_148/doc.xml"/>
   <DOCLIST>
     <DOC value="workspace/docs/alice_1/doc.xml"/>
     <DOC value="workspace/docs/IMG_148/doc.xml"/>
