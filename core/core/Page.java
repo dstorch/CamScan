@@ -114,8 +114,8 @@ public class Page implements Comparable{
 	}
 
 	public BufferedImage getProcessedImgFromDisk() throws IOException {
-		return ImageIO.read(new File(processed()));
-		//return VisionManager.loadImage(processed());
+		//return ImageIO.read(new File(processed()));
+		return VisionManager.loadImage(processed());
 	}
 
 	
@@ -124,8 +124,8 @@ public class Page implements Comparable{
     	System.out.println("Raw file: "+raw());
 
     	// read a buffered image from the disk
-    	BufferedImage buff = ImageIO.read(new File(raw()));
-    	//BufferedImage buff = VisionManager.loadImage(raw());
+    	//BufferedImage buff = ImageIO.read(new File(raw()));
+    	BufferedImage buff = VisionManager.loadImage(raw());
     	
     	// guess and set corners and configuration values of Page
     	setCorners(VisionManager.findCorners(buff));
