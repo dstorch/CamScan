@@ -100,7 +100,8 @@ public class ConfigurationDictionary {
 		  return out.toString();
 	}
 	
-	public String toString1(){
+	@Override
+	public String toString(){
 		LinkedList<String> repr = new LinkedList<String>();;
 		for(Object _key: this.getAllKeys()){
 			String key = (String)_key;

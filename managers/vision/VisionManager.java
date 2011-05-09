@@ -121,9 +121,9 @@ public class VisionManager {
 	 */
 	private static IplImage applyFlipCorrection(IplImage img, ConfigurationValue flip){
 		if (!(Boolean)flip.value()){return img;}
-		int flipmode = 0;
+		int flipmode = 1;
 		if (flip.type == ConfigurationValue.ValueType.FlipVertical){
-			flipmode = 1;
+			flipmode = 0;
 		}
 		cvFlip(img, img, flipmode);
 		return img;
