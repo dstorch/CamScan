@@ -137,7 +137,7 @@ public class Page implements Comparable{
 
 		// change the name of the metadata and processed files
 		String newMet = metafile().substring(0, (metafile().length()-(name().length()+4)))+newName+".xml";
-		String newPro = Parameters.PROCESSED_DIRECTORY+"/"+newName+".tiff";
+		String newPro = Parameters.PROCESSED_DIRECTORY+File.separator+newName+".tiff";
 
 		System.out.println("New Metafile " + newMet);
 		System.out.println("New Profile " + newPro);
@@ -166,7 +166,7 @@ public class Page implements Comparable{
 	}
 
 	public void setOcrResults() throws IOException {
-		String[] fields = metafile().split("/");
+		String[] fields = metafile().split("\\\\");
 		PageText text = ocrManager.getPageText(_processed, fields[fields.length-1]);
 		synchronized (this) {
 			_text = text;

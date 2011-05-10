@@ -28,32 +28,32 @@ public class Parameters {
 	/**
 	 * path of the python script to invoke for exportation
 	 */
-	public static final String EXPORT_PATH = "managers/export/jpg2pdf.py";
+	public static final String EXPORT_PATH = "managers" + File.separator + "export" + File.separator + "jpg2pdf.py";
 	
 	/**
 	 * path of the python script to invoke for exportation
 	 */
-	public static final String STOP_WORDS = "managers/search/stopwords.txt";
+	public static final String STOP_WORDS = "managers" + File.separator + "search" + File.separator + "stopwords.txt";
 
 	/**
 	 * path of the python script to invoke for exportation
 	 */
-	public static final String SEARCHER_PATH = "managers/search/grepper.py";
+	public static final String SEARCHER_PATH = "managers" + File.separator + "search" + File.separator + "grepper.py";
 	
 	/**
 	 * path of raw files
 	 */
-	public static final String RAW_DIRECTORY = "workspace/raw";
+	public static final String RAW_DIRECTORY = "workspace" + File.separator + "raw";
 	
 	/**
 	 * path of processed image files
 	 */
-	public static final String PROCESSED_DIRECTORY = "workspace/processed";
+	public static final String PROCESSED_DIRECTORY = "workspace" + File.separator + "processed";
 	
 	/**
 	 * path of the document data
 	 */
-	public static final String DOC_DIRECTORY = "workspace/docs";
+	public static final String DOC_DIRECTORY = "workspace" + File.separator + "docs";
 	
 	/**
 	 * Max number of search hits to report in the working document

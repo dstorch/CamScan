@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <STARTUP>
-  <TESSERACT path="/opt/local/bin/tesseract"/>
+  <TESSERACT path="C:\\Program Files (x86)\\Tesseract-OCR\\tesseract.exe"/>
+  <WORKINGDOC value="workspace\docs\DSC_7384\doc.xml"/>
+  <WORKINGPAGE value="workspace\docs\DSC_7384\DSC_7384.xml" order="1" name="DSC_7384"/>
+  <DOCLIST>
+    <DOC value="workspace\docs\DSC_7384\doc.xml"/>
+  </DOCLIST>
 </STARTUP>
