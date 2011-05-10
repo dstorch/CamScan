@@ -39,7 +39,7 @@ public class ExportThread extends Thread {
 	        
 			System.out.println("python "+Parameters.EXPORT_PATH+" "+docPath+" "+_outfile);
 			Process process;
-		
+	
 			process = Runtime.getRuntime().exec("python "+Parameters.EXPORT_PATH+" "+docPath+" "+_outfile);		
 			reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			

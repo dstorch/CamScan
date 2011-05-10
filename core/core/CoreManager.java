@@ -86,7 +86,7 @@ public class CoreManager {
 		for (Iterator i = root.elementIterator("WORKINGDOC"); i.hasNext();) {
 			Element workingdoc = (Element) i.next();
 			String workingStr = workingdoc.attribute("value").getStringValue();
-			String[] fields = workingStr.split("/");
+			String[] fields = workingStr.split("\\\\");
 			
 			if (fields.length > 1) {
 				String name = fields[fields.length - 2];
@@ -219,7 +219,7 @@ public class CoreManager {
 	// returns null if there isn't a document with name
 	private Document getDocFromName(String docName){
 		
-		String[] fields = docName.split("/");
+		String[] fields = docName.split("\\\\");
 		if (fields.length > 1) {
 			
 		}
@@ -314,11 +314,11 @@ public class CoreManager {
 		String doc1 = d1.name();
 		int numPages = d1.pages().size();
 
-		String docPath = Parameters.DOC_DIRECTORY+"/"+doc1+"/";
+		String docPath = Parameters.DOC_DIRECTORY+File.separator+doc1+File.separator;
 
 		for (Page p : d2.pages()) {
 			// extract name of file and append to path of document 1 to get new path
-			String[] s = p.metafile().split("/");
+			String[] s = p.metafile().split("\\\\");
 			String newMetaPath = docPath + s[s.length - 1];
 
 			File oldFile = new File(p.metafile());
@@ -357,10 +357,10 @@ public class CoreManager {
 
 		// put this document in workspace/docs by default
 		String name = sourceLocation.getName();
-		String directory = Parameters.DOC_DIRECTORY + "/" + name;
+		String directory = Parameters.DOC_DIRECTORY + File.separator + name;
 		File dirFile = new File(directory);
 		if (!dirFile.mkdir()) throw new IOException("Import aborted: problem making new document directory!");
-		String pathname = directory + "/" + "doc.xml";
+		String pathname = directory + File.separator + "doc.xml";
 		Document newDoc = new Document(name, pathname);
 
 		File targetLocation = new File(Parameters.RAW_DIRECTORY);
@@ -445,8 +445,8 @@ public class CoreManager {
 
                 // set pathname attributes of the page
                 p.setRawFile(targetLocation.getPath());
-                p.setProcessedFile(Parameters.PROCESSED_DIRECTORY + "/" + sourceLocation.getName());
-                p.setMetafile(Parameters.DOC_DIRECTORY + "/" + d.name() + "/" + noExt + ".xml");
+                p.setProcessedFile(Parameters.PROCESSED_DIRECTORY + File.separator + sourceLocation.getName());
+                p.setMetafile(Parameters.DOC_DIRECTORY + File.separator + d.name() + File.separator + noExt + ".xml");
 
                 // guess initial configuration values
                 p.initGuesses();
@@ -471,15 +471,15 @@ public class CoreManager {
         // get the image file name without a ".tiff" extension
         String imageFile = sourceLocation.getName();
         String noExt = removeExtension(imageFile);
-        String directory = Parameters.DOC_DIRECTORY + "/" + noExt;
+        String directory = Parameters.DOC_DIRECTORY + File.separator + noExt;
         File dirFile = new File(directory);
         if (!dirFile.mkdir()) {
             throw new IOException("Import aborted: problem making new document directory!");
         }
-        String pathname = directory + "/" + "doc.xml";
+        String pathname = directory + File.separator + "doc.xml";
         Document newDoc = new Document(noExt, pathname);
 
-        File targetLocation = new File(Parameters.RAW_DIRECTORY + "/" + sourceLocation.getName());
+        File targetLocation = new File(Parameters.RAW_DIRECTORY + File.separator + sourceLocation.getName());
         importPages(sourceLocation, targetLocation, newDoc, 1);
 
         // add the document to the global list of documents
