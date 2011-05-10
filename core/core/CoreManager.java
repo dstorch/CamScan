@@ -586,7 +586,14 @@ public class CoreManager {
 		Page curr = getWorkingPage();
 		BufferedImage img = getRawImage();
 		if (curr != null && img != null) {
-			_processedImage = VisionManager.rerenderImage(getRawImage(), VisionManager.findCorners(getRawImage()), curr.config());
+			
+			Corners originalCorners = new Corners(new Point(0, 0), 
+	      			  new Point(getRawImage().getWidth(), 0), 
+	      			  new Point(0, getRawImage().getHeight()), 
+	      			  new Point(getRawImage().getWidth(), getRawImage().getHeight()));
+			
+//			_processedImage = VisionManager.rerenderImage(getRawImage(), VisionManager.findCorners(getRawImage()), curr.config());
+			_processedImage = VisionManager.rerenderImage(getRawImage(), originalCorners, curr.config());
 		}
 	}
 

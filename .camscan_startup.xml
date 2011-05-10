@@ -2,6 +2,6 @@
 
 <STARTUP>
   <TESSERACT path="/usr/local/bin/tesseract"/>
-  <WORKINGPAGE value="workspace/docs/copiedDoc/hamlet_1.xml" order="1" name="hamlet_1"/>
+  <TESSERACT path="C:\Program Files (x86)\Tesseract-OCR\tesseract.exe"/>
   <DOCLIST/>
 </STARTUP>
