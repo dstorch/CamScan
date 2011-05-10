@@ -28,7 +28,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Iterator;
 import javax.swing.DefaultListModel;
-import javax.swing.DropMode;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.ListModel;
@@ -124,6 +123,19 @@ public class PageExplorerPanel extends JPanel {
         this.pageList.setSelectedIndex(order);
         this.mainPanel.updateCentralPanels(false);
     }
+    
+	
+	public void incrementIndex() {
+		int order = this.pageList.getSelectedIndex();
+		order++;
+		this.pageList.setSelectedIndex(order);
+	}
+	
+	public void decrementIndex() {
+		int order = this.pageList.getSelectedIndex();
+		order--;
+		this.pageList.setSelectedIndex(order);
+	}
 
     /****************************************
      *

@@ -271,4 +271,16 @@ public class Parameters {
 	 ****************************************/
 	
 	public static final String LOGO = "libraries/icons/CamscanLogo.png";
+	
+	public static final String EDIT = "libraries/icons/pencil.png";
+	
+	public static final String VIEW = "libraries/icons/display.png";
+	
+	public static final String ZOOM_IN = "libraries/icons/zoomin.png";
+	
+	public static final String ZOOM_OUT = "libraries/icons/zoomout.png";
+	
+	public static final String DOWN_ARROW = "libraries/icons/downarrow.png";
+	
+	public static final String UP_ARROW = "libraries/icons/uparrow.jpg";
 }
