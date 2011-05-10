@@ -167,9 +167,6 @@ public class DocExplorerPanel extends JPanel {
 
         public void valueChanged(ListSelectionEvent e) {
             if (e.getValueIsAdjusting() == false) {
-            	
-            	// remember the old working page
-            	Page workingPage = Parameters.getCoreManager().getWorkingPage();
 
                 // Get the current selection and set it as the working document.
                 String currDocName = (String) docList.getSelectedValue();
@@ -180,6 +177,7 @@ public class DocExplorerPanel extends JPanel {
                 }
 
                 try {
+                	System.out.println(currDocName);
                     Parameters.getCoreManager().setWorkingDocumentFromName(currDocName);
                 } catch (IOException e1) {
                     e1.printStackTrace();
