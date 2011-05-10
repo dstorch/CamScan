@@ -270,18 +270,40 @@ public class VisionManager {
     	IplImage gray_original = cvCloneImage(gray);
     		
     	ArrayList<MergeZone> merged = findPotentialZones(gray);
-    		
+    	
+    	/*
     	while(merged.size() > 4){
     		merged.remove(merged.size() - 1);
     	}
-    	
     	if (merged.size() < 4){
-    		//handle this!
-    		//oh god!
     		return defaultCorners;
-    	}
+    	}*/
+    	
+    	ArrayList<PotentialCorners> potentialSet = new ArrayList<PotentialCorners>();
 		
-		Corners mini_corners = pointsToCorners(merged);
+		for(int c1=0;c1<merged.size();c1++){
+			for(int c2=c1+1;c2<merged.size();c2++){
+				for(int c3=c2+1;c3<merged.size();c3++){
+					for(int c4=c3+1;c4<merged.size();c4++){
+						ArrayList<MergeZone> ccs = new ArrayList<MergeZone>();
+						ccs.add(merged.get(c1));
+						ccs.add(merged.get(c2));
+						ccs.add(merged.get(c3));
+						ccs.add(merged.get(c4));
+						
+						PotentialCorners pc = new PotentialCorners();
+						pc.corners = pointsToCorners(ccs);
+						pc.metrics();
+						
+						potentialSet.add(pc);
+        			}
+    			}
+			}
+		}
+		Collections.sort(potentialSet);
+		
+		//Corners mini_corners = pointsToCorners(merged);
+		Corners mini_corners = potentialSet.get(0).corners;
 		
 		double xscale = image.width() / mini.width();
 		double yscale = image.height() / mini.height();
@@ -316,10 +338,10 @@ public class VisionManager {
 		
 		Collections.sort(merged);
 		
-		int i=0;
+		/*int i=0;
 		for(MergeZone pp: merged){
 			System.out.println((++i) + ": " + pp.weight);
-		}
+		}*/
 		
 		return new Corners(merged.get(3).point, merged.get(2).point, merged.get(0).point, merged.get(1).point);
 	}
@@ -582,6 +604,8 @@ public class VisionManager {
 		Collections.sort( merged );
 		
 		//debugging
+		//TODO: remove
+		
 		warpage = linearScaledImage(warpage);
 		for(MergeZone pp: merged){
 			Point p = pp.point;
@@ -676,7 +700,7 @@ public class VisionManager {
 		}
 		
 		System.out.println("Vision library stub launcher");
-		IplImage image = cvLoadImage("tests/images/DSC_7384.JPG");
+		IplImage image = cvLoadImage("tests/images/IMG_1534.tif");
 		System.out.println("Loaded");
         if (image != null) {
         	
@@ -702,9 +726,45 @@ public class VisionManager {
         		
         		ArrayList<MergeZone> merged = findPotentialZones(gray);
         		
-        		while(merged.size() > 4){
-        			merged.remove(merged.size() - 1);
+        		ArrayList<PotentialCorners> potentialSet = new ArrayList<PotentialCorners>();
+        		
+        		for(int c1=0;c1<merged.size();c1++){
+        			for(int c2=c1+1;c2<merged.size();c2++){
+        				for(int c3=c2+1;c3<merged.size();c3++){
+        					for(int c4=c3+1;c4<merged.size();c4++){
+                				//System.out.println(c1 + " " + c2 + " " + c3 + " " + c4);
+        						
+        						ArrayList<MergeZone> ccs = new ArrayList<MergeZone>();
+        						ccs.add(merged.get(c1));
+        						ccs.add(merged.get(c2));
+        						ccs.add(merged.get(c3));
+        						ccs.add(merged.get(c4));
+        						
+        						PotentialCorners pc = new PotentialCorners();
+        						pc.corners = pointsToCorners(ccs);
+        						pc.metrics();
+        						
+        						potentialSet.add(pc);
+                			}
+            			}
+        			}
         		}
+        		Collections.sort(potentialSet);
+        		for(PotentialCorners c: potentialSet){
+        			System.out.println(c);
+        		}
+        		
+        		
+        		
+        		//while(merged.size() > 4){
+        		//	merged.remove(merged.size() - 1);
+        		//}
+        		Corners best = potentialSet.get(0).corners;
+        		merged = new ArrayList<MergeZone>();
+        		merged.add(new MergeZone( best.upleft() ));
+        		merged.add(new MergeZone( best.upright() ));
+        		merged.add(new MergeZone( best.downleft() ));
+        		merged.add(new MergeZone( best.downright() ));
         		
         		for(MergeZone pp: merged){
         			Point p = pp.point;
