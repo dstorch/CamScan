@@ -297,15 +297,7 @@ public class VisionManager {
 	}
 	
 	private static double angular_distance(double a1, double a2){
-		a1 += Math.PI;
-		a2 += Math.PI;
-		
-		//inside
-		double d1 = Math.abs(a2-a1);
-		//around
-		double d2 = Math.abs(Math.min(a1,a2)) + Math.abs(Math.PI*2 - Math.max(a1,a2));
-		
-		return d1;//Math.min(d1,d2);
+		return Math.abs((a2+Math.PI)-(a1+Math.PI));
 	}
 	
 	private static Corners pointsToCorners(List<MergeZone> merged){
