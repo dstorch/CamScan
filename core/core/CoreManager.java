@@ -385,7 +385,10 @@ public class CoreManager {
            
             boolean validExt = false;
             for (int i = 0; i<Parameters.imgExtensions.length;i++) {
-            	if (filename.endsWith(Parameters.imgExtensions[i])) validExt = true;
+            	if (filename.toLowerCase().endsWith(Parameters.imgExtensions[i])) {
+            		validExt = true;
+            		break;
+            	}
             }
 
             if (validExt) {
@@ -674,7 +677,6 @@ public class CoreManager {
     	return pieces[pieces.length-1];
     }
 
-    
 //
 //	// called when user tries to place corner; tries to make a better point given the user's guess
 //    // writes the current process image to workspace/processed (as Tiff file)

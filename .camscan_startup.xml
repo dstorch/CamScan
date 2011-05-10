@@ -2,4 +2,5 @@
 
 <STARTUP>
   <TESSERACT path="C:\Program Files (x86)\Tesseract-OCR\tesseract.exe"/>
-  </STARTUP>
+  <DOCLIST/>
+</STARTUP>
