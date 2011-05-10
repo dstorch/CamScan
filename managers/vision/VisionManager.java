@@ -24,7 +24,7 @@ import static com.googlecode.javacv.cpp.opencv_calib3d.*;
 
 public class VisionManager {
 	
-	private static final boolean OPENCV_ENABLED = false;
+	private static final boolean OPENCV_ENABLED = true;
 	
 	/*
 	 * Estimate good values for the configuration dictionary for a raw image.
@@ -359,11 +359,11 @@ public class VisionManager {
 	 * http://code.google.com/p/javacv/issues/detail?id=2
 	 */
 	private static IplImage BufferedImageToIplImage(BufferedImage image){
-		BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_3BYTE_BGR);
-		Graphics g = bufferedImage.getGraphics();
-		g.drawImage(image, 0, 0, null);
-		g.dispose();
-		return IplImage.createFrom(bufferedImage);
+		//BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_3BYTE_BGR);
+		//Graphics g = bufferedImage.getGraphics();
+		//g.drawImage(image, 0, 0, null);
+		//g.dispose();
+		return IplImage.createFrom(image);
 	}
 	
 	public static BufferedImage loadImage(String path) throws IOException{
