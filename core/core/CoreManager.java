@@ -248,6 +248,7 @@ public class CoreManager {
                                 setWorkingDocument(first);
                                 setWorkingPageAndImage(first.pages().first());
                             }else{ // there are no Documents
+                                System.out.println("IN ELSE!!!");
                                 _workingDocument = null;
                                 _workingPage = null;
                                 _rawImage = null;
