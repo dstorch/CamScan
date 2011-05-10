@@ -92,6 +92,7 @@ public class ViewPanel extends JPanel {
 	 */
 	@Override
 	public void paintComponent(Graphics g) {
+                super.paintComponent(g);
 		if (Parameters.getCoreManager().getWorkingPage()!= null){
 		// When the page has changed, set the new img instance variable
 		// and modify the scale factor.
