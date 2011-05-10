@@ -530,6 +530,7 @@ public class CoreManager {
      * @throws IOException 
      */
     public void setWorkingDocumentFromName(String docName) throws IOException {
+        System.out.println("Doc Name: "+docName);
         Document doc = getDocFromName(docName);
          _workingDocument = doc;
          setWorkingPageAndImage(doc.pages().first());
