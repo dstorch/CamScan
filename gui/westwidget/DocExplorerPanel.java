@@ -211,6 +211,7 @@ public class DocExplorerPanel extends JPanel {
                         Parameters.getCoreManager().deleteDocument(docName);
                         update();
                         centralPanel.updatePanels(false);
+                        centralPanel.getEastPanel().getPageExpPanel().update();
                     } catch (IOException ex) {
                         JOptionPane.showMessageDialog(null, ex.getMessage(), "Delete Error", JOptionPane.ERROR_MESSAGE);
                     }

@@ -62,7 +62,7 @@ public class Document {
 		setName(newName);
 		setPathName(newDir.getPath()+"/doc.xml");
 		
-		// set instance variables of the contained page objects
+		// move metadata files of page objects into correct directory
 		for (Page p : pages()) {
 			
 			// get the name of the metafile (not the complete pathname)
@@ -104,7 +104,7 @@ public class Document {
                 // delete all image files in raw directory (AND PROCESSED DIRECTORY?????)
                 for (Page p : pages()) {
                     p.deleteRawFile();
-                    //p.deleteProcessedFile();
+                    p.deleteProcessedFile();
                 }
 	}
 
@@ -161,7 +161,7 @@ public class Document {
 		if(page.order()>index) page.setOrder(page.order() - 1);
             }
             p.deleteMetadataFile();
-            //p.deleteProcessedFile();
+            p.deleteProcessedFile();
             p.deleteRawFile(); 
             serialize();
         }
@@ -186,12 +186,6 @@ public class Document {
             }
 
             p.setOrder(newOrder);
-            /*for (Page page : pages()) {
-		if((page.order()>=newOrder)&&(page.metafile()!=p.metafile())&&(page.order()<oldOrder)){
-                    System.out.println("****IN IF: changing "+page.order()+ " TO "+page.order()+1);
-                    page.setOrder(page.order() + 1);
-                }
-            }*/
             updateList();
             serialize();
 

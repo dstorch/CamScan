@@ -238,6 +238,7 @@ public class CoreManager {
                                 _workingDocument = null;
                                 _workingPage = null;
                                 _rawImage = null;
+                                _processedImage = null;
                             }
                         }
 		}

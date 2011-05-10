@@ -92,7 +92,7 @@ public class ViewPanel extends JPanel {
 	 */
 	@Override
 	public void paintComponent(Graphics g) {
-		
+		if (Parameters.getCoreManager().getWorkingPage()!= null){
 		// When the page has changed, set the new img instance variable
 		// and modify the scale factor.
 		if (this.img != Parameters.getCoreManager().getProcessedImage() && Parameters.getCoreManager().getProcessedImage() != null) {
@@ -119,6 +119,7 @@ public class ViewPanel extends JPanel {
 			this.imageLabel.setBounds((this.getWidth() - newW)/2, (this.getHeight() - newH)/2, newW, newH);
 			this.imageLabel.setIcon(this.getScaledImageIcon());
 		}
+            }
 	}
 
 	/**

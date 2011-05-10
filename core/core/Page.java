@@ -144,9 +144,9 @@ public class Page implements Comparable{
 		File oldMeta = new File(metafile());
 		File newMeta = new File(newMet);
                 File oldProcessed = new File(processed());
-                //File newProcessed = new File(newPro);
-		if (!oldMeta.renameTo(newMeta)) throw new IOException("Could not rename document!");
-                //if (!oldProcessed.renameTo(newProcessed)) throw new IOException("Could not rename document!");
+                File newProcessed = new File(newPro);
+		if (!oldMeta.renameTo(newMeta)) throw new IOException("Could not rename Page (metadata file)!");
+                if (!oldProcessed.renameTo(newProcessed)) throw new IOException("Could not rename Page (processed file)!");
 
 		// reset instance variables
 		setName(newName);

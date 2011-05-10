@@ -76,9 +76,8 @@ public class PageExplorerPanel extends JPanel {
     public PageExplorerPanel(MainPanel mainPanel) {
 
         this.mainPanel = mainPanel;
-        /*model = new DefaultListModel();
-        getPageNames();
-        this.pageList = new JList(model);*/
+        Parameters.setPageExplorerPanel(this);
+
         this.pageList = new JList(this.getPageNames());
 
         this.pageList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -200,7 +199,7 @@ public class PageExplorerPanel extends JPanel {
             if (evt.getKeyCode() == 8) {
                 int index = pageList.getSelectedIndex() + 1;
                 Document d = Parameters.getCoreManager().workingDocument();
-                int selected = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete page" + index + "?", "Delete Document", JOptionPane.OK_CANCEL_OPTION);
+                int selected = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete page " + index + "?", "Delete Document", JOptionPane.OK_CANCEL_OPTION);
                 if (selected == JOptionPane.OK_OPTION) {
 
                     try {

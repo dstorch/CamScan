@@ -144,6 +144,10 @@ public class CentralPanel extends JPanel {
 	public EditPanel getEditPanel() {
 		return this.editPanel;
 	}
+
+        public EastPanel getEastPanel(){
+            return this.eastPanel;
+        }
 	
 	/****************************************
 	 * 
