@@ -215,7 +215,8 @@ public class PageExplorerPanel extends JPanel {
                     try {
                         Parameters.getCoreManager().deletePage(d, index);
                         update();
-                        // Parameters.getFrame().getContentPane().centralPanel.updatePanels(false);
+                        mainPanel.updateCentralPanels(false);
+                        Parameters.getDocExpPanel().update();
                     } catch (IOException ex) {
                         JOptionPane.showMessageDialog(null, ex.getMessage(), "Delete Error", JOptionPane.ERROR_MESSAGE);
                     }
@@ -270,7 +271,7 @@ public class PageExplorerPanel extends JPanel {
             JList.DropLocation dl = (JList.DropLocation) info.getDropLocation();
             if (dl.getIndex() == -1) {
                 System.out.println("INDEX = -1");
-                //return false;
+                return false;
             }
             System.out.println("Can Import!");
             return true;
@@ -288,9 +289,9 @@ public class PageExplorerPanel extends JPanel {
 
             System.out.println("Creating transferable");
 
-            JList.DropLocation dl = (JList.DropLocation) info.getDropLocation();
-            //DefaultListModel listModel = (DefaultListModel) pageList.getModel();
+            JList.DropLocation dl = (JList.DropLocation) info.getDropLocation();;
             int index = dl.getIndex();
+            
             Document d = Parameters.getCoreManager().workingDocument();
             indexTo = index;
             String value2 = (String) pageList.getModel().getElementAt(dl.getIndex());
@@ -312,28 +313,6 @@ public class PageExplorerPanel extends JPanel {
             
             System.out.println("Created transferable");
 
-            String value1 = (String) pageList.getModel().getElementAt(dl.getIndex() - 1);
-
-            // Display a dialog with the drop information.
-            //String dropValue = "\"" + data + "\" dropped ";
-            /*if (dl.isInsert()) {
-                if (dl.getIndex() == 0) {
-                    displayDropLocation(dropValue + "at beginning of list");
-                } else if (dl.getIndex() >= pageList.getModel().getSize()) {
-                    displayDropLocation(dropValue + "at end of list");
-                } else {
-                    String value1 = (String) pageList.getModel().getElementAt(dl.getIndex() - 1);
-                    String value2 = (String) pageList.getModel().getElementAt(dl.getIndex());
-                    displayDropLocation(dropValue + "between \"" + value1 + "\" and \"" + value2 + "\"");
-                }
-            } else {
-                displayDropLocation(dropValue + "on top of " + "\"" + value + "\"");
-            }*/
-
-            /**  This is commented out for the basicdemo.html tutorial page.
-             **  If you add this code snippet back and delete the
-             **  "return false;" line, the list will accept drops
-             **  of type string.*/
             // Perform the actual import (rearrange List of Pages).
             if (insert) {
                 try {
