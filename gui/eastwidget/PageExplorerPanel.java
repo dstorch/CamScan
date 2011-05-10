@@ -16,23 +16,13 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import core.Document;
-import core.Mode;
 import core.Page;
 import core.Parameters;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Iterator;
-import javax.swing.DefaultListModel;
-import javax.swing.JComponent;
 import javax.swing.JOptionPane;
-import javax.swing.ListModel;
-import javax.swing.SwingUtilities;
-import javax.swing.TransferHandler;
 
 /**
  * The page tree that will appear on the
@@ -75,6 +65,7 @@ public class PageExplorerPanel extends JPanel {
     public PageExplorerPanel(MainPanel mainPanel) {
 
         this.mainPanel = mainPanel;
+        
         Parameters.setPageExplorerPanel(this);
 
         this.pageList = new JList(this.getPageNames());
@@ -211,7 +202,7 @@ public class PageExplorerPanel extends JPanel {
             if (evt.getKeyCode() == 8) {
                 int index = pageList.getSelectedIndex() + 1;
                 Document d = Parameters.getCoreManager().workingDocument();
-                int selected = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete page" + index + "?", "Delete Document", JOptionPane.OK_CANCEL_OPTION);
+                int selected = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete page " + index + "?", "Delete Document", JOptionPane.OK_CANCEL_OPTION);
                 if (selected == JOptionPane.OK_OPTION) {
 
                     try {
@@ -236,14 +227,12 @@ public class PageExplorerPanel extends JPanel {
         public void mouseClicked(java.awt.event.MouseEvent evt) {
             if (evt.getClickCount() == 2) {
                 int index = pageList.locationToIndex(evt.getPoint())+1;
-                System.out.println("INDEX:" + index);
                 String input = JOptionPane.showInputDialog(null, "Enter new Page name: ", "Rename Page", 1);
                 if(input != null){
                     try {
-                        System.out.println("INPUT: "+input);
                         Parameters.getCoreManager().renamePage(Parameters.getCoreManager().workingDocument(),index, input);
                         update();
-                        //setPageOrder(input);
+                        setPageOrder(index-1);
 
                     } catch (IOException ex) {
                         JOptionPane.showMessageDialog(null, ex.getMessage(), "Rename Error", JOptionPane.ERROR_MESSAGE);

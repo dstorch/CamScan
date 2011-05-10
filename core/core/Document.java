@@ -61,8 +61,8 @@ public class Document {
 		// set instance variables
 		setName(newName);
 		setPathName(newDir.getPath()+"/doc.xml");
-
-		// set instance variables of the contained page objects
+		
+		// move metadata files of page objects into correct directory
 		for (Page p : pages()) {
 
 			// get the name of the metafile (not the complete pathname)
@@ -101,11 +101,11 @@ public class Document {
 		File docDirectory = new File(Parameters.DOC_DIRECTORY+"/"+name());
 		if (!deleteDir(docDirectory)) throw new IOException("Problem deleting the document!");
 
-		// delete all image files in raw directory (AND PROCESSED DIRECTORY?????)
-		for (Page p : pages()) {
-			p.deleteRawFile();
-			//p.deleteProcessedFile();
-		}
+                // delete all image files in raw directory (AND PROCESSED DIRECTORY?????)
+                for (Page p : pages()) {
+                    p.deleteRawFile();
+                    p.deleteProcessedFile();
+                }
 	}
 
 	public void serialize() throws IOException {
@@ -147,6 +147,7 @@ public class Document {
 		}
 		return hits;
 	}
+
 
 	public boolean equals(Document d){
 		return (d.name().equals(this.name()));

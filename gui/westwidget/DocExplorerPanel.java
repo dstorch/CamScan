@@ -171,13 +171,12 @@ public class DocExplorerPanel extends JPanel {
                 // Get the current selection and set it as the working document.
                 String currDocName = (String) docList.getSelectedValue();
 
-                if (currDocName == null) {
-                    docList.setSelectedIndex(0);
-                    currDocName = "0";
-                }
+                if (currDocName != null) {
+                    //docList.setSelectedIndex(0);
+                    //currDocName = "0";
+                
 
                 try {
-                	System.out.println(currDocName);
                     Parameters.getCoreManager().setWorkingDocumentFromName(currDocName);
                 } catch (IOException e1) {
                     e1.printStackTrace();
@@ -190,7 +189,7 @@ public class DocExplorerPanel extends JPanel {
                 // Get the very first page and display its image on the
                 // central panel.
                 centralPanel.updatePanels(false);
-                
+                }
             }
         }
     }
@@ -209,6 +208,7 @@ public class DocExplorerPanel extends JPanel {
                         Parameters.getCoreManager().deleteDocument(docName);
                         update();
                         centralPanel.updatePanels(false);
+                        centralPanel.getEastPanel().getPageExpPanel().update();
                     } catch (IOException ex) {
                         JOptionPane.showMessageDialog(null, ex.getMessage(), "Delete Error", JOptionPane.ERROR_MESSAGE);
                     }
@@ -233,7 +233,6 @@ public class DocExplorerPanel extends JPanel {
                         Parameters.getCoreManager().renameDocument(docName, input);                       
                         update();
                         setDocOrder(input);
-
                     } catch (IOException ex) {
                         JOptionPane.showMessageDialog(null, ex.getMessage(), "Rename Error", JOptionPane.ERROR_MESSAGE);
                     }

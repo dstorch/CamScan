@@ -247,16 +247,18 @@ public class CoreManager {
 		// not get serialized)
 		if (_workingDocument != null) {
 			if (_workingDocument.equals(d)){
-				if(_allDocuments.size()>1){
-					Document first = _allDocuments.get(0);
-					setWorkingDocument(first);
-					setWorkingPageAndImage(first.pages().first());
-				}else{ // there are no Documents
-					_workingDocument = null;
-				_workingPage = null;
-				_rawImage = null;
-				}
-			}
+                            if(_allDocuments.size()>1){
+                                Document first = _allDocuments.get(0);
+                                setWorkingDocument(first);
+                                setWorkingPageAndImage(first.pages().first());
+                            }else{ // there are no Documents
+                                _workingDocument = null;
+                                _workingPage = null;
+                                _rawImage = null;
+                                _processedImage = null;
+                            }
+                        }
+
 		}
 
 		d.delete();
@@ -532,6 +534,7 @@ public class CoreManager {
      * @throws IOException 
      */
     public void setWorkingDocumentFromName(String docName) throws IOException {
+        System.out.println("Doc Name: "+docName);
         Document doc = getDocFromName(docName);
          _workingDocument = doc;
          setWorkingPageAndImage(doc.pages().first());
