@@ -273,7 +273,7 @@ public class VisionManager {
     	
     	if (merged.size() < 4){
     		return defaultCorners;
-    	}
+    	}//solve for the 4th corner when we have 3?
     	
     	ArrayList<PotentialCorners> potentialSet = new ArrayList<PotentialCorners>();
 		
