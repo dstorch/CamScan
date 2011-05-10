@@ -162,7 +162,7 @@ public class Page implements Comparable{
 	// writes the current process image to workspace/processed
 	public void writeProcessedImage() throws IOException {
 		// write out image as a TIFF file
-		VisionManager.writeTIFF(getRawImgFromDisk(), processed());
+		VisionManager.outputToFile(getRawImgFromDisk(), processed(), this.corners(), this.config());
 	}
 
 	public void setOcrResults() throws IOException {
