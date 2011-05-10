@@ -42,10 +42,9 @@ public class PotentialCorners implements Comparable {
 		this.score = this.metric2();
 	}
 	
-	//potential other hueristics
+	//potential other heuristics
 	
 	//metric 2: total area covered
-	//90 degreesizeness
 	//corner weight
 	//whether they have corners near the image corners
 	//common aspect ratios

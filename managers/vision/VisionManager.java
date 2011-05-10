@@ -271,11 +271,6 @@ public class VisionManager {
     		
     	ArrayList<MergeZone> merged = findPotentialZones(gray);
     	
-    	/*
-    	while(merged.size() > 4){
-    		merged.remove(merged.size() - 1);
-    	}*/
-    	
     	if (merged.size() < 4){
     		return defaultCorners;
     	}
@@ -597,9 +592,9 @@ public class VisionManager {
 			pp.weight = integralbuf.get(yl*width+xl) + integralbuf.get(yr*width+xr) - integralbuf.get(yl*width+xr) - integralbuf.get(yr*width+xl);
 			//pp.weight /= (yr-yl) * (xr-xl);
 			
-			if (pp.distance(new Point(0,0)) < 3 || pp.distance(new Point(width,0)) < 3 || pp.distance(new Point(0,height)) < 3 || pp.distance(new Point(width,height)) < 3){
-				pp.weight = -1e100;
-			}
+			//if (pp.distance(new Point(0,0)) < 3 || pp.distance(new Point(width,0)) < 3 || pp.distance(new Point(0,height)) < 3 || pp.distance(new Point(width,height)) < 3){
+			//	pp.weight = -1e100;
+			//}
 			
 		}
 		Collections.sort( merged );
