@@ -153,6 +153,8 @@ public class Page implements Comparable{
 		setMetafile(newMet);
                 setProcessedFile(newPro);
 
+                serialize();
+
 	}
     
     // writes the current process image to workspace/processed
