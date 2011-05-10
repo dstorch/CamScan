@@ -675,7 +675,7 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	public void toggleHorizontalFlipMode() {
 		
 		// apply the horizontal split and toggle back to standard mode
-		if (this.mode == EditPanelMode.HSPLIT || this.mode == EditPanelMode.VSPLIT) {
+		if (this.mode == EditPanelMode.HSPLIT) {
 			
 			Corners box1 = this.horizontalSplit.getFirstPageCorners();
 			Corners box2 = this.horizontalSplit.getSecondPageCorners();

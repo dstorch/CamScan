@@ -16,24 +16,13 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import core.Document;
-import core.Mode;
 import core.Page;
 import core.Parameters;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Iterator;
-import javax.swing.DefaultListModel;
-import javax.swing.DropMode;
-import javax.swing.JComponent;
 import javax.swing.JOptionPane;
-import javax.swing.ListModel;
-import javax.swing.SwingUtilities;
-import javax.swing.TransferHandler;
 
 /**
  * The page tree that will appear on the
@@ -76,6 +65,7 @@ public class PageExplorerPanel extends JPanel {
     public PageExplorerPanel(MainPanel mainPanel) {
 
         this.mainPanel = mainPanel;
+        
         Parameters.setPageExplorerPanel(this);
 
         this.pageList = new JList(this.getPageNames());
@@ -122,6 +112,19 @@ public class PageExplorerPanel extends JPanel {
         this.pageList.setSelectedIndex(order);
         this.mainPanel.updateCentralPanels(false);
     }
+    
+	
+	public void incrementIndex() {
+		int order = this.pageList.getSelectedIndex();
+		order++;
+		this.pageList.setSelectedIndex(order);
+	}
+	
+	public void decrementIndex() {
+		int order = this.pageList.getSelectedIndex();
+		order--;
+		this.pageList.setSelectedIndex(order);
+	}
 
     /****************************************
      *
