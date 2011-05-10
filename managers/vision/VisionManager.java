@@ -111,9 +111,40 @@ public class VisionManager {
 	
 	/*
 	 * Applies temperature correction to an image.
-	 * TODO: implement this! (how is this done?)
 	 */
 	private static IplImage applyTemperatureCorrection(IplImage img, ConfigurationValue temp){
+		int redshift = 0;
+		int blueshift = 0;
+		
+		int kelvin = (Integer)temp.value();
+		if (kelvin > 0){
+			redshift = -kelvin;
+			blueshift = kelvin;
+		}else{
+			redshift = kelvin;
+			blueshift = -kelvin;
+		}
+		
+		int blue;
+		int red;
+		final ByteBuffer buf = img.getByteBuffer();
+		
+		for(int x=0;x<img.width();x++){
+			for(int y=0;y<img.height();y++){
+				
+				red = (buf.get(y*img.width()*3 + x*3 + 0)&0xff) + redshift;
+				blue = (buf.get(y*img.width()*3 + x*3 + 2)&0xff) + blueshift;				
+				
+				red = (red > 255)? 255:red;
+				blue = (blue > 255)? 255:blue;
+				red = (red < 0)? 0:red;
+				blue = (blue < 0)? 0:blue;
+				
+				buf.put(y*img.width()*3+x*3 + 0, (byte)red);
+				buf.put(y*img.width()*3+x*3 + 2, (byte)blue);
+			}
+		}
+
 		return img;
 	}
 	
