@@ -183,7 +183,7 @@ public class CentralPanel extends JPanel {
 	 */
 	public void switchToViewPanel() {
 		
-		this.currentMode = Mode.EDIT;
+		this.currentMode = Mode.VIEW;
 
 		CoreManager cm = Parameters.getCoreManager();
 		cm.updateProcessedImage();

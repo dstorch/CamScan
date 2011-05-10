@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.Vector;
 
@@ -100,6 +102,7 @@ public class SearchResultsPanel extends JPanel implements ActionListener {
 		this.upperList = new JList();
 		this.upperList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		this.upperList.getSelectionModel().addListSelectionListener(new UpperListSelectionListener());
+		//this.upperList.addMouseListener(new MouseMotion());
 		this.upperList.setLayoutOrientation(JList.VERTICAL);
 		
 		// Add the scroll pane with he list to the upper panel
@@ -250,6 +253,55 @@ public class SearchResultsPanel extends JPanel implements ActionListener {
 	 * Private Classes
 	 * 
 	 ****************************************/
+	
+//	private class MouseMotion implements MouseListener {
+//
+//        public void mouseClicked(java.awt.event.MouseEvent evt) {
+//            if (evt.getClickCount() == 2) {
+//                int index = upperList.locationToIndex(evt.getPoint());
+//                if (index == -1) {
+//        			JOptionPane.showMessageDialog(null,
+//        				    "Please select a valid result to go to the appropriate page.",
+//        				    "No Result Selected",
+//        				    JOptionPane.WARNING_MESSAGE);
+//        			return;
+//        		}
+//        		
+//        		// Serialize the previous working page
+//            	if (Parameters.getCoreManager().getWorkingPage() != null) {
+//            		try {
+//        				Parameters.getCoreManager().getWorkingPage().serialize();
+//        			} catch (IOException e1) {
+//        				e1.printStackTrace();
+//        			}
+//            	}
+//            	
+//            	// Update the page panel to show the selected page
+//            	// selected.
+//            	centralPanel.setPageOrderInPageExpPanel(index);
+//            	centralPanel.setSelectedDocInDocExpPanel(Parameters.getCoreManager().workingDocument().name());
+//
+//            	Page currPage = Parameters.getCoreManager().getWorkingDocPageFromName(index + 1);
+//
+//            	try {
+//            		Parameters.getCoreManager().setWorkingPageAndImage(currPage);
+//            	} catch (IOException e1) {
+//            		e1.printStackTrace();
+//            	}
+//
+//            	centralPanel.switchToViewPanel();
+//            	centralPanel.updatePanels(false);
+//            }
+//        }
+//
+//        public void mousePressed(java.awt.event.MouseEvent evt) {}
+//
+//        public void mouseReleased(java.awt.event.MouseEvent evt) {}
+//
+//        public void mouseEntered(MouseEvent me) {}
+//
+//        public void mouseExited(MouseEvent me) {}
+//    }
 
 	/**
 	 * The ActionListener class for selecting items

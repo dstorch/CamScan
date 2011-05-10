@@ -117,8 +117,10 @@ public class ViewPanel extends JPanel {
 			if (this.img != null) {
 				int newW = (int) (this.img.getWidth(this) * this.scaleFactor);
 				int newH = (int) (this.img.getHeight(this) * this.scaleFactor);
-				//this.imageLabel.setLocation((this.getWidth() - newW)/2, (this.getHeight() - newH)/2);
-				this.imageLabel.setLocation(0, 0);
+
+				this.imageLabel.setVerticalAlignment(JLabel.CENTER);
+				this.imageLabel.setHorizontalAlignment(JLabel.CENTER);
+
 				this.imageLabel.setBounds((this.getWidth() - newW)/2, (this.getHeight() - newH)/2, newW, newH);
 				this.imageLabel.setIcon(this.getScaledImageIcon());
 			}
