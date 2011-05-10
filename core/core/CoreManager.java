@@ -592,6 +592,17 @@ public class CoreManager {
 			}
     	}
     }
+    
+    /*
+     * Given a temperature (centered around 0, e.g. -50 to 50), adjust the image.
+     */
+    public void changeTemperature(int temperature){
+    	try {
+			Parameters.getCoreManager().getWorkingPage().config().setKey(new ConfigurationValue(ConfigurationValue.ValueType.ColorTemperature, temperature));
+		} catch (InvalidTypingException e) {
+			System.out.println("ConfigurationValue threw an InvalidTypingException! Won't be able to change the temperature.");
+		}
+    }
 
     public void boostConstrast(boolean boost) {
     	ConfigurationValue configVal = this.getWorkingPage().config().getKey(ConfigurationValue.ValueType.ContrastBoost);
