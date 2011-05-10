@@ -513,6 +513,13 @@ public class CoreManager {
 
     // write a directory of image files
     public void exportImages(Document document, String outdirectory) throws IOException {
+    	
+    	for (Page page : document.pages()) {
+    		//TODO
+    		_processedImage = VisionManager.rerenderImage(getRawImage(), page.corners(), page.config());
+    		page.writeProcessedImage();
+    	}
+    	
         _exporter.exportImages(document, outdirectory);
     }
 

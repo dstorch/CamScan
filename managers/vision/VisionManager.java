@@ -305,7 +305,7 @@ public class VisionManager {
 		//around
 		double d2 = Math.abs(Math.min(a1,a2)) + Math.abs(Math.PI*2 - Math.max(a1,a2));
 		
-		return Math.min(d1,d2);
+		return d1;//Math.min(d1,d2);
 	}
 	
 	private static Corners pointsToCorners(List<MergeZone> merged){
@@ -321,6 +321,7 @@ public class VisionManager {
 		for(MergeZone pp: merged){
 			pp.weight = -angular_distance(Math.atan2( pp.point.y-my, pp.point.x-mx ), Math.PI);
 		}
+		
 		Collections.sort(merged);
 		
 		int i=0;
@@ -328,7 +329,7 @@ public class VisionManager {
 			System.out.println((++i) + ": " + pp.weight);
 		}
 		
-		return new Corners(merged.get(0).point, merged.get(1).point, merged.get(3).point, merged.get(2).point);
+		return new Corners(merged.get(3).point, merged.get(2).point, merged.get(0).point, merged.get(1).point);
 	}
 	
 	
