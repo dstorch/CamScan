@@ -92,36 +92,39 @@ public class ViewPanel extends JPanel {
 	 */
 	@Override
 	public void paintComponent(Graphics g) {
-                super.paintComponent(g);
+		super.paintComponent(g);
+
 		if (Parameters.getCoreManager().getWorkingPage()!= null){
-		// When the page has changed, set the new img instance variable
-		// and modify the scale factor.
-		if (this.img != Parameters.getCoreManager().getProcessedImage() && Parameters.getCoreManager().getProcessedImage() != null) {
+			// When the page has changed, set the new img instance variable
+			// and modify the scale factor.
+			if (this.img != Parameters.getCoreManager().getProcessedImage() && Parameters.getCoreManager().getProcessedImage() != null) {
 
-			this.img = Parameters.getCoreManager().getProcessedImage();
-			
+				this.img = Parameters.getCoreManager().getProcessedImage();
 
-			double xSideRatio = ((double) this.getWidth())/((double) this.imageLabel.getWidth());
-			double ySideRatio = ((double) this.getHeight())/((double) this.imageLabel.getHeight());
 
-			if (ySideRatio > xSideRatio)
-				this.scaleFactor = xSideRatio;
-			else
-				this.scaleFactor = ySideRatio;
+				double xSideRatio = ((double) this.getWidth())/((double) this.imageLabel.getWidth());
+				double ySideRatio = ((double) this.getHeight())/((double) this.imageLabel.getHeight());
 
-			this.scaleFactor *= 0.95;
+				if (ySideRatio > xSideRatio)
+					this.scaleFactor = xSideRatio;
+				else
+					this.scaleFactor = ySideRatio;
+
+				this.scaleFactor *= 0.95;
+			}
+
+			// Scale and draw the image.
+			if (this.img != null) {
+				int newW = (int) (this.img.getWidth(this) * this.scaleFactor);
+				int newH = (int) (this.img.getHeight(this) * this.scaleFactor);
+				//this.imageLabel.setLocation((this.getWidth() - newW)/2, (this.getHeight() - newH)/2);
+				this.imageLabel.setLocation(0, 0);
+				this.imageLabel.setBounds((this.getWidth() - newW)/2, (this.getHeight() - newH)/2, newW, newH);
+				this.imageLabel.setIcon(this.getScaledImageIcon());
+			}
+		} else {
+			this.imageLabel.setIcon(null);
 		}
-		
-		// Scale and draw the image.
-		if (this.img != null) {
-			int newW = (int) (this.img.getWidth(this) * this.scaleFactor);
-			int newH = (int) (this.img.getHeight(this) * this.scaleFactor);
-			//this.imageLabel.setLocation((this.getWidth() - newW)/2, (this.getHeight() - newH)/2);
-			this.imageLabel.setLocation(0, 0);
-			this.imageLabel.setBounds((this.getWidth() - newW)/2, (this.getHeight() - newH)/2, newW, newH);
-			this.imageLabel.setIcon(this.getScaledImageIcon());
-		}
-            }
 	}
 
 	/**

@@ -261,7 +261,7 @@ public class CoreManager {
                         }
 
 		}
-
+		
 		d.delete();
 		_allDocuments.remove(d);
 		d = null;

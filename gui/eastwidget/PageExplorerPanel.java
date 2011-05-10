@@ -215,7 +215,8 @@ public class PageExplorerPanel extends JPanel {
                     try {
                         Parameters.getCoreManager().deletePage(d, index);
                         update();
-                        // Parameters.getFrame().getContentPane().centralPanel.updatePanels(false);
+                        mainPanel.updateCentralPanels(false);
+                        Parameters.getDocExpPanel().update();
                     } catch (IOException ex) {
                         JOptionPane.showMessageDialog(null, ex.getMessage(), "Delete Error", JOptionPane.ERROR_MESSAGE);
                     }
