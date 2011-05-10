@@ -273,7 +273,7 @@ public class SplitMode extends EditPanel {
 	 */
 	private void updateCorners(Corners c1, Corners c2) {
 		// 1. top left
-		Point p = new Point((int) (this.box1.downleft().x+this.transUL1.dx-transImage.dx),
+		Point p = new Point((int) (this.box1.upleft().x+this.transUL1.dx-transImage.dx),
 				(int) (this.box1.upleft().y+this.transUL1.dy-transImage.dy));
 		c1.setUpLeft(p);
 		
@@ -294,7 +294,7 @@ public class SplitMode extends EditPanel {
 		
 		
 		// 1. top left
-		p = new Point((int) (this.box2.downleft().x+this.transUL2.dx-transImage.dx),
+		p = new Point((int) (this.box2.upleft().x+this.transUL2.dx-transImage.dx),
 				(int) (this.box2.upleft().y+this.transUL2.dy-transImage.dy));
 		c2.setUpLeft(p);
 		
