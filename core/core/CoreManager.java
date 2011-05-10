@@ -215,6 +215,11 @@ public class CoreManager {
 	// returns null if there isn't a document with name
 	private Document getDocFromName(String docName){
 		
+		String[] fields = docName.split("/");
+		if (fields.length > 1) {
+			
+		}
+		
 		Document doc = null;
 		for (Document d : _allDocuments) {
 			
@@ -468,7 +473,7 @@ public class CoreManager {
         Document newDoc = new Document(noExt, pathname);
 
         File targetLocation = new File(Parameters.RAW_DIRECTORY + "/" + sourceLocation.getName());
-        importPages(sourceLocation, targetLocation, newDoc, 0);
+        importPages(sourceLocation, targetLocation, newDoc, 1);
 
         // add the document to the global list of documents
         _allDocuments.add(newDoc);
