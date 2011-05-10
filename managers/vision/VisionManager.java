@@ -274,10 +274,11 @@ public class VisionManager {
     	/*
     	while(merged.size() > 4){
     		merged.remove(merged.size() - 1);
-    	}
+    	}*/
+    	
     	if (merged.size() < 4){
     		return defaultCorners;
-    	}*/
+    	}
     	
     	ArrayList<PotentialCorners> potentialSet = new ArrayList<PotentialCorners>();
 		
