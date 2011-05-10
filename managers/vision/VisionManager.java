@@ -281,7 +281,19 @@ public class VisionManager {
     		return defaultCorners;
     	}
 		
-		return pointsToCorners(merged);
+		Corners mini_corners = pointsToCorners(merged);
+		
+		double xscale = image.width() / mini.width();
+		double yscale = image.height() / mini.height();
+		
+		Corners corners = new Corners( 
+				new Point((int) (mini_corners.upleft().x*xscale), (int) (mini_corners.upleft().y*yscale)),
+				new Point((int) (mini_corners.upright().x*xscale), (int) (mini_corners.upright().y*yscale)),
+				new Point((int) (mini_corners.downleft().x*xscale), (int) (mini_corners.downleft().y*yscale)),
+				new Point((int) (mini_corners.downright().x*xscale), (int) (mini_corners.downright().y*yscale))
+		);
+		
+		return corners;
 	}
 	
 	private static double angular_distance(double a1, double a2){
@@ -671,7 +683,7 @@ public class VisionManager {
 		}
 		
 		System.out.println("Vision library stub launcher");
-		IplImage image = cvLoadImage("tests/images/DSC_7381.JPG");
+		IplImage image = cvLoadImage("tests/images/DSC_7384.JPG");
 		System.out.println("Loaded");
         if (image != null) {
         	

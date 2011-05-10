@@ -172,6 +172,10 @@ public class CoreManager {
 	}
 
 	public void setWorkingPageAndImage(Page page) throws IOException {
+		if (_workingPage == page){
+			return;
+		}
+		
 		_workingPage = page;
 		_rawImage = page.getRawImgFromDisk();
 

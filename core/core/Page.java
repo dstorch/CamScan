@@ -109,6 +109,7 @@ public class Page implements Comparable{
 	}
 
 	public BufferedImage getRawImgFromDisk() throws IOException {
+		System.out.println("Getting raw image from disk");
 		//return ImageIO.read(new File(raw()));
 		return VisionManager.loadImage(raw());
 	}
