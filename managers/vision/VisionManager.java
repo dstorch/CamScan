@@ -259,7 +259,7 @@ public class VisionManager {
 	 */
 	public static Corners findCorners(BufferedImage img){
 		Corners defaultCorners = new Corners(new Point(0,0), new Point(img.getWidth(),0), new Point(0,img.getHeight()), new Point(img.getWidth(),img.getHeight()));
-		if (false/*!OPENCV_ENABLED*/){return defaultCorners;}
+		if (!OPENCV_ENABLED){return defaultCorners;}
 		
 		IplImage image = BufferedImageToIplImage(img);
 		
