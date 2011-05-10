@@ -275,31 +275,39 @@ public class VisionManager {
     		return defaultCorners;
     	}//solve for the 4th corner when we have 3?
     	
-    	ArrayList<PotentialCorners> potentialSet = new ArrayList<PotentialCorners>();
-		
-		for(int c1=0;c1<merged.size();c1++){
-			for(int c2=c1+1;c2<merged.size();c2++){
-				for(int c3=c2+1;c3<merged.size();c3++){
-					for(int c4=c3+1;c4<merged.size();c4++){
-						ArrayList<MergeZone> ccs = new ArrayList<MergeZone>();
-						ccs.add(merged.get(c1));
-						ccs.add(merged.get(c2));
-						ccs.add(merged.get(c3));
-						ccs.add(merged.get(c4));
-						
-						PotentialCorners pc = new PotentialCorners();
-						pc.corners = pointsToCorners(ccs);
-						pc.metrics();
-						
-						potentialSet.add(pc);
-        			}
-    			}
+    	Corners mini_corners;
+    	
+    	if (merged.size() > 20){
+    		while(merged.size() > 4){
+    			merged.remove( merged.size()-1 );
+    		}
+    		mini_corners = pointsToCorners(merged);
+    	}else{
+	    	ArrayList<PotentialCorners> potentialSet = new ArrayList<PotentialCorners>();
+			
+			for(int c1=0;c1<merged.size();c1++){
+				for(int c2=c1+1;c2<merged.size();c2++){
+					for(int c3=c2+1;c3<merged.size();c3++){
+						for(int c4=c3+1;c4<merged.size();c4++){
+							ArrayList<MergeZone> ccs = new ArrayList<MergeZone>();
+							ccs.add(merged.get(c1));
+							ccs.add(merged.get(c2));
+							ccs.add(merged.get(c3));
+							ccs.add(merged.get(c4));
+							
+							PotentialCorners pc = new PotentialCorners();
+							pc.corners = pointsToCorners(ccs);
+							pc.metrics();
+							
+							potentialSet.add(pc);
+	        			}
+	    			}
+				}
 			}
-		}
-		Collections.sort(potentialSet);
-		
-		//Corners mini_corners = pointsToCorners(merged);
-		Corners mini_corners = potentialSet.get(0).corners;
+			Collections.sort(potentialSet);
+			
+			mini_corners = potentialSet.get(0).corners;
+    	}
 		
 		double xscale = image.width() / mini.width();
 		double yscale = image.height() / mini.height();
@@ -592,9 +600,9 @@ public class VisionManager {
 			pp.weight = integralbuf.get(yl*width+xl) + integralbuf.get(yr*width+xr) - integralbuf.get(yl*width+xr) - integralbuf.get(yr*width+xl);
 			//pp.weight /= (yr-yl) * (xr-xl);
 			
-			//if (pp.distance(new Point(0,0)) < 3 || pp.distance(new Point(width,0)) < 3 || pp.distance(new Point(0,height)) < 3 || pp.distance(new Point(width,height)) < 3){
-			//	pp.weight = -1e100;
-			//}
+			if (pp.distance(new Point(0,0)) < 3 || pp.distance(new Point(width,0)) < 3 || pp.distance(new Point(0,height)) < 3 || pp.distance(new Point(width,height)) < 3){
+				pp.weight = -1e100;
+			}
 			
 		}
 		Collections.sort( merged );
