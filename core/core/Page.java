@@ -167,7 +167,7 @@ public class Page implements Comparable{
 
 	public void setOcrResults() throws IOException {
 		String[] fields = metafile().split("/");
-		PageText text = ocrManager.getPageText(_raw, fields[fields.length-1]);
+		PageText text = ocrManager.getPageText(_processed, fields[fields.length-1]);
 		synchronized (this) {
 			_text = text;
 			serialize();
