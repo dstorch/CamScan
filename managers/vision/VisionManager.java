@@ -111,9 +111,40 @@ public class VisionManager {
 	
 	/*
 	 * Applies temperature correction to an image.
-	 * TODO: implement this! (how is this done?)
 	 */
 	private static IplImage applyTemperatureCorrection(IplImage img, ConfigurationValue temp){
+		int redshift = 0;
+		int blueshift = 0;
+		
+		int kelvin = (Integer)temp.value();
+		if (kelvin > 0){
+			redshift = -kelvin;
+			blueshift = kelvin;
+		}else{
+			redshift = kelvin;
+			blueshift = -kelvin;
+		}
+		
+		int blue;
+		int red;
+		final ByteBuffer buf = img.getByteBuffer();
+		
+		for(int x=0;x<img.width();x++){
+			for(int y=0;y<img.height();y++){
+				
+				red = (buf.get(y*img.width()*3 + x*3 + 0)&0xff) + redshift;
+				blue = (buf.get(y*img.width()*3 + x*3 + 2)&0xff) + blueshift;				
+				
+				red = (red > 255)? 255:red;
+				blue = (blue > 255)? 255:blue;
+				red = (red < 0)? 0:red;
+				blue = (blue < 0)? 0:blue;
+				
+				buf.put(y*img.width()*3+x*3 + 0, (byte)red);
+				buf.put(y*img.width()*3+x*3 + 2, (byte)blue);
+			}
+		}
+
 		return img;
 	}
 	
@@ -160,7 +191,7 @@ public class VisionManager {
 		
 		cvCvtColor(hsl, img, CV_HLS2RGB);
 		
-		//alternate algorithm balancing each channel seperately. leads to weird chroma artifacts.
+		//alternate algorithm balancing each channel separately. leads to weird chroma artifacts.
 		/*IplImage ch1 = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
 		IplImage ch2 = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
 		IplImage ch3 = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
@@ -227,7 +258,8 @@ public class VisionManager {
 	 * Return the best estimate of the four corners of a piece of paper in the image.
 	 */
 	public static Corners findCorners(BufferedImage img){
-		if (true/*!OPENCV_ENABLED*/){return new Corners(new Point(0,0), new Point(img.getWidth(),0), new Point(0,img.getHeight()), new Point(img.getWidth(),img.getHeight()));}
+		Corners defaultCorners = new Corners(new Point(0,0), new Point(img.getWidth(),0), new Point(0,img.getHeight()), new Point(img.getWidth(),img.getHeight()));
+		if (true/*!OPENCV_ENABLED*/){return defaultCorners;}
 		
 		IplImage image = BufferedImageToIplImage(img);
 		
@@ -246,6 +278,7 @@ public class VisionManager {
     	if (merged.size() < 4){
     		//handle this!
     		//oh god!
+    		return defaultCorners;
     	}
 		
 		return pointsToCorners(merged);

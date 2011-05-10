@@ -76,6 +76,7 @@ public class PageExplorerPanel extends JPanel {
 
         this.mainPanel = mainPanel;
         Parameters.setPageExplorerPanel(this);
+
         this.pageList = new JList(this.getPageNames());
 
         this.pageList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
