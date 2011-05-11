@@ -145,6 +145,10 @@ public class CentralPanel extends JPanel {
 	public EditPanel getEditPanel() {
 		return this.editPanel;
 	}
+
+        public EastPanel getEastPanel(){
+            return this.eastPanel;
+        }
 	
 	/****************************************
 	 * 
@@ -180,12 +184,10 @@ public class CentralPanel extends JPanel {
 	 */
 	public void switchToViewPanel() {
 		
-		this.currentMode = Mode.EDIT;
+		this.currentMode = Mode.VIEW;
 
 		CoreManager cm = Parameters.getCoreManager();
 		cm.updateProcessedImage();
-		Page workingPage = cm.getWorkingPage();
-		cm.launchOcrThread(workingPage);
 		
 		this.toolbarPanel.selectViewRButton();
 		

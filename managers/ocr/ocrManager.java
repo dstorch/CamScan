@@ -8,14 +8,14 @@ import core.Position;
 public class ocrManager {
 
 	// absolute path to the tesseract executable
-	public static String TESS_PATH = "C:\\Program Files (x86)\\Tesseract-OCR\\tesseract.exe";
+	public static String TESS_PATH = "C:" + File.separator + "Program Files (x86)" + File.separator + "Tesseract-OCR" + File.separator + "tesseract.exe";
 
 	// path to the python script for processing the tesseract output
-	private final static String EXTRACTBB_PATH = "managers/ocr/extractbb.py";
+	private final static String EXTRACTBB_PATH = "managers" + File.separator + "ocr" + File.separator + "extractbb.py";
 	
 	// pathnames used for tesseract temp file and config file
-	private final static String CONFIG_FILE = "libraries/tesseract/config.txt";
-	private final static String OUT_PATH = "workspace/temp";
+	private final static String CONFIG_FILE = "libraries" + File.separator + "tesseract" + File.separator + "config.txt";
+	private final static String OUT_PATH = "workspace" + File.separator + "temp";
 	
 	
 	/**
@@ -28,18 +28,19 @@ public class ocrManager {
 	public static PageText getPageText(String imageFile, String outname) throws IOException{
 		
 		// delete the outfile if it exists
-		File outFile = new File(OUT_PATH+"/"+outname+".html");
+		File outFile = new File(OUT_PATH+File.separator+outname+".html");
 		if (outFile.exists()) outFile.delete();
 		
 		// run tesseract
-		String arguments = TESS_PATH+" "+imageFile+" "+OUT_PATH+"/"+outname+" " + CONFIG_FILE;
+		String arguments = TESS_PATH+" "+imageFile+" "+OUT_PATH+File.separator+outname+" " + CONFIG_FILE;
+		System.out.println(arguments);
 		Runtime.getRuntime().exec(arguments);
 		
 		// block until the file is created
 		while (!outFile.canRead()) {}
 
 		// now run python script for extracting data
-		String command = "python "+EXTRACTBB_PATH+" "+OUT_PATH+"/"+outname+".html";
+		String command = "python "+EXTRACTBB_PATH+" "+OUT_PATH+File.separator+outname+".html";
 		Process process = Runtime.getRuntime().exec(command);
 		
 		// use a reader to read text from the standard output stream of the processs

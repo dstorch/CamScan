@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.awt.Graphics;
 import java.awt.Point;
 import core.Corners;
+import core.SystemConfiguration;
+
 import javax.imageio.ImageIO;
 
 import com.googlecode.javacv.cpp.opencv_core.CvMat;
@@ -23,8 +25,6 @@ import static com.googlecode.javacv.cpp.opencv_calib3d.*;
 
 
 public class VisionManager {
-	
-	private static final boolean OPENCV_ENABLED = false;
 	
 	/*
 	 * Estimate good values for the configuration dictionary for a raw image.
@@ -90,7 +90,7 @@ public class VisionManager {
 	 * The result will be a flat, pretty page.
 	 */
 	public static BufferedImage rerenderImage(BufferedImage img, Corners corners, ConfigurationDictionary config){
-		if (!OPENCV_ENABLED){return img;}
+		if (!SystemConfiguration.OPENCV_ENABLED){return img;}
 		
 		IplImage image = BufferedImageToIplImage(img);
 		image = _imageGlobalTransforms(image, config);
@@ -250,7 +250,7 @@ public class VisionManager {
 	 * calling rerenderImage (as rerender does it interally.)
 	 */
 	public static BufferedImage imageGlobalTransforms(BufferedImage img, ConfigurationDictionary config){
-		if (!OPENCV_ENABLED){return img;}
+		if (!SystemConfiguration.OPENCV_ENABLED){return img;}
 		return IplImageToBufferedImage( _imageGlobalTransforms(BufferedImageToIplImage(img), config) );
 	}
 	
@@ -259,7 +259,7 @@ public class VisionManager {
 	 */
 	public static Corners findCorners(BufferedImage img){
 		Corners defaultCorners = new Corners(new Point(0,0), new Point(img.getWidth(),0), new Point(0,img.getHeight()), new Point(img.getWidth(),img.getHeight()));
-		if (true/*!OPENCV_ENABLED*/){return defaultCorners;}
+		if (!SystemConfiguration.OPENCV_ENABLED){return defaultCorners;}
 		
 		IplImage image = BufferedImageToIplImage(img);
 		
@@ -270,30 +270,60 @@ public class VisionManager {
     	IplImage gray_original = cvCloneImage(gray);
     		
     	ArrayList<MergeZone> merged = findPotentialZones(gray);
-    		
-    	while(merged.size() > 4){
-    		merged.remove(merged.size() - 1);
-    	}
     	
     	if (merged.size() < 4){
-    		//handle this!
-    		//oh god!
     		return defaultCorners;
+    	}//solve for the 4th corner when we have 3?
+    	
+    	Corners mini_corners;
+    	
+    	if (merged.size() > 20){
+    		while(merged.size() > 4){
+    			merged.remove( merged.size()-1 );
+    		}
+    		mini_corners = pointsToCorners(merged);
+    	}else{
+	    	ArrayList<PotentialCorners> potentialSet = new ArrayList<PotentialCorners>();
+			
+			for(int c1=0;c1<merged.size();c1++){
+				for(int c2=c1+1;c2<merged.size();c2++){
+					for(int c3=c2+1;c3<merged.size();c3++){
+						for(int c4=c3+1;c4<merged.size();c4++){
+							ArrayList<MergeZone> ccs = new ArrayList<MergeZone>();
+							ccs.add(merged.get(c1));
+							ccs.add(merged.get(c2));
+							ccs.add(merged.get(c3));
+							ccs.add(merged.get(c4));
+							
+							PotentialCorners pc = new PotentialCorners();
+							pc.corners = pointsToCorners(ccs);
+							pc.metrics();
+							
+							potentialSet.add(pc);
+	        			}
+	    			}
+				}
+			}
+			Collections.sort(potentialSet);
+			
+			mini_corners = potentialSet.get(0).corners;
     	}
 		
-		return pointsToCorners(merged);
+		double xscale = image.width() / mini.width();
+		double yscale = image.height() / mini.height();
+		
+		Corners corners = new Corners( 
+				new Point((int) (mini_corners.upleft().x*xscale), (int) (mini_corners.upleft().y*yscale)),
+				new Point((int) (mini_corners.upright().x*xscale), (int) (mini_corners.upright().y*yscale)),
+				new Point((int) (mini_corners.downleft().x*xscale), (int) (mini_corners.downleft().y*yscale)),
+				new Point((int) (mini_corners.downright().x*xscale), (int) (mini_corners.downright().y*yscale))
+		);
+		
+		return corners;
 	}
 	
 	private static double angular_distance(double a1, double a2){
-		a1 += Math.PI;
-		a2 += Math.PI;
-		
-		//inside
-		double d1 = Math.abs(a2-a1);
-		//around
-		double d2 = Math.abs(Math.min(a1,a2)) + Math.abs(Math.PI*2 - Math.max(a1,a2));
-		
-		return Math.min(d1,d2);
+		return Math.abs((a2+Math.PI)-(a1+Math.PI));
 	}
 	
 	private static Corners pointsToCorners(List<MergeZone> merged){
@@ -309,19 +339,20 @@ public class VisionManager {
 		for(MergeZone pp: merged){
 			pp.weight = -angular_distance(Math.atan2( pp.point.y-my, pp.point.x-mx ), Math.PI);
 		}
+		
 		Collections.sort(merged);
 		
-		int i=0;
+		/*int i=0;
 		for(MergeZone pp: merged){
 			System.out.println((++i) + ": " + pp.weight);
-		}
+		}*/
 		
-		return new Corners(merged.get(0).point, merged.get(1).point, merged.get(3).point, merged.get(2).point);
+		return new Corners(merged.get(3).point, merged.get(2).point, merged.get(0).point, merged.get(1).point);
 	}
 	
 	
 	private static void writeImageToFile(BufferedImage img, String path) throws IOException{
-		if (!OPENCV_ENABLED){
+		if (!SystemConfiguration.OPENCV_ENABLED){
 			File output = new File(path);
 			ImageIO.write(img, "png", output);
 		}else{
@@ -333,7 +364,7 @@ public class VisionManager {
 	 * Write an image out to a path as a TIFF
 	 */
 	public static void writeTIFF(BufferedImage img, String path) throws IOException{
-		if (!OPENCV_ENABLED){
+		if (!SystemConfiguration.OPENCV_ENABLED){
 			File output = new File(path);
 			ImageIO.write(img, "tiff", output);
 		}else{
@@ -359,15 +390,15 @@ public class VisionManager {
 	 * http://code.google.com/p/javacv/issues/detail?id=2
 	 */
 	private static IplImage BufferedImageToIplImage(BufferedImage image){
-		BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_3BYTE_BGR);
-		Graphics g = bufferedImage.getGraphics();
-		g.drawImage(image, 0, 0, null);
-		g.dispose();
-		return IplImage.createFrom(bufferedImage);
+		//BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_3BYTE_BGR);
+		//Graphics g = bufferedImage.getGraphics();
+		//g.drawImage(image, 0, 0, null);
+		//g.dispose();
+		return IplImage.createFrom(image);
 	}
 	
 	public static BufferedImage loadImage(String path) throws IOException{
-		if (!OPENCV_ENABLED){
+		if (!SystemConfiguration.OPENCV_ENABLED){
 			File input = new File(path);
 			return ImageIO.read(input);
 		}else{
@@ -577,6 +608,8 @@ public class VisionManager {
 		Collections.sort( merged );
 		
 		//debugging
+		//TODO: remove
+		
 		warpage = linearScaledImage(warpage);
 		for(MergeZone pp: merged){
 			Point p = pp.point;
@@ -665,13 +698,13 @@ public class VisionManager {
 	@SuppressWarnings("unused")
 	public static void main(String[] args) throws IOException{
 		
-		if (!OPENCV_ENABLED){
+		if (!SystemConfiguration.OPENCV_ENABLED){
 			System.out.println("OpenCV disabled!");
 			System.exit(1);
 		}
 		
 		System.out.println("Vision library stub launcher");
-		IplImage image = cvLoadImage("tests/images/DSC_7381.JPG");
+		IplImage image = cvLoadImage("tests/images/IMG_1534.tif");
 		System.out.println("Loaded");
         if (image != null) {
         	
@@ -697,9 +730,45 @@ public class VisionManager {
         		
         		ArrayList<MergeZone> merged = findPotentialZones(gray);
         		
-        		while(merged.size() > 4){
-        			merged.remove(merged.size() - 1);
+        		ArrayList<PotentialCorners> potentialSet = new ArrayList<PotentialCorners>();
+        		
+        		for(int c1=0;c1<merged.size();c1++){
+        			for(int c2=c1+1;c2<merged.size();c2++){
+        				for(int c3=c2+1;c3<merged.size();c3++){
+        					for(int c4=c3+1;c4<merged.size();c4++){
+                				//System.out.println(c1 + " " + c2 + " " + c3 + " " + c4);
+        						
+        						ArrayList<MergeZone> ccs = new ArrayList<MergeZone>();
+        						ccs.add(merged.get(c1));
+        						ccs.add(merged.get(c2));
+        						ccs.add(merged.get(c3));
+        						ccs.add(merged.get(c4));
+        						
+        						PotentialCorners pc = new PotentialCorners();
+        						pc.corners = pointsToCorners(ccs);
+        						pc.metrics();
+        						
+        						potentialSet.add(pc);
+                			}
+            			}
+        			}
         		}
+        		Collections.sort(potentialSet);
+        		for(PotentialCorners c: potentialSet){
+        			System.out.println(c);
+        		}
+        		
+        		
+        		
+        		//while(merged.size() > 4){
+        		//	merged.remove(merged.size() - 1);
+        		//}
+        		Corners best = potentialSet.get(0).corners;
+        		merged = new ArrayList<MergeZone>();
+        		merged.add(new MergeZone( best.upleft() ));
+        		merged.add(new MergeZone( best.upright() ));
+        		merged.add(new MergeZone( best.downleft() ));
+        		merged.add(new MergeZone( best.downright() ));
         		
         		for(MergeZone pp: merged){
         			Point p = pp.point;

@@ -122,6 +122,7 @@ public class Page implements Comparable{
 	}
 
 	public BufferedImage getRawImgFromDisk() throws IOException {
+		System.out.println("Getting raw image from disk");
 		//return ImageIO.read(new File(raw()));
 		System.out.println("making raw image from disk");
 		return VisionManager.loadImage(raw());
@@ -151,36 +152,37 @@ public class Page implements Comparable{
 
 		// change the name of the metadata and processed files
 		String newMet = metafile().substring(0, (metafile().length()-(name().length()+4)))+newName+".xml";
-		String newPro = Parameters.PROCESSED_DIRECTORY+"/"+newName+".tiff";
+		String newPro = Parameters.PROCESSED_DIRECTORY+File.separator+newName+".tiff";
 
 		System.out.println("New Metafile " + newMet);
 		System.out.println("New Profile " + newPro);
 
 		File oldMeta = new File(metafile());
 		File newMeta = new File(newMet);
-		File oldProcessed = new File(processed());
-		File newProcessed = new File(newPro);
-		if (!oldMeta.renameTo(newMeta)) throw new IOException("Could not rename document!");
-		if (!oldProcessed.renameTo(newProcessed)) throw new IOException("Could not rename document!");
+
+                File oldProcessed = new File(processed());
+                File newProcessed = new File(newPro);
+		if (!oldMeta.renameTo(newMeta)) throw new IOException("Could not rename Page (metadata file)!");
+                if (!oldProcessed.renameTo(newProcessed)) throw new IOException("Could not rename Page (processed file)!");
 
 		// reset instance variables
 		setName(newName);
 		setMetafile(newMet);
 		setProcessedFile(newPro);
 		
-		serialize();
-
+                serialize();
+                _parentDoc.serialize();
 	}
 
 	// writes the current process image to workspace/processed
 	public void writeProcessedImage() throws IOException {
 		// write out image as a TIFF file
-		VisionManager.writeTIFF(getRawImgFromDisk(), processed());
+		VisionManager.outputToFile(getRawImgFromDisk(), processed(), this.corners(), this.config());
 	}
 
 	public void setOcrResults() throws IOException {
-		String[] fields = metafile().split("/");
-		PageText text = ocrManager.getPageText(_raw, fields[fields.length-1]);
+		String[] fields = metafile().split("\\\\");
+		PageText text = ocrManager.getPageText(_processed, fields[fields.length-1]);
 		synchronized (this) {
 			_text = text;
 			serialize();

@@ -27,8 +27,8 @@ public class ExportManager implements Exporter {
 		    try {
 		    	
 		    	// determine the name of the output file
-		    	String[] pathpieces = p.processed().split("/");
-		    	String outfile = outdirectory+"/"+pathpieces[pathpieces.length - 1];
+		    	String[] pathpieces = p.processed().split("\\\\");
+		    	String outfile = outdirectory+File.separator+pathpieces[pathpieces.length - 1];
 		    	
 			    OutputStream out = new FileOutputStream(outfile);
 			    try {

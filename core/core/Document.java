@@ -48,7 +48,7 @@ public class Document {
 	public void rename(String newName) throws IOException {
 
 		// change the name of the directory on disk
-		String newPath = Parameters.DOC_DIRECTORY+"/"+newName;
+		String newPath = Parameters.DOC_DIRECTORY+File.separator+newName;
 		String oldPath = pathname().substring(0, pathname().length()-8);
 
 
@@ -60,18 +60,18 @@ public class Document {
 
 		// set instance variables
 		setName(newName);
-		setPathName(newDir.getPath()+"/doc.xml");
+		setPathName(newDir.getPath()+File.separator+"doc.xml");
 
-		// set instance variables of the contained page objects
+		// move metadata files of page objects into correct directory
 		for (Page p : pages()) {
 
 			// get the name of the metafile (not the complete pathname)
 			String oldMetafile = p.metafile();			
-			String[] pathfields = oldMetafile.split("/");
+			String[] pathfields = oldMetafile.split(File.separator);
 			String name = pathfields[pathfields.length-1];
 
 			// set path name variable for each page metafile
-			p.setMetafile(Parameters.DOC_DIRECTORY+"/"+newName+"/"+name);
+			p.setMetafile(Parameters.DOC_DIRECTORY+File.separator+newName+File.separator+name);
 		}
 
 
@@ -98,14 +98,16 @@ public class Document {
 	}
 
 	public void delete() throws IOException {
-		File docDirectory = new File(Parameters.DOC_DIRECTORY+"/"+name());
+		File docDirectory = new File(Parameters.DOC_DIRECTORY+File.separator+name());
 		if (!deleteDir(docDirectory)) throw new IOException("Problem deleting the document!");
+
 
 		// delete all image files in raw directory (AND PROCESSED DIRECTORY?????)
 		for (Page p : pages()) {
 			p.deleteRawFile();
 			p.deleteProcessedFile();
 		}
+
 	}
 
 	public void serialize() throws IOException {
@@ -147,6 +149,7 @@ public class Document {
 		}
 		return hits;
 	}
+
 
 	public boolean equals(Document d){
 		return (d.name().equals(this.name()));

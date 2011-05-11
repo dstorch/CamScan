@@ -16,7 +16,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import core.Document;
-import core.Mode;
 import core.Page;
 import core.Parameters;
 import java.awt.datatransfer.DataFlavor;
@@ -26,11 +25,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Iterator;
-import javax.swing.DefaultListModel;
+//import javax.swing.DropMode;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
-import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
@@ -75,6 +72,7 @@ public class PageExplorerPanel extends JPanel {
     public PageExplorerPanel(MainPanel mainPanel) {
 
         this.mainPanel = mainPanel;
+        
         Parameters.setPageExplorerPanel(this);
 
         this.pageList = new JList(this.getPageNames());
@@ -86,10 +84,10 @@ public class PageExplorerPanel extends JPanel {
         this.pageList.addMouseListener(new MouseMotion());
 
         // for DnD
-        /*this.pageList.setDropMode(DropMode.INSERT);
+        this.pageList.setDropMode(DropMode.INSERT);
         this.pageList.setDragEnabled(true);
         this.pageList.setTransferHandler(new TH());
-        this.pageList.setVisibleRowCount(-1); */
+        this.pageList.setVisibleRowCount(-1); 
 
 
         this.listScroller = new JScrollPane(this.pageList);
@@ -211,13 +209,14 @@ public class PageExplorerPanel extends JPanel {
             if (evt.getKeyCode() == 8) {
                 int index = pageList.getSelectedIndex() + 1;
                 Document d = Parameters.getCoreManager().workingDocument();
-                int selected = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete page" + index + "?", "Delete Document", JOptionPane.OK_CANCEL_OPTION);
+                int selected = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete page " + index + "?", "Delete Document", JOptionPane.OK_CANCEL_OPTION);
                 if (selected == JOptionPane.OK_OPTION) {
 
                     try {
                         Parameters.getCoreManager().deletePage(d, index);
                         update();
-                        // Parameters.getFrame().getContentPane().centralPanel.updatePanels(false);
+                        mainPanel.updateCentralPanels(false);
+                        Parameters.getDocExpPanel().update();
                     } catch (IOException ex) {
                         JOptionPane.showMessageDialog(null, ex.getMessage(), "Delete Error", JOptionPane.ERROR_MESSAGE);
                     }
@@ -241,7 +240,7 @@ public class PageExplorerPanel extends JPanel {
                     try {
                         Parameters.getCoreManager().renamePage(Parameters.getCoreManager().workingDocument(),index, input);
                         update();
-                        //setPageOrder(input);
+                        setPageOrder(index-1);
 
                     } catch (IOException ex) {
                         JOptionPane.showMessageDialog(null, ex.getMessage(), "Rename Error", JOptionPane.ERROR_MESSAGE);
@@ -261,7 +260,7 @@ public class PageExplorerPanel extends JPanel {
      * Class to support drag and dropping for reordering pages
      *
      */
-    /*protected class TH extends TransferHandler {
+    protected class TH extends TransferHandler {
 
         public boolean canImport(TransferHandler.TransferSupport info) {
             // we only import Strings
@@ -285,7 +284,6 @@ public class PageExplorerPanel extends JPanel {
 
             // Check for String flavor
             if (!info.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                displayDropLocation("List doesn't accept a drop of this type.");
                 return false;
             }
 
@@ -304,18 +302,18 @@ public class PageExplorerPanel extends JPanel {
             String value = (String) pageList.getModel().getElementAt(index);//listModel.getElementAt(index);
 
             // Get the string that is being dropped.
-            /*Transferable t = info.getTransferable();
+            Transferable t = info.getTransferable();
             String data;
             try {
                 data = (String) t.getTransferData(DataFlavor.stringFlavor);
             } catch (Exception e) {
                 System.out.println("In exception!");
                 return false;
-            }*/
+            }
             
-            //System.out.println("Created transferable");
+            System.out.println("Created transferable");
 
-            //String value1 = (String) pageList.getModel().getElementAt(dl.getIndex() - 1);
+            String value1 = (String) pageList.getModel().getElementAt(dl.getIndex() - 1);
 
             // Display a dialog with the drop information.
             //String dropValue = "\"" + data + "\" dropped ";
@@ -338,7 +336,7 @@ public class PageExplorerPanel extends JPanel {
              **  "return false;" line, the list will accept drops
              **  of type string.*/
             // Perform the actual import (rearrange List of Pages).
-            /*if (insert) {
+            if (insert) {
                 try {
                     System.out.println("Insert");
                     Parameters.getCoreManager().reorderPage(d, p, indexTo + 1);
@@ -384,14 +382,5 @@ public class PageExplorerPanel extends JPanel {
             }
         }
     }
-
-    private void displayDropLocation(final String string) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            public void run() {
-                JOptionPane.showMessageDialog(null, string);
-            }
-        });
-    } */
 
 }

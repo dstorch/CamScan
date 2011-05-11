@@ -189,6 +189,7 @@ public class DocExplorerPanel extends JPanel {
 	                centralPanel.updatePanels(false);
 	                
                 }   
+
             }
         }
     }
@@ -207,6 +208,7 @@ public class DocExplorerPanel extends JPanel {
                         Parameters.getCoreManager().deleteDocument(docName);
                         update();
                         centralPanel.updatePanels(false);
+                        centralPanel.getEastPanel().getPageExpPanel().update();
                     } catch (IOException ex) {
                         JOptionPane.showMessageDialog(null, ex.getMessage(), "Delete Error", JOptionPane.ERROR_MESSAGE);
                     }
@@ -231,7 +233,6 @@ public class DocExplorerPanel extends JPanel {
                         Parameters.getCoreManager().renameDocument(docName, input);                       
                         update();
                         setDocOrder(input);
-
                     } catch (IOException ex) {
                         JOptionPane.showMessageDialog(null, ex.getMessage(), "Rename Error", JOptionPane.ERROR_MESSAGE);
                     }
