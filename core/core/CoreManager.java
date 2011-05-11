@@ -45,12 +45,37 @@ public class CoreManager {
 	// called from the constructor when the application launches
 	public void startup() throws DocumentException, IOException {
 		SAXReader reader = new SAXReader();
-		org.dom4j.Document document = reader.read(new FileReader(Parameters.STARTUP_FILE));
+		
+		// try to read the startup file. If no file is found, then
+		// treat this as the first launch of the application
+		org.dom4j.Document document = null;
+		try {
+			document = reader.read(new FileReader(Parameters.STARTUP_FILE));
+		} catch (FileNotFoundException e) {
+			SystemConfiguration.autoconfigure();
+			return;
+		}
+		
+		
 		Element root = document.getRootElement();
 
 		// keep track of whether something went wrong, and throw a warning
 		// if necessary
 		boolean throwWarning = false;
+		
+		// read in the path of the tesseract executable
+		for (Iterator i = root.elementIterator("TESSERACT"); i.hasNext();) {
+			Element tesseractEl = (Element) i.next();
+			String tessPath = tesseractEl.attribute("path").getStringValue();
+			SystemConfiguration.TESS_PATH = tessPath;
+		}
+		
+		// read in the path of the python executable
+		for (Iterator i = root.elementIterator("PYTHON"); i.hasNext();) {
+			Element pythonEl = (Element) i.next();
+			String pythonPath = pythonEl.attribute("path").getStringValue();
+			SystemConfiguration.PYTHON_PATH = pythonPath;
+		}	
 
 		for (Iterator i = root.elementIterator("WORKINGPAGE"); i.hasNext();) {
 			Element workingPage = (Element) i.next();
@@ -59,12 +84,6 @@ public class CoreManager {
 			String name = workingPage.attribute("name").getStringValue();
 			setWorkingPage(workingStr, Integer.parseInt(order), name);
 		}
-
-		for (Iterator i = root.elementIterator("TESSERACT"); i.hasNext();) {
-			Element tesseractEl = (Element) i.next();
-			String tessPath = tesseractEl.attribute("path").getStringValue();
-			ocrManager.TESS_PATH = tessPath;
-		}		
 
 		for (Iterator i = root.elementIterator("DOCLIST"); i.hasNext();) {
 			Element docList = (Element) i.next();
@@ -87,12 +106,12 @@ public class CoreManager {
 			Element workingdoc = (Element) i.next();
 			String workingStr = workingdoc.attribute("value").getStringValue();
 			String[] fields = workingStr.split("\\\\");
-			
+
 			if (fields.length > 1) {
 				String name = fields[fields.length - 2];
 				setWorkingDocumentFromName(name);
 			}	
-			
+
 		}
 
 		// if a problem has occurred, throw a file not found exception
@@ -125,8 +144,13 @@ public class CoreManager {
 
 			// tesseract pathname
 			Element tesseract = DocumentHelper.createElement("TESSERACT");
-			tesseract.addAttribute("path", ocrManager.TESS_PATH);
+			tesseract.addAttribute("path", SystemConfiguration.TESS_PATH);
 			root.add(tesseract);
+
+			// python pathname
+			Element python = DocumentHelper.createElement("PYTHON");
+			python.addAttribute("path", SystemConfiguration.PYTHON_PATH);
+			root.add(python);
 
 			if (_workingDocument != null) {
 				Element workingdoc = DocumentHelper.createElement("WORKINGDOC");
@@ -176,7 +200,7 @@ public class CoreManager {
 		if (_workingPage == page){
 			return;
 		}
-		
+
 		_workingPage = page;
 		_rawImage = page.getRawImgFromDisk();
 
@@ -219,15 +243,15 @@ public class CoreManager {
 
 	// returns null if there isn't a document with name
 	private Document getDocFromName(String docName){
-		
+
 		String[] fields = docName.split("\\\\");
 		if (fields.length > 1) {
-			
+
 		}
-		
+
 		Document doc = null;
 		for (Document d : _allDocuments) {
-			
+
 			if (docName.equals(d.name())) {
 				doc = d;
 			}
@@ -248,21 +272,21 @@ public class CoreManager {
 		// not get serialized)
 		if (_workingDocument != null) {
 			if (_workingDocument.equals(d)){
-                            if(_allDocuments.size()>1){
-                                Document first = _allDocuments.get(0);
-                                setWorkingDocument(first);
-                                setWorkingPageAndImage(first.pages().first());
-                            }else{ // there are no Documents
-                                System.out.println("IN ELSE!!!");
-                                _workingDocument = null;
-                                _workingPage = null;
-                                _rawImage = null;
-                                _processedImage = null;
-                            }
-                        }
+				if(_allDocuments.size()>1){
+					Document first = _allDocuments.get(0);
+					setWorkingDocument(first);
+					setWorkingPageAndImage(first.pages().first());
+				}else{ // there are no Documents
+					System.out.println("IN ELSE!!!");
+				_workingDocument = null;
+				_workingPage = null;
+				_rawImage = null;
+				_processedImage = null;
+				}
+			}
 
 		}
-		
+
 		d.delete();
 		_allDocuments.remove(d);
 		d = null;
@@ -383,177 +407,177 @@ public class CoreManager {
 		writeStartupFile();
 		return newDoc;
 	}
-	
-    // recursively copies all image files to the workspace/
-     private void importPages(File sourceLocation, File targetLocation, Document d, int order)
 
-            throws IOException {
+	// recursively copies all image files to the workspace/
+	private void importPages(File sourceLocation, File targetLocation, Document d, int order)
 
-        if (sourceLocation.isDirectory()) {
+	throws IOException {
 
-            if (!targetLocation.exists()) {
-                targetLocation.mkdir();
-            }
+		if (sourceLocation.isDirectory()) {
 
-            String[] children = sourceLocation.list();
-            for (int i = 0; i < children.length; i++) {
-            importPages(new File(sourceLocation, children[i]),
-                        new File(targetLocation, children[i]), d, ++order);
-            }
-        } else {
+			if (!targetLocation.exists()) {
+				targetLocation.mkdir();
+			}
 
-            String filename = sourceLocation.getName();
-           
-            boolean validExt = false;
-            for (int i = 0; i<Parameters.imgExtensions.length;i++) {
-            	if (filename.toLowerCase().endsWith(Parameters.imgExtensions[i])) {
-            		validExt = true;
-            		break;
-            	}
-            }
+			String[] children = sourceLocation.list();
+			for (int i = 0; i < children.length; i++) {
+				importPages(new File(sourceLocation, children[i]),
+						new File(targetLocation, children[i]), d, ++order);
+			}
+		} else {
 
-            if (validExt) {
-            	
-                // copy the image into the workspace
-                InputStream in = new FileInputStream(sourceLocation);
+			String filename = sourceLocation.getName();
 
-                try {
-                    OutputStream out = new FileOutputStream(targetLocation);
+			boolean validExt = false;
+			for (int i = 0; i<Parameters.imgExtensions.length;i++) {
+				if (filename.toLowerCase().endsWith(Parameters.imgExtensions[i])) {
+					validExt = true;
+					break;
+				}
+			}
 
-                    try {
-                        // Copy the bits from instream to outstream
-                        byte[] buf = new byte[1024];
+			if (validExt) {
 
-                        int len;
+				// copy the image into the workspace
+				InputStream in = new FileInputStream(sourceLocation);
 
-                        while ((len = in.read(buf)) > 0) {
-                            out.write(buf, 0, len);
-                        }
-                    } finally {
-                        out.close();
-                    }
-                } finally {
-                    in.close();
-                }
+				try {
+					OutputStream out = new FileOutputStream(targetLocation);
 
-                // get the image file name without a ".tiff" extension
-                String imageFile = sourceLocation.getName();
-                int lastIndex = imageFile.lastIndexOf(".");
-                String noExt = imageFile.substring(0, lastIndex);
+					try {
+						// Copy the bits from instream to outstream
+						byte[] buf = new byte[1024];
 
-                // construct the page and add it to the document
-                Page p = new Page(d, order, noExt);
+						int len;
 
-                // set pathname attributes of the page
-                p.setRawFile(targetLocation.getPath());
-                p.setProcessedFile(Parameters.PROCESSED_DIRECTORY + File.separator + sourceLocation.getName());
-                p.setMetafile(Parameters.DOC_DIRECTORY + File.separator + d.name() + File.separator + noExt + ".xml");
+						while ((len = in.read(buf)) > 0) {
+							out.write(buf, 0, len);
+						}
+					} finally {
+						out.close();
+					}
+				} finally {
+					in.close();
+				}
 
-                // guess initial configuration values
-                p.initGuesses();
-                d.addPage(p);
+				// get the image file name without a ".tiff" extension
+				String imageFile = sourceLocation.getName();
+				int lastIndex = imageFile.lastIndexOf(".");
+				String noExt = imageFile.substring(0, lastIndex);
 
-                // do OCR!
-                launchOcrThread(p);
-            }
-        }
-    }
+				// construct the page and add it to the document
+				Page p = new Page(d, order, noExt);
 
-    public void launchOcrThread(Page page) {
-        OCRThread t = new OCRThread(page);
-        t.start();
-    }
+				// set pathname attributes of the page
+				p.setRawFile(targetLocation.getPath());
+				p.setProcessedFile(Parameters.PROCESSED_DIRECTORY + File.separator + sourceLocation.getName());
+				p.setMetafile(Parameters.DOC_DIRECTORY + File.separator + d.name() + File.separator + noExt + ".xml");
 
-    // called when the user imports a single photograph
-    // as a document
-    public Document createDocumentFromFile(File sourceLocation) throws IOException {
+				// guess initial configuration values
+				p.initGuesses();
+				d.addPage(p);
 
-        // put this document in workspace/docs by default
-        // get the image file name without a ".tiff" extension
-        String imageFile = sourceLocation.getName();
-        String noExt = removeExtension(imageFile);
-        String directory = Parameters.DOC_DIRECTORY + File.separator + noExt;
-        File dirFile = new File(directory);
-        if (!dirFile.mkdir()) {
-            throw new IOException("Import aborted: problem making new document directory!");
-        }
-        String pathname = directory + File.separator + "doc.xml";
-        Document newDoc = new Document(noExt, pathname);
+				// do OCR!
+				launchOcrThread(p);
+			}
+		}
+	}
 
-        File targetLocation = new File(Parameters.RAW_DIRECTORY + File.separator + sourceLocation.getName());
-        importPages(sourceLocation, targetLocation, newDoc, 1);
+	public void launchOcrThread(Page page) {
+		OCRThread t = new OCRThread(page);
+		t.start();
+	}
 
-        // add the document to the global list of documents
-        _allDocuments.add(newDoc);
-        
-    	_workingDocument = newDoc;
+	// called when the user imports a single photograph
+	// as a document
+	public Document createDocumentFromFile(File sourceLocation) throws IOException {
 
-        // write the XML for the new document to disk
-        newDoc.serialize();
-        writeStartupFile();
+		// put this document in workspace/docs by default
+		// get the image file name without a ".tiff" extension
+		String imageFile = sourceLocation.getName();
+		String noExt = removeExtension(imageFile);
+		String directory = Parameters.DOC_DIRECTORY + File.separator + noExt;
+		File dirFile = new File(directory);
+		if (!dirFile.mkdir()) {
+			throw new IOException("Import aborted: problem making new document directory!");
+		}
+		String pathname = directory + File.separator + "doc.xml";
+		Document newDoc = new Document(noExt, pathname);
 
-        return newDoc;
-    }
+		File targetLocation = new File(Parameters.RAW_DIRECTORY + File.separator + sourceLocation.getName());
+		importPages(sourceLocation, targetLocation, newDoc, 1);
 
-    // write a document out as a multipage pdf
-    public void exportToPdf(String pathname, String outfile) throws IOException {
+		// add the document to the global list of documents
+		_allDocuments.add(newDoc);
 
-        // get the document based on name
-        Document doc = null;
-        for (Document d : _allDocuments) {
-            if (pathname.equals(d.pathname())) {
-                doc = d;
-            }
-        }
+		_workingDocument = newDoc;
 
-        if (doc == null) {
-            throw new IOException("Problem exporting document!");
-        }
+		// write the XML for the new document to disk
+		newDoc.serialize();
+		writeStartupFile();
 
-        _exporter.exportToPdf(doc, outfile);
-    }
+		return newDoc;
+	}
 
-    // write a directory of image files
-    public void exportImages(Document document, String outdirectory) throws IOException {
-    	
-    	for (Page page : document.pages()) {
-    		//TODO
-    		_processedImage = VisionManager.rerenderImage(getRawImage(), page.corners(), page.config());
-    		page.writeProcessedImage();
-    	}
-    	
-        _exporter.exportImages(document, outdirectory);
-    }
+	// write a document out as a multipage pdf
+	public void exportToPdf(String pathname, String outfile) throws IOException {
 
-    // write a text file containing the document text
-    public void exportText(Document document, String outfile) throws IOException {
-        _exporter.exportText(document, outfile);
-    }
+		// get the document based on name
+		Document doc = null;
+		for (Document d : _allDocuments) {
+			if (pathname.equals(d.pathname())) {
+				doc = d;
+			}
+		}
 
-    public SearchResults search(String query) {
-    	return _searcher.getSearchResults(query, _workingDocument, _allDocuments);
-    }
+		if (doc == null) {
+			throw new IOException("Problem exporting document!");
+		}
 
-    /**
-     * Given the name of a document, it sets its
-     * instance of Document as the working
-     * document.
-     *
-     * @param docName The name of the document
-     * @throws IOException 
-     */
-    public void setWorkingDocumentFromName(String docName) throws IOException {
-        System.out.println("Doc Name: "+docName);
-        Document doc = getDocFromName(docName);
-         _workingDocument = doc;
-         setWorkingPageAndImage(doc.pages().first());
-    }
-    
-    public void setWorkingDocument(Document doc) {
-    	_workingDocument = doc;
-    }
+		_exporter.exportToPdf(doc, outfile);
+	}
 
-    public Page getWorkingPage() {
+	// write a directory of image files
+	public void exportImages(Document document, String outdirectory) throws IOException {
+
+		for (Page page : document.pages()) {
+			//TODO
+			_processedImage = VisionManager.rerenderImage(getRawImage(), page.corners(), page.config());
+			page.writeProcessedImage();
+		}
+
+		_exporter.exportImages(document, outdirectory);
+	}
+
+	// write a text file containing the document text
+	public void exportText(Document document, String outfile) throws IOException {
+		_exporter.exportText(document, outfile);
+	}
+
+	public SearchResults search(String query) {
+		return _searcher.getSearchResults(query, _workingDocument, _allDocuments);
+	}
+
+	/**
+	 * Given the name of a document, it sets its
+	 * instance of Document as the working
+	 * document.
+	 *
+	 * @param docName The name of the document
+	 * @throws IOException 
+	 */
+	public void setWorkingDocumentFromName(String docName) throws IOException {
+		System.out.println("Doc Name: "+docName);
+		Document doc = getDocFromName(docName);
+		_workingDocument = doc;
+		setWorkingPageAndImage(doc.pages().first());
+	}
+
+	public void setWorkingDocument(Document doc) {
+		_workingDocument = doc;
+	}
+
+	public Page getWorkingPage() {
 		return _workingPage;
 	}
 
@@ -603,13 +627,13 @@ public class CoreManager {
 		Page curr = getWorkingPage();
 		BufferedImage img = getRawImage();
 		if (curr != null && img != null) {
-			
+
 			Corners originalCorners = new Corners(new Point(0, 0), 
-	      			  new Point(getRawImage().getWidth(), 0), 
-	      			  new Point(0, getRawImage().getHeight()), 
-	      			  new Point(getRawImage().getWidth(), getRawImage().getHeight()));
-			
-//			_processedImage = VisionManager.rerenderImage(getRawImage(), VisionManager.findCorners(getRawImage()), curr.config());
+					new Point(getRawImage().getWidth(), 0), 
+					new Point(0, getRawImage().getHeight()), 
+					new Point(getRawImage().getWidth(), getRawImage().getHeight()));
+
+			//			_processedImage = VisionManager.rerenderImage(getRawImage(), VisionManager.findCorners(getRawImage()), curr.config());
 			_processedImage = VisionManager.rerenderImage(getRawImage(), originalCorners, curr.config());
 		}
 	}
@@ -630,29 +654,29 @@ public class CoreManager {
 			} catch (InvalidTypingException e) {
 				e.printStackTrace();
 			}
-    	}
-    }
-    
-    /*
-     * Given a temperature (centered around 0, e.g. -50 to 50), adjust the image.
-     */
-    public void changeTemperature(int temperature){
-    	try {
+		}
+	}
+
+	/*
+	 * Given a temperature (centered around 0, e.g. -50 to 50), adjust the image.
+	 */
+	public void changeTemperature(int temperature){
+		try {
 			Parameters.getCoreManager().getWorkingPage().config().setKey(new ConfigurationValue(ConfigurationValue.ValueType.ColorTemperature, temperature));
 		} catch (InvalidTypingException e) {
 			System.out.println("ConfigurationValue threw an InvalidTypingException! Won't be able to change the temperature.");
 		}
 	}
-    
-    public void boostConstrast(boolean boost) {
-    	ConfigurationValue configVal = this.getWorkingPage().config().getKey(ConfigurationValue.ValueType.ContrastBoost);
-    	
-    	try {
+
+	public void boostConstrast(boolean boost) {
+		ConfigurationValue configVal = this.getWorkingPage().config().getKey(ConfigurationValue.ValueType.ContrastBoost);
+
+		try {
 			Parameters.getCoreManager().getWorkingPage().config().setKey(new ConfigurationValue(ConfigurationValue.ValueType.ContrastBoost, !(Boolean) configVal.value()));
 		} catch (InvalidTypingException e) {
 			e.printStackTrace();
 		}
-    }
+	}
 
 	/**
 	 * Given two Corners objects giving corner locations in image
@@ -694,46 +718,46 @@ public class CoreManager {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-        
-    	// do OCR!
-        launchOcrThread(_workingPage);
-        launchOcrThread(splitProduct);
-        
-        Parameters.getPageExpPanel().update();
-        this.setProcessedImage(this.getRawImage());
-        Parameters.getCoreManager().updateProcessedImageWithRawDimensions();
 
-    }
-    
-    private String removeExtension(String file) {
-    	String[] pieces = file.split("[.]");
-    	
-    	String result = "";
-    	for (int i = 0; i < pieces.length-1; i++) {
-    		result += pieces[i];
-    	}
-    	
-    	return result;
-    }
-    
-    private String getExtension(String file) {
-    	System.out.println(file);
-    	String[] pieces = file.split("[.]");
-    	return pieces[pieces.length-1];
-    }
+		// do OCR!
+		launchOcrThread(_workingPage);
+		launchOcrThread(splitProduct);
 
-    // Called every time entering Edit Mode or Configuration Dictionary is changed
-    public void getEditImageTransform() {
-        _processedImage = VisionManager.imageGlobalTransforms(_rawImage,
-        		Parameters.getCoreManager().getWorkingPage().config());
-    }
-    
+		Parameters.getPageExpPanel().update();
+		this.setProcessedImage(this.getRawImage());
+		Parameters.getCoreManager().updateProcessedImageWithRawDimensions();
+
+	}
+
+	private String removeExtension(String file) {
+		String[] pieces = file.split("[.]");
+
+		String result = "";
+		for (int i = 0; i < pieces.length-1; i++) {
+			result += pieces[i];
+		}
+
+		return result;
+	}
+
+	private String getExtension(String file) {
+		System.out.println(file);
+		String[] pieces = file.split("[.]");
+		return pieces[pieces.length-1];
+	}
+
+	// Called every time entering Edit Mode or Configuration Dictionary is changed
+	public void getEditImageTransform() {
+		_processedImage = VisionManager.imageGlobalTransforms(_rawImage,
+				Parameters.getCoreManager().getWorkingPage().config());
+	}
 
 
-//
-//    // called when user tries to place corner; tries to make a better point given the user's guess
-//    public Point snapCorner(Point pt) {
-//        return VisionManager.snapCorner(Parameters.getCurrPageImg(), pt);
-//    }
+
+	//
+	//    // called when user tries to place corner; tries to make a better point given the user's guess
+	//    public Point snapCorner(Point pt) {
+	//        return VisionManager.snapCorner(Parameters.getCurrPageImg(), pt);
+	//    }
 
 }
