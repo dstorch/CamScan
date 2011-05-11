@@ -236,11 +236,9 @@ public class PageExplorerPanel extends JPanel {
         public void mouseClicked(java.awt.event.MouseEvent evt) {
             if (evt.getClickCount() == 2) {
                 int index = pageList.locationToIndex(evt.getPoint())+1;
-                System.out.println("INDEX:" + index);
                 String input = JOptionPane.showInputDialog(null, "Enter new Page name: ", "Rename Page", 1);
                 if(input != null){
                     try {
-                        System.out.println("INPUT: "+input);
                         Parameters.getCoreManager().renamePage(Parameters.getCoreManager().workingDocument(),index, input);
                         update();
                         //setPageOrder(input);

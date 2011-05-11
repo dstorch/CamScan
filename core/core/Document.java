@@ -104,7 +104,7 @@ public class Document {
 		// delete all image files in raw directory (AND PROCESSED DIRECTORY?????)
 		for (Page p : pages()) {
 			p.deleteRawFile();
-			//p.deleteProcessedFile();
+			p.deleteProcessedFile();
 		}
 	}
 

@@ -38,6 +38,10 @@ public class Page implements Comparable{
 	// the placement of the page relative to other
 	// pages in the document
 	private int _order;
+	
+	// whether the text found by OCR is
+	// based on the current processed image
+	private boolean _ocrUpToDate;
 
 	public Page(Document parent, int order, String name) {
 
@@ -107,14 +111,25 @@ public class Page implements Comparable{
 	public void setContainingDocument(Document parent) {
 		_parentDoc = parent;
 	}
+	public void ocrUpToDate() {
+		_ocrUpToDate = true;
+	}
+	public void ocrNeedsRevision() {
+		_ocrUpToDate = false;
+	}
+	public boolean getOcrUpToDate() {
+		return _ocrUpToDate;
+	}
 
 	public BufferedImage getRawImgFromDisk() throws IOException {
 		//return ImageIO.read(new File(raw()));
+		System.out.println("making raw image from disk");
 		return VisionManager.loadImage(raw());
 	}
 
 	public BufferedImage getProcessedImgFromDisk() throws IOException {
 		//return ImageIO.read(new File(processed()));
+		System.out.println("making raw image from disk");
 		return VisionManager.loadImage(processed());
 	}
 

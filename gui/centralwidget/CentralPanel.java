@@ -11,6 +11,7 @@ import search.SearchResults;
 
 import core.CoreManager;
 import core.Mode;
+import core.Page;
 import core.Parameters;
 
 import westwidget.WestPanel;
@@ -183,6 +184,8 @@ public class CentralPanel extends JPanel {
 
 		CoreManager cm = Parameters.getCoreManager();
 		cm.updateProcessedImage();
+		Page workingPage = cm.getWorkingPage();
+		cm.launchOcrThread(workingPage);
 		
 		this.toolbarPanel.selectViewRButton();
 		

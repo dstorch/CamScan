@@ -172,6 +172,8 @@ public class CoreManager {
 	}
 
 	public void setWorkingPageAndImage(Page page) throws IOException {
+		
+		System.out.println("set working page and image");
 		_workingPage = page;
 		_rawImage = page.getRawImgFromDisk();
 
@@ -214,11 +216,6 @@ public class CoreManager {
 
 	// returns null if there isn't a document with name
 	private Document getDocFromName(String docName){
-		
-		String[] fields = docName.split("/");
-		if (fields.length > 1) {
-			
-		}
 		
 		Document doc = null;
 		for (Document d : _allDocuments) {
@@ -451,7 +448,7 @@ public class CoreManager {
         }
     }
 
-    private void launchOcrThread(Page page) {
+    public void launchOcrThread(Page page) {
         OCRThread t = new OCRThread(page);
         t.start();
     }
@@ -578,6 +575,7 @@ public class CoreManager {
 		Page curr = getWorkingPage();
 		BufferedImage img = getRawImage();
 		if (curr != null && img != null) {
+			getWorkingPage().ocrNeedsRevision();
 			_processedImage = VisionManager.rerenderImage(getRawImage(), curr.corners(), curr.config());
 		}
 	}
@@ -677,9 +675,6 @@ public class CoreManager {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-		System.out.println("working page: "+_workingPage.processed());
-		System.out.println("split product: "+splitProduct.processed());
         
     	// do OCR!
         launchOcrThread(_workingPage);
