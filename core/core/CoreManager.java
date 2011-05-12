@@ -3,8 +3,6 @@ package core;
 import java.io.*;
 import java.util.*;
 
-import ocr.OCRThread;
-import ocr.ocrManager;
 import org.dom4j.*;
 import org.dom4j.io.*;
 import search.*;
@@ -12,8 +10,18 @@ import vision.*;
 import export.*;
 import java.awt.image.BufferedImage;
 import java.awt.Point;
-import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
+
+/*******************************************************************
+ * CoreManager
+ *
+ * The main delegator class for calling out to the modules.
+ * Also stores the working Page and the working Document, as
+ * well as the list of all documents stored in the library.
+ * 
+ * @author dstorch, sbirch, mmicalle, stelios
+ * 
+ *******************************************************************/
 
 @SuppressWarnings("rawtypes")
 public class CoreManager {
@@ -23,12 +31,23 @@ public class CoreManager {
 	private XMLReader _xmlReader;
 	private List<Document> _allDocuments;
 
-	// instance variables telling the GUI which page to display
+	/**
+	 * Instance variables keeping track of the
+	 * current display.
+	 */
 	private Document _workingDocument;
 	private Page _workingPage;
 	private BufferedImage _rawImage;
 	private BufferedImage _processedImage;
 
+	/**
+	 * Constructor
+	 * Sets some instance variables and calls the startup
+	 * function.
+	 * 
+	 * @throws DocumentException
+	 * @throws IOException
+	 */
 	public CoreManager() throws DocumentException, IOException {
 		_xmlReader = new XMLReader();
 		_exporter = Exporter.Factory.create();
@@ -37,15 +56,188 @@ public class CoreManager {
 		startup();
 	}
 
+	/*******************************************************************
+	 * 
+	 * GETTERS
+	 * 
+	 *******************************************************************/
+
 	public List<Document> getDocuments() {
 		return _allDocuments;
 	}
 
+	public Document workingDocument() {
+		return _workingDocument;
+	}
 
-	// called from the constructor when the application launches
+	public Page getWorkingPage() {
+		return _workingPage;
+	}
+
+	public BufferedImage getRawImage() {
+		return _rawImage;
+	}
+
+	public BufferedImage getProcessedImage() {
+		return _processedImage;
+	}
+
+	/**
+	 * Given a document name, scans the list of documents
+	 * for one with a matching name. Returns null if no
+	 * match was found.
+	 * 
+	 * @param docName - the name of the document to get
+	 * @return the Document object to return
+	 */
+	private Document getDocFromName(String docName){
+
+		String[] fields = docName.split("\\\\");
+		if (fields.length > 1) {
+
+		}
+
+		Document doc = null;
+		for (Document d : _allDocuments) {
+
+			if (docName.equals(d.name())) {
+				doc = d;
+			}
+		}
+
+		return doc;
+	}
+
+
+	/**
+	 * Given a document and a page number, retrieves
+	 * the corresponding page.
+	 * 
+	 * @param d - the Document
+	 * @param o - the page number, an int
+	 * 
+	 * @return the corresponding page of that number
+	 */
+	public Page getPageFromOrder(Document d, int o){
+		for (Page p : d.pages()) {
+			if(p.order() == o) return p;
+		}
+		return null;
+	}
+
+
+	/**
+	 * Given an order, it returns the page of the given
+	 * order from the working document.
+	 *
+	 * @param order The order of the page to fetch
+	 * @return The page with the given order of the
+	 * working document.
+	 */
+	public Page getWorkingDocPageFromName(int order) {
+
+		for (Page page : _workingDocument.pages()) {
+			if (order == page.order()) {
+				return page;
+			}
+		}
+
+		return null;
+	}
+
+
+	/*******************************************************************
+	 * 
+	 * SETTERS
+	 * 
+	 *******************************************************************/
+
+	/**
+	 * Given the name of a document, it sets its
+	 * instance of Document as the working
+	 * document.
+	 *
+	 * @param docName The name of the document
+	 * @throws IOException 
+	 */
+	public void setWorkingDocumentFromName(String docName) throws IOException {
+		System.out.println("Doc Name: "+docName);
+		Document doc = getDocFromName(docName);
+		_workingDocument = doc;
+		setWorkingPageAndImage(doc.pages().first());
+	}
+
+	public void setWorkingDocument(Document doc) {
+		_workingDocument = doc;
+	}
+
+	public void setProcessedImage(BufferedImage img) {
+		_processedImage = img;
+	}
+
+	/**
+	 * Sets the working page by parsing the XML on disk.
+	 * 
+	 * @param path - the path to the metafile for the page
+	 * @param order - the page number
+	 * @param name - the name of the Page
+	 * 
+	 * @throws FileNotFoundException
+	 * @throws DocumentException
+	 */
+	public void setWorkingPage(String path, int order, String name) throws FileNotFoundException, DocumentException {
+		try {
+			_workingPage = _xmlReader.parsePage(path, order, _workingDocument, name);
+		} catch (FileNotFoundException e) {
+			JOptionPane.showMessageDialog(Parameters.getFrame(),
+					"Some of your data might be lost. Did CamScan shut down correctly?",
+					"Startup Warning", JOptionPane.WARNING_MESSAGE);
+		} catch (DocumentException e) {
+			JOptionPane.showMessageDialog(Parameters.getFrame(),
+					"Your CamScan data may have been corrupted.",
+					"Startup Warning", JOptionPane.WARNING_MESSAGE);
+		}
+	}
+
+	/**
+	 * Given a page, set it as the working page and set
+	 * the working image by reading it in from the disk.
+	 * 
+	 * @param page - the Page to set as the working Page
+	 * @throws IOException
+	 */
+	public void setWorkingPageAndImage(Page page) throws IOException {
+
+		if (_workingPage == page){
+			return;
+		}
+
+		_workingPage = page;
+		_rawImage = page.getRawImgFromDisk();
+
+		if (Parameters.isInEditMode())
+			this.updateProcessedImageWithRawDimensions();
+		else
+			this.updateProcessedImage();
+	}
+
+
+	/*******************************************************************
+	 * 
+	 * STARTUP AND SHUTDOWN
+	 * 
+	 *******************************************************************/
+
+	/**
+	 * Called once on startup. Reads the state of the application
+	 * from .camscan_startup.xml.
+	 * 
+	 * @throws DocumentException
+	 * @throws IOException
+	 */
 	public void startup() throws DocumentException, IOException {
 		SAXReader reader = new SAXReader();
-		
+
 		// try to read the startup file. If no file is found, then
 		// treat this as the first launch of the application
 		org.dom4j.Document document = null;
@@ -55,21 +247,21 @@ public class CoreManager {
 			SystemConfiguration.autoconfigure();
 			return;
 		}
-		
-		
+
+
 		Element root = document.getRootElement();
 
 		// keep track of whether something went wrong, and throw a warning
 		// if necessary
 		boolean throwWarning = false;
-		
+
 		// read in the path of the tesseract executable
 		for (Iterator i = root.elementIterator("TESSERACT"); i.hasNext();) {
 			Element tesseractEl = (Element) i.next();
 			String tessPath = tesseractEl.attribute("path").getStringValue();
 			SystemConfiguration.TESS_PATH = tessPath;
 		}
-		
+
 		// read in the path of the python executable
 		for (Iterator i = root.elementIterator("PYTHON"); i.hasNext();) {
 			Element pythonEl = (Element) i.next();
@@ -105,7 +297,7 @@ public class CoreManager {
 		for (Iterator i = root.elementIterator("WORKINGDOC"); i.hasNext();) {
 			Element workingdoc = (Element) i.next();
 			String workingStr = workingdoc.attribute("value").getStringValue();
-			String[] fields = workingStr.split("\\\\");
+			String[] fields = workingStr.split(SystemConfiguration.PATH_REGEX);
 
 			if (fields.length > 1) {
 				String name = fields[fields.length - 2];
@@ -123,16 +315,21 @@ public class CoreManager {
 
 	}
 
-	public Document workingDocument() {
-		return _workingDocument;
-	}
-
-	// called before the application exits
+	/**
+	 * Called once during a normal shutdown of the application.
+	 * 
+	 * @throws IOException
+	 */
 	public void shutdown() throws IOException {
 		writeStartupFile();
 	}
 
-	// writes the startup file to disk based on the list of all documents
+	/**
+	 * Writes the startup XML so that on the next launch
+	 * of the application, the state will be preserved.
+	 * 
+	 * @throws IOException
+	 */
 	public void writeStartupFile() throws IOException {
 		OutputFormat pretty = OutputFormat.createPrettyPrint();
 		XMLWriter filewriter = new XMLWriter(new FileWriter(Parameters.STARTUP_FILE), pretty);
@@ -181,43 +378,20 @@ public class CoreManager {
 		}
 	}
 
-	public void setWorkingPage(String path, int order, String name) throws FileNotFoundException, DocumentException {
-		try {
-			_workingPage = _xmlReader.parsePage(path, order, _workingDocument, name);
-		} catch (FileNotFoundException e) {
-			JOptionPane.showMessageDialog(Parameters.getFrame(),
-					"Some of your data might be lost. Did CamScan shut down correctly?",
-					"Startup Warning", JOptionPane.WARNING_MESSAGE);
-		} catch (DocumentException e) {
-			JOptionPane.showMessageDialog(Parameters.getFrame(),
-					"Your CamScan data may have been corrupted.",
-					"Startup Warning", JOptionPane.WARNING_MESSAGE);
-		}
-	}
+	/*******************************************************************
+	 * 
+	 * DOCUMENT MANIPULATION
+	 * 
+	 *******************************************************************/
 
-	public void setWorkingPageAndImage(Page page) throws IOException {
-
-		if (_workingPage == page){
-			return;
-		}
-
-		_workingPage = page;
-		_rawImage = page.getRawImgFromDisk();
-
-		if (Parameters.isInEditMode())
-			this.updateProcessedImageWithRawDimensions();
-		else
-			this.updateProcessedImage();
-	}
-
-	// when a working document is "closed" it is serialized
-	// to the disk
-	public void closeWorkingDocument() throws IOException {
-		if (_workingDocument != null) {
-			_workingDocument.serialize();
-		}
-	}
-
+	/**
+	 * One of the renaming functions. Given the name of a document,
+	 * finds that document in the list, and calls the version of
+	 * the function below in order to complete the rename.
+	 * 
+	 * @param docName - the old name of the document
+	 * @param newName - the new name of the document
+	 */
 	public void renameDocument(String docName, String newName) throws IOException {
 		for (Document d : _allDocuments) {
 			if (docName.equals(d.name())) {
@@ -226,6 +400,15 @@ public class CoreManager {
 		}
 	}
 
+	/**
+	 * Given a Document, renames it to the given name. Called by the overloaded
+	 * form of this method (see above).
+	 * 
+	 * @param d - the Document to rename
+	 * @param newName - the new name of the document
+	 * 
+	 * @throws IOException
+	 */
 	private void renameDocument(Document d, String newName) throws IOException {
 		d.rename(newName);
 		d.serialize();
@@ -233,6 +416,16 @@ public class CoreManager {
 		setWorkingDocumentFromName(newName);
 	}
 
+	/**
+	 * Given a Document and a Page number, renames the corresponding
+	 * page.
+	 * 
+	 * @param d - the Document to rename
+	 * @param order - the page number in the document of the page to rename
+	 * @param newName - the new name
+	 * 
+	 * @throws IOException
+	 */
 	public void renamePage(Document d, int order, String newName) throws IOException{
 		Page p = getPageFromOrder(d,order);
 		for(Page page : d.pages()){
@@ -240,26 +433,14 @@ public class CoreManager {
 		}
 	}
 
-
-	// returns null if there isn't a document with name
-	private Document getDocFromName(String docName){
-
-		String[] fields = docName.split("\\\\");
-		if (fields.length > 1) {
-
-		}
-
-		Document doc = null;
-		for (Document d : _allDocuments) {
-
-			if (docName.equals(d.name())) {
-				doc = d;
-			}
-		}
-
-		return doc;
-	}
-
+	/**
+	 * Given the name of a document, deletes it by calling the
+	 * overloaded version of the function below.
+	 * 
+	 * @param docName - the name of the document to delete
+	 * 
+	 * @throws IOException
+	 */
 	public void deleteDocument(String docName) throws IOException {
 		Document toDelete = getDocFromName(docName);
 		deleteDocument(toDelete);
@@ -278,10 +459,10 @@ public class CoreManager {
 					setWorkingPageAndImage(first.pages().first());
 				}else{ // there are no Documents
 					System.out.println("IN ELSE!!!");
-				_workingDocument = null;
-				_workingPage = null;
-				_rawImage = null;
-				_processedImage = null;
+					_workingDocument = null;
+					_workingPage = null;
+					_rawImage = null;
+					_processedImage = null;
 				}
 			}
 
@@ -295,29 +476,64 @@ public class CoreManager {
 		writeStartupFile();
 	}
 
-	public Page getPageFromOrder(Document d, int o){
-		for (Page p : d.pages()) {
-			if(p.order() == o) return p;
-		}
-		return null;
-	}
-
+	/**
+	 * Given a Document and a page number in that document, deletes
+	 * the indicated Page completely from the workspace.
+	 * 
+	 * @param d - the Document containing the Page to delete
+	 * @param order - the page number of the Page to delete
+	 * 
+	 * @throws IOException
+	 */
 	public void deletePage(Document d, int order) throws IOException{
 		Page p = getPageFromOrder(d, order);
 		deletePage(d, p);
 	}
 
+	/**
+	 * Overloaded version of teh deletePage() function above.
+	 * Given a Document and a Page, deletes the corresponding
+	 * page.
+	 * 
+	 * @param d - the Document containing the Page to delete
+	 * @param p - the Page to delete
+	 * 
+	 * @throws IOException
+	 */
 	private void deletePage(Document d, Page p) throws IOException{
 		d.deletePage(p);
 		// if the last page is deleted, delete the document as well
 		if(d.pages().size()==0) deleteDocument(d);
 	}
 
+	/**
+	 * Given a Document and a Page in that Document, moves
+	 * the page so that it is positioned at the specified
+	 * page number.
+	 * 
+	 * Called by drag and drop reordering.
+	 * 
+	 * @param d - the Document containing the page to reorder
+	 * @param p - the Page to reorder
+	 * @param newOrder - the page number to which Page p will be moved
+	 * 
+	 * @throws IOException
+	 */
 	public void reorderPage(Document d, Page p, int newOrder) throws IOException{
 		if(p.order()!=newOrder) d.reorderPage(p, newOrder);
 	}
 
-
+	/**
+	 * Implements combining the pages from two documents
+	 * into a single document.
+	 * 
+	 * Calls the overloaded version of the function which takes
+	 * Documents and not Strings naming documents.
+	 * 
+	 * @param d1 - a string naming the first document to merge
+	 * @param d2 - a string naming the second document to merge
+	 * @throws IOException
+	 */
 	public void mergeDocuments(String d1, String d2) throws IOException{
 		Document toMerge1 = null;
 		Document toMerge2 = null;
@@ -333,7 +549,14 @@ public class CoreManager {
 	}
 
 
-	// Merges two inputted documents (appends pages of d2 to end of d1)
+	/**
+	 * Given two documents, combines them into a single document
+	 * by taking the pages of the two originals.
+	 * 
+	 * @param d1 - one Document to merge
+	 * @param d2 - the second Document to merge
+	 * @throws IOException
+	 */
 	private void mergeDocuments(Document d1, Document d2) throws IOException {
 
 		String doc1 = d1.name();
@@ -372,8 +595,24 @@ public class CoreManager {
 
 	}
 
-	// Called after an import in order to establish a new
-	// document object, if the user imports an entire folder
+	/*******************************************************************
+	 * 
+	 * IMPORT AND EXPORT
+	 * 
+	 *******************************************************************/
+
+	/**
+	 * Given the location of a folder of images to import,
+	 * copies the raw images into the workspace, and creates
+	 * a Document object with the required attributes.
+	 * 
+	 * Runs corner finding and OCR automatically on the imported
+	 * images.
+	 * 
+	 * Calls importPages() to do most of the work.
+	 * 
+	 * @param sourceLocation - the directory containing the images to import
+	 */
 	public Document createDocumentFromFolder(File sourceLocation) throws IOException {
 
 		if (sourceLocation.isFile()) {
@@ -408,9 +647,57 @@ public class CoreManager {
 		return newDoc;
 	}
 
-	// recursively copies all image files to the workspace/
-	private void importPages(File sourceLocation, File targetLocation, Document d, int order)
+	/**
+	 * The import function for importing a single image file.
+	 * 
+	 * @param sourceLocation - the file to import
+	 * 
+	 * @return the Document instance which is created as an
+	 * internal representation of the imported image
+	 * 
+	 * @throws IOException
+	 */
+	public Document createDocumentFromFile(File sourceLocation) throws IOException {
 
+		// put this document in workspace/docs by default
+		// get the image file name without a ".tiff" extension
+		String imageFile = sourceLocation.getName();
+		String noExt = removeExtension(imageFile);
+		String directory = Parameters.DOC_DIRECTORY + File.separator + noExt;
+		File dirFile = new File(directory);
+		if (!dirFile.mkdir()) {
+			throw new IOException("Import aborted: problem making new document directory!");
+		}
+		String pathname = directory + File.separator + "doc.xml";
+		Document newDoc = new Document(noExt, pathname);
+
+		File targetLocation = new File(Parameters.RAW_DIRECTORY + File.separator + sourceLocation.getName());
+		importPages(sourceLocation, targetLocation, newDoc, 1);
+
+		// add the document to the global list of documents
+		_allDocuments.add(newDoc);
+
+		_workingDocument = newDoc;
+
+		// write the XML for the new document to disk
+		newDoc.serialize();
+		writeStartupFile();
+
+		return newDoc;
+	}
+
+
+	/**
+	 * Recursively imports images in the selected folder.
+	 * 
+	 * @param sourceLocation - the root folder of the subdirectory to import
+	 * @param targetLocation - the location to which all image files should be copied
+	 * @param d - the document instance that the imported images belong to
+	 * @param order - keeps track of the page number as it recurs
+	 * 
+	 * @throws IOException
+	 */
+	private void importPages(File sourceLocation, File targetLocation, Document d, int order)
 	throws IOException {
 
 		if (sourceLocation.isDirectory()) {
@@ -478,48 +765,20 @@ public class CoreManager {
 				d.addPage(p);
 
 				// do OCR!
-				launchOcrThread(p);
+				p.launchOcrThread();
 			}
 		}
 	}
 
-	public void launchOcrThread(Page page) {
-		OCRThread t = new OCRThread(page);
-		t.start();
-	}
 
-	// called when the user imports a single photograph
-	// as a document
-	public Document createDocumentFromFile(File sourceLocation) throws IOException {
-
-		// put this document in workspace/docs by default
-		// get the image file name without a ".tiff" extension
-		String imageFile = sourceLocation.getName();
-		String noExt = removeExtension(imageFile);
-		String directory = Parameters.DOC_DIRECTORY + File.separator + noExt;
-		File dirFile = new File(directory);
-		if (!dirFile.mkdir()) {
-			throw new IOException("Import aborted: problem making new document directory!");
-		}
-		String pathname = directory + File.separator + "doc.xml";
-		Document newDoc = new Document(noExt, pathname);
-
-		File targetLocation = new File(Parameters.RAW_DIRECTORY + File.separator + sourceLocation.getName());
-		importPages(sourceLocation, targetLocation, newDoc, 1);
-
-		// add the document to the global list of documents
-		_allDocuments.add(newDoc);
-
-		_workingDocument = newDoc;
-
-		// write the XML for the new document to disk
-		newDoc.serialize();
-		writeStartupFile();
-
-		return newDoc;
-	}
-
-	// write a document out as a multipage pdf
+	/**
+	 * The GUI calls this function in order to implement PDF export.
+	 * Just calls the underlying function of the Exporter.
+	 * 
+	 * @param pathname
+	 * @param outfile
+	 * @throws IOException
+	 */
 	public void exportToPdf(String pathname, String outfile) throws IOException {
 
 		// get the document based on name
@@ -537,7 +796,14 @@ public class CoreManager {
 		_exporter.exportToPdf(doc, outfile);
 	}
 
-	// write a directory of image files
+	/**
+	 * Exports a document by copying the images out to a new folder.
+	 * 
+	 * @param document - the Document to copy
+	 * @param outdirectory - a String giving the directory to copy to
+	 * 
+	 * @throws IOException
+	 */
 	public void exportImages(Document document, String outdirectory) throws IOException {
 
 		for (Page page : document.pages()) {
@@ -549,71 +815,42 @@ public class CoreManager {
 		_exporter.exportImages(document, outdirectory);
 	}
 
-	// write a text file containing the document text
+	/**
+	 * Exports the text extracted from the document by OCR.
+	 * 
+	 * @param document - the document to export
+	 * @param outfile - the pathname specifying the outfile
+	 * 
+	 * @throws IOException
+	 */
 	public void exportText(Document document, String outfile) throws IOException {
 		_exporter.exportText(document, outfile);
 	}
+
+
+	/*******************************************************************
+	 * 
+	 * SEARCH
+	 * 
+	 *******************************************************************/
 
 	public SearchResults search(String query) {
 		return _searcher.getSearchResults(query, _workingDocument, _allDocuments);
 	}
 
-	/**
-	 * Given the name of a document, it sets its
-	 * instance of Document as the working
-	 * document.
-	 *
-	 * @param docName The name of the document
-	 * @throws IOException 
-	 */
-	public void setWorkingDocumentFromName(String docName) throws IOException {
-		System.out.println("Doc Name: "+docName);
-		Document doc = getDocFromName(docName);
-		_workingDocument = doc;
-		setWorkingPageAndImage(doc.pages().first());
-	}
 
-	public void setWorkingDocument(Document doc) {
-		_workingDocument = doc;
-	}
-
-	public Page getWorkingPage() {
-		return _workingPage;
-	}
-
-	public BufferedImage getRawImage() {
-		return _rawImage;
-	}
-
-	public void setProcessedImage(BufferedImage img) {
-		_processedImage = img;
-	}
-
-	public BufferedImage getProcessedImage() {
-		return _processedImage;
-	}
+	/*******************************************************************
+	 * 
+	 * VISION
+	 * 
+	 *******************************************************************/
 
 	/**
-	 * Given an order, it returns the page of the given
-	 * order from the working document.
-	 *
-	 * @param order The order of the page to fetch
-	 * @return The page with the given order of the
-	 * working document.
+	 * Calls the rerender function of the VisionManager in order to apply
+	 * changes made by the user.
+	 * 
+	 * The GUI should call this function when switching back into view mode.
 	 */
-	public Page getWorkingDocPageFromName(int order) {
-
-		for (Page page : _workingDocument.pages()) {
-			if (order == page.order()) {
-				return page;
-			}
-		}
-
-		return null;
-	}
-
-	// called when changing from edit mode to view mode
-	// uses changes made in edit mode and rerenders the image
 	public void updateProcessedImage() {
 		Page curr = getWorkingPage();
 		BufferedImage img = getRawImage();
@@ -638,6 +875,12 @@ public class CoreManager {
 		}
 	}
 
+	/**
+	 * Implements horizontal and vertical flipping by
+	 * calling into the VisionManager.
+	 * 
+	 * @param isVertical
+	 */
 	public void flipImage(boolean isVertical) {
 
 		if (isVertical){
@@ -657,8 +900,10 @@ public class CoreManager {
 		}
 	}
 
-	/*
-	 * Given a temperature (centered around 0, e.g. -50 to 50), adjust the image.
+	/**
+	 * Uses the VisionManager to implement the temperature slider.
+	 * 
+	 * @param temperature
 	 */
 	public void changeTemperature(int temperature){
 		try {
@@ -720,8 +965,8 @@ public class CoreManager {
 		}
 
 		// do OCR!
-		launchOcrThread(_workingPage);
-		launchOcrThread(splitProduct);
+		_workingPage.launchOcrThread();
+		splitProduct.launchOcrThread();
 
 		Parameters.getPageExpPanel().update();
 		this.setProcessedImage(this.getRawImage());
@@ -729,6 +974,16 @@ public class CoreManager {
 
 	}
 
+	/**
+	 * Convenience string manipulation function. Given a file name,
+	 * returns that name with the extension removed. That is,
+	 * "image.jpg" will return "image".
+	 * 
+	 * @param file - a filename
+	 * @return the filename String with the file extension removed.
+	 * 
+	 * @see getExtension()
+	 */
 	private String removeExtension(String file) {
 		String[] pieces = file.split("[.]");
 
@@ -740,24 +995,29 @@ public class CoreManager {
 		return result;
 	}
 
+	/**
+	 * Convenience string manipulation function. Given a file name,
+	 * returns the file extension. That is,
+	 * "image.jpg" will return "jpg".
+	 * 
+	 * @param file - a filename
+	 * @return the file extension of the filename string passed in.
+	 * 
+	 * @see removeExtension()
+	 */
 	private String getExtension(String file) {
 		System.out.println(file);
 		String[] pieces = file.split("[.]");
 		return pieces[pieces.length-1];
 	}
 
-	// Called every time entering Edit Mode or Configuration Dictionary is changed
+	/**
+	 * Called every time entering Edit Mode or Configuration Dictionary is changed
+	 */
 	public void getEditImageTransform() {
 		_processedImage = VisionManager.imageGlobalTransforms(_rawImage,
 				Parameters.getCoreManager().getWorkingPage().config());
 	}
 
-
-
-	//
-	//    // called when user tries to place corner; tries to make a better point given the user's guess
-	//    public Point snapCorner(Point pt) {
-	//        return VisionManager.snapCorner(Parameters.getCurrPageImg(), pt);
-	//    }
 
 }

@@ -2,6 +2,17 @@ package search;
 
 import core.Page;
 
+/*******************************************************************
+ * SearchHit
+ *
+ * The interface by which the core of the system accesses search
+ * hits.
+ * 
+ * @author dstorch
+ * 
+ *******************************************************************/
+
+@SuppressWarnings("rawtypes")
 public interface SearchHit extends Comparable {
 
 	public Page link();

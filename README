@@ -1,1 +1,113 @@
-This is CamScan!
+#############################################################################
+# CAMSCAN --
+#   An application for producing useful documents from images.
+#
+# Contents:
+#   1. Project set-up
+#   2. Design overview
+#   3. Additional resources
+#
+# Authors and Contact:
+#  1. Michelle Micallef
+#     mmicalle@cs.brown.edu
+#	  michelle_micallef@brown.edu
+#  2. David Storch
+#     dstorch@cs.brown.edu
+#     david_storch@brown.edu
+#  3. Sam Birch
+#     sbirch@brown.edu
+#     samuel_birch@brown.edu
+#  4. Stylianos Anagnostopoulos
+#     sanagnos@cs.brown.edu
+#     stelios@brown.edu
+#
+# BROWN UNIVERSITY
+# May 2011
+#
+#############################################################################
+
+
+
+#############################################################################
+# 1. Project set-up
+#############################################################################
+
+a) core
+===
+This is the source code folder containing the core of the system. The Core
+consists of a main delegator class (CoreManager.java), and classes which
+implement our document model (e.g. Document.java and Page.java).
+
+b) gui
+===
+The gui/ directory is a second source code location which contains the code
+implementing CamScan's graphical user interface.
+
+c) managers
+===
+This third and final source code directory contains all of the sub-modules
+involved in CamScan. Each module is implemented inside its own package.
+As of this writing there are four modules:
+	-export
+	-ocr
+	-search
+	-vision
+	
+d) libraries
+===
+The libraries/ directory contains most of CamScan's dependencies.
+For example, libraries/jar contains sever jar files which must be included
+in the java build path in order for CamScan to run. The libraries/icons
+folder contains the images that are appear on the GUI as icons.
+
+e) workspace
+===
+This is the directory where CamScan automatically keeps user data.
+Specifically, raw image files imported by the user are always copied
+to workspace/raw. Processed versions of the raw file are temporarily
+written to workspace/processed. Temporary products produced by Tesseract
+are written to workspace/temp. The document metadata itself is stored
+in workspace/docs in a series of XML files.
+
+f) tests
+===
+Contains test data used in development of CamScan.
+
+
+#############################################################################
+# 2. Design overview
+#############################################################################
+
+a) Introduction
+===
+Our main design principle is that we have a GUI which calls methods from
+the core of the system, and that the core delegates to independent submodules.
+These modules can be executed independently from the rest of the system, and
+do not rely on one another or call each other's functions.
+
+Another important design principle is that the core represents the state
+of the system at any given time. However, the core also provides serialization
+functionality which writes the state of the system to disk according to an XML-based
+specification. By calling serialization functions at appropriate times, the state
+of the system is kept synchronized with data written on the disk.
+
+b) Languages
+===
+The core part of the system is written in Java. The computer vision module
+makes use of a Java wrapper for openCV, so the image processing is outsourced
+to C/C++.
+
+The OCR module makes use of a Python script in order to extract useful
+data from the output of Tesseract. This was useful because a lightweight
+Python script based on regular expressions could do the same work as a much
+more IO-intensive Java program.
+
+The PDF export functionality is written almost entirely in Python. We are
+using ReportLab, a convenient PDF drawing library for Python.
+
+#############################################################################
+# 3. Additional resources
+#############################################################################
+
+
+

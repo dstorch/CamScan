@@ -6,6 +6,16 @@ import core.PageText;
 import core.Position;
 import core.SystemConfiguration;
 
+/*******************************************************************
+ * ocrManager
+ *
+ * The Java interface for executing Tesseract and reading in the
+ * OCR results.
+ * 
+ * @author mmicalle
+ * 
+ *******************************************************************/
+
 public class ocrManager {
 
 	// path to the python script for processing the tesseract output

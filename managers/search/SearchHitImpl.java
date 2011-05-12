@@ -2,6 +2,17 @@ package search;
 
 import core.Page;
 
+/*******************************************************************
+ * SearchHitImpl
+ *
+ * Implements the SearchHit interface. This class is essentially
+ * a simple struct which provides all of the data necessary
+ * to display search hits in the search results screen.
+ * 
+ * @author dstorch
+ * 
+ *******************************************************************/
+
 public class SearchHitImpl implements SearchHit {
 
 	private Page _link;

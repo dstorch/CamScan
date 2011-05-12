@@ -1,16 +1,24 @@
 package core;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 
-import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
 import search.SearchResults;
 import westwidget.DocExplorerPanel;
 import eastwidget.PageExplorerPanel;
 import gui.MainPanel;
+
+/*******************************************************************
+ * Parameters
+ *
+ * Stores some global constants. Also stores a static global instance
+ * of the CoreManager so that the core of the system can always
+ * be accessed from the GUI.
+ * 
+ * @author dstorch, stelios
+ * 
+ *******************************************************************/
 
 public class Parameters {
 

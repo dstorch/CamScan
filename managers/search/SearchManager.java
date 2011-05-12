@@ -4,11 +4,25 @@ import java.io.*;
 import java.util.*;
 import core.*;
 
+/*******************************************************************
+ * SearchManager
+ *
+ * Implements the Searcher's public interface.
+ * 
+ * @author dstorch
+ * 
+ *******************************************************************/
+
 public class SearchManager implements Searcher {
 	
 	private Stemmer _stemmer;
 	private Set<String> _stopWords;
 	
+	/**
+	 * Constructor
+	 * 
+	 * @throws IOException
+	 */
 	public SearchManager() throws IOException {
 		_stemmer = new Stemmer();
 		_stopWords = new HashSet<String>();
@@ -21,7 +35,16 @@ public class SearchManager implements Searcher {
 		}
 	}
 	
-	
+	/**
+	 * The top-level search method.
+	 * 
+	 * @param query - the String passed as the search query by the user
+	 * @param workingDocument - the Document which the user was viewing when s/he clicked search
+	 * @param allDocuments - the list of all documents in the library
+	 * 
+	 * @return a SearchResults object resulting from the search
+	 */
+	@SuppressWarnings("unused")
 	public SearchResults getSearchResults(String query, Document workingDocument, List<Document> allDocuments) {
 		List<Term> queryNew = sanitize(query);
 		
@@ -78,6 +101,12 @@ public class SearchManager implements Searcher {
 		return new SearchResultsImpl(topInWorkingDoc, topElsewhere);
 	}
 	
+	
+	/**
+	 * Removes stop words and applies Porter stemming.
+	 * This makes the search results more flexible, and less
+	 * dependent on small, unimportant words and part of speech.
+	 */
 	public List<Term> sanitize(String text) {
 		String textlower = text.toLowerCase();
 		String[] textNew = textlower.split("[^a-z0-9]+");
