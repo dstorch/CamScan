@@ -174,10 +174,10 @@ if __name__ == "__main__" :
 		print "Usage: python jpg2pdf.py <doc.xml> <out.pdf>"
 	else :
 		try :
-			main()
-			sys.stdout.write("OK\n")
-		#except IOError :
-		#	error("I/O problem encountered when exporting to PDF.")
+                        main()
+                        sys.stdout.write("OK\n")
+		except IOError :
+			error("I/O problem encountered when exporting to PDF.")
 		except xml.parsers.expat.ExpatError :
 			error("Corrupted document data. Export failed!")
 		except EmptyDocumentError :

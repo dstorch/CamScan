@@ -55,6 +55,7 @@ public class ExportThread extends Thread {
 			
 			reader.close();
 		
+			System.out.println("export done");
 		}
 		
 		// show an error message if an IOException is thrown
