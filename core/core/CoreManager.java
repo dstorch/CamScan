@@ -668,7 +668,7 @@ public class CoreManager {
 		}
 	}
 
-	public void boostConstrast(boolean boost) {
+	public void boostConstrast() {
 		ConfigurationValue configVal = this.getWorkingPage().config().getKey(ConfigurationValue.ValueType.ContrastBoost);
 
 		try {
