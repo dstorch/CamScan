@@ -253,6 +253,8 @@ public class VisionManager {
 	private static IplImage _imageGlobalTransforms(IplImage img, ConfigurationDictionary config){
 		if (config == null){return img;}
 		
+		img = cvCloneImage(img);
+		
 		for(Object _name: config.getAllKeys()){
 			String name = (String)_name;
 			ConfigurationValue currentValue = config.getKeyWithName(name);
