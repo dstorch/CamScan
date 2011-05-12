@@ -110,9 +110,9 @@ public class ButtonPanel extends JPanel {
 		flipVertically.addActionListener(new FlipVerticallyListener());
 		this.controls.add(flipVertically);
 		
-		JLabel contrastLabel = new JLabel("Contrast: ", SwingConstants.CENTER);
-		this.add(contrastLabel);
-		this.controls.add(contrastLabel);
+		JLabel emptyLabel = new JLabel("");
+		this.add(emptyLabel);
+		this.controls.add(emptyLabel);
 		
 		this.contrastButton = new JButton("Boost Contrast");
 		this.add(this.contrastButton);
