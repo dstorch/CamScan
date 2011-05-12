@@ -148,6 +148,7 @@ public class ToolbarPanel extends JPanel {
 		c.insets = new Insets(0,150,0,0);
 		this.nextPageUp = new JButton(new ImageIcon(Parameters.UP_ARROW));
 		this.nextPageUp.addActionListener(new NextPageUpListener());
+		this.nextPageUp.setToolTipText("Page up");
 		this.add(this.nextPageUp, c);
 		
 		// the up arrow button
@@ -155,6 +156,7 @@ public class ToolbarPanel extends JPanel {
 		c.insets = new Insets(0,0,0,0);
 		this.nextPageDown = new JButton(new ImageIcon(Parameters.DOWN_ARROW));
 		this.nextPageDown.addActionListener(new NextPageDownListener());
+		this.nextPageDown.setToolTipText("Page down");
 		this.add(this.nextPageDown, c);
 		
 		

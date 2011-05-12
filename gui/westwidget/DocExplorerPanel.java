@@ -172,24 +172,24 @@ public class DocExplorerPanel extends JPanel {
                 String currDocName = (String) docList.getSelectedValue();
 
                 if (currDocName != null) {
-                    //docList.setSelectedIndex(0);
-                    //currDocName = "0";
-                
 
-                try {
-                    Parameters.getCoreManager().setWorkingDocumentFromName(currDocName);
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
+	                try {
+	                	System.out.println(currDocName);
+	                    Parameters.getCoreManager().setWorkingDocumentFromName(currDocName);
+	                } catch (IOException e1) {
+	                    e1.printStackTrace();
+	                }
+	
+	                // Update the page explorer panel with the pages of the
+	                // new working document.
+	                pageExpPanel.update();
+	
+	                // Get the very first page and display its image on the
+	                // central panel.
+	                centralPanel.updatePanels(false);
+	                
+                }   
 
-                // Update the page explorer panel with the pages of the
-                // new working document.
-                pageExpPanel.update();
-
-                // Get the very first page and display its image on the
-                // central panel.
-                centralPanel.updatePanels(false);
-                }
             }
         }
     }

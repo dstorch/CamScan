@@ -25,7 +25,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import javax.swing.DropMode;
+//import javax.swing.DropMode;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -84,10 +84,10 @@ public class PageExplorerPanel extends JPanel {
         this.pageList.addMouseListener(new MouseMotion());
 
         // for DnD
-        this.pageList.setDropMode(DropMode.INSERT);
-        this.pageList.setDragEnabled(true);
-        this.pageList.setTransferHandler(new TH());
-        this.pageList.setVisibleRowCount(-1); 
+//        this.pageList.setDropMode(DropMode.INSERT);
+//        this.pageList.setDragEnabled(true);
+//        this.pageList.setTransferHandler(new TH());
+//        this.pageList.setVisibleRowCount(-1); 
 
 
         this.listScroller = new JScrollPane(this.pageList);

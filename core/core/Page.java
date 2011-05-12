@@ -38,6 +38,10 @@ public class Page implements Comparable{
 	// the placement of the page relative to other
 	// pages in the document
 	private int _order;
+	
+	// whether the text found by OCR is
+	// based on the current processed image
+	private boolean _ocrUpToDate;
 
 	public Page(Document parent, int order, String name) {
 
@@ -107,15 +111,26 @@ public class Page implements Comparable{
 	public void setContainingDocument(Document parent) {
 		_parentDoc = parent;
 	}
+	public void ocrUpToDate() {
+		_ocrUpToDate = true;
+	}
+	public void ocrNeedsRevision() {
+		_ocrUpToDate = false;
+	}
+	public boolean getOcrUpToDate() {
+		return _ocrUpToDate;
+	}
 
 	public BufferedImage getRawImgFromDisk() throws IOException {
 		System.out.println("Getting raw image from disk");
 		//return ImageIO.read(new File(raw()));
+		System.out.println("making raw image from disk");
 		return VisionManager.loadImage(raw());
 	}
 
 	public BufferedImage getProcessedImgFromDisk() throws IOException {
 		//return ImageIO.read(new File(processed()));
+		System.out.println("making raw image from disk");
 		return VisionManager.loadImage(processed());
 	}
 
@@ -137,7 +152,7 @@ public class Page implements Comparable{
 
 		// change the name of the metadata and processed files
 		String newMet = metafile().substring(0, (metafile().length()-(name().length()+4)))+newName+".xml";
-		String newPro = Parameters.PROCESSED_DIRECTORY+"/"+newName+".tiff";
+		String newPro = Parameters.PROCESSED_DIRECTORY+File.separator+newName+".tiff";
 
 		System.out.println("New Metafile " + newMet);
 		System.out.println("New Profile " + newPro);
@@ -166,7 +181,7 @@ public class Page implements Comparable{
 	}
 
 	public void setOcrResults() throws IOException {
-		String[] fields = metafile().split("/");
+		String[] fields = metafile().split("\\\\");
 		PageText text = ocrManager.getPageText(_processed, fields[fields.length-1]);
 		synchronized (this) {
 			_text = text;
