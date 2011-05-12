@@ -12,6 +12,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import core.Parameters;
 
@@ -63,6 +65,11 @@ public class ButtonPanel extends JPanel {
 	 * Reference to the central panel.
 	 */
 	private CentralPanel centralPanel;
+	
+	/**
+	 * The temperature slider;
+	 */
+	private JSlider temperatureSlider;
 	
 	/****************************************
 	 * 
@@ -116,9 +123,23 @@ public class ButtonPanel extends JPanel {
 		this.add(temperatureLabel);
 		this.controls.add(temperatureLabel);
 		
-		JSlider temperatureSlider = new JSlider();
-		this.add(temperatureSlider);
-		this.controls.add(temperatureSlider);
+		this.temperatureSlider = new JSlider(JSlider.HORIZONTAL,-50, 50, 5);
+		this.temperatureSlider.addChangeListener(new TempListener());
+		this.add(this.temperatureSlider);
+		this.controls.add(this.temperatureSlider);
+	}
+	
+	/**
+	 * Implementation of a ChangeListener for the 
+	 * temperature slider.
+	 */
+	private class TempListener implements ChangeListener {
+
+		@Override
+		public void stateChanged(ChangeEvent arg0) {
+			Parameters.getCoreManager().changeTemperature(temperatureSlider.getValue());
+		}
+		
 	}
 	
 	/****************************************

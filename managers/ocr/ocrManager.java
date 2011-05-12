@@ -99,6 +99,5 @@ public class ocrManager {
 		for (Position p : pt.positions()) {
 			System.out.println(p.xmin()+" "+p.ymin()+" : "+p.word());
 		}
-
 	} 
 }

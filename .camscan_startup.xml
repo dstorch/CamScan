@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <STARTUP>
+  <TESSERACT path="C:\Program Files (x86)\Tesseract-OCR\tesseract.exe"/>
+  <PYTHON path="C:\Python27\python.exe"/>
+  <WORKINGDOC value="workspace\docs\acceptance\doc.xml"/>
+  <WORKINGPAGE value="workspace\docs\acceptance\acceptance.xml" order="1" name="acceptance"/>
+  <DOCLIST>
+    <DOC value="workspace\docs\acceptance\doc.xml"/>
+  </DOCLIST>
 </STARTUP>

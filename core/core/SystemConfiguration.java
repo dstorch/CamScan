@@ -103,7 +103,6 @@ public class SystemConfiguration {
 			} catch (NullPointerException e) {}
 			
 		}
-
 	}
 
 }
