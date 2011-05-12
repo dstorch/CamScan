@@ -116,20 +116,9 @@ public class VisionManager {
 	 * Applies temperature correction to an image.
 	 */
 	private static IplImage applyTemperatureCorrection(IplImage img, ConfigurationValue temp){
-		int redshift = 0;
-		int blueshift = 0;
-		
 		int kelvin = (Integer)temp.value();
-		if (kelvin > 0){
-			redshift = -kelvin;
-			blueshift = kelvin;
-		}else{
-			redshift = kelvin;
-			blueshift = -kelvin;
-		}
-		
-		System.out.println("Kelvin: " + kelvin+ " redshift: " + redshift + " blueshift: " + blueshift);
-		
+		int redshift = kelvin;
+		int blueshift = -kelvin;
 		
 		int blue;
 		int red;
@@ -847,7 +836,7 @@ public class VisionManager {
             	outputToFile(IplImageToBufferedImage(image), "output.png", corners, estimateConfigurationValues(IplImageToBufferedImage(image)));
         	}else if (true){
         		
-        		applyTemperatureCorrection(image, new ConfigurationValue(ConfigurationValue.ValueType.ColorTemperature, 0));
+        		applyTemperatureCorrection(image, new ConfigurationValue(ConfigurationValue.ValueType.ColorTemperature, -50));
         		//applyBinarization(image, new ConfigurationValue(ConfigurationValue.ValueType.Binarize, true));
         		
         		cvSaveImage("result.png", image);
