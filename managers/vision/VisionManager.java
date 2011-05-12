@@ -139,7 +139,7 @@ public class VisionManager {
 			for(int y=0;y<img.height();y++){
 				
 				red = (buf.get(y*img.width()*3 + x*3 + 0)&0xff) + redshift;
-				blue = (buf.get(y*img.width()*3 + x*3 + 2)&0xff) + blueshift;				
+				blue = (buf.get(y*img.width()*3 + x*3 + 2)&0xff) + blueshift;			
 				
 				red = (red > 255)? 255:red;
 				blue = (blue > 255)? 255:blue;
@@ -167,13 +167,23 @@ public class VisionManager {
 		return img;
 	}
 	
+	
+	/*
+	 * Binarize the image, that is move near-white to white and near-black to black.
+	 */
+	private static IplImage applyBinarization(IplImage img, ConfigurationValue binarize){
+		return null;
+	}
+	
 	/*
 	 * Apply a contrast boost by equalizing the image in grayscale & reapplying that
 	 * relative difference in the luma channel. Also see alternative algorithm (faster,
 	 * but has chroma artifacts.)
 	 */
 	private static IplImage applyContrastBoost(IplImage img, ConfigurationValue boost){
-		if (!(Boolean)boost.value()){return img;}
+		System.out.println("Thinking of boosting the contrast...");
+		if (!(Boolean)boost.value()){System.out.println("Nah, nevermind."); return img;}
+		System.out.println("I'm doing it!");
 		
 		IplImage gray = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
     	cvCvtColor(img, gray, CV_RGB2GRAY);
@@ -735,7 +745,7 @@ public class VisionManager {
 	}
 	
 	@SuppressWarnings("unused")
-	public static void main(String[] args) throws IOException{
+	public static void main(String[] args) throws IOException, InvalidTypingException{
 		
 		if (!SystemConfiguration.OPENCV_ENABLED){
 			System.out.println("OpenCV disabled!");
@@ -750,7 +760,7 @@ public class VisionManager {
         	IplImage mini = resizeMaxSide(image, 200);
         	final ByteBuffer minibuf = mini.getByteBuffer();
         	
-        	if (true){
+        	if (false){
         		/*
         		 * Ideas:
         		 * -use angle invariance to do RANSAC on the points
@@ -835,6 +845,12 @@ public class VisionManager {
         	}else if (false){
         		Corners corners = new Corners(new Point(961, 531), new Point(2338, 182), new Point(1411, 2393), new Point(2874, 1986));        	
             	outputToFile(IplImageToBufferedImage(image), "output.png", corners, estimateConfigurationValues(IplImageToBufferedImage(image)));
+        	}else if (true){
+        		
+        		applyTemperatureCorrection(image, new ConfigurationValue(ConfigurationValue.ValueType.ColorTemperature, 0));
+        		//applyBinarization(image, new ConfigurationValue(ConfigurationValue.ValueType.Binarize, true));
+        		
+        		cvSaveImage("result.png", image);
         	}
 
         	
