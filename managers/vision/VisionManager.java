@@ -55,6 +55,9 @@ public class VisionManager {
 		return point;
 	}
 	
+	/*
+	 * Euclidean distance.
+	 */
 	private static double distance(Point a, Point b){
 		return Math.sqrt( (a.x-b.x)*(a.x-b.x) + (a.y-b.y)*(a.y-b.y) );
 	}
@@ -125,6 +128,9 @@ public class VisionManager {
 			blueshift = -kelvin;
 		}
 		
+		System.out.println("Kelvin: " + kelvin+ " redshift: " + redshift + " blueshift: " + blueshift);
+		
+		
 		int blue;
 		int red;
 		final ByteBuffer buf = img.getByteBuffer();
@@ -149,7 +155,7 @@ public class VisionManager {
 	}
 	
 	/*
-	 * Flips an image.
+	 * Flips an image. Handles both vertical and horizontal flips (reads the relevant type from the ConfigurationValue)
 	 */
 	private static IplImage applyFlipCorrection(IplImage img, ConfigurationValue flip){
 		if (!(Boolean)flip.value()){return img;}
@@ -322,10 +328,17 @@ public class VisionManager {
 		return corners;
 	}
 	
+	/*
+	 * Angular distance for computing the ordering the of corners
+	 */
 	private static double angular_distance(double a1, double a2){
 		return Math.abs((a2+Math.PI)-(a1+Math.PI));
 	}
 	
+	/*
+	 * Find the top-left/top-right/bottom-left/bottom-right corners by going around from
+	 * the midpoint in a circle (starting west). The first one encountered is the top-left, then top-right, etc.
+	 */
 	private static Corners pointsToCorners(List<MergeZone> merged){
 		double mx = 0;
 		double my = 0;
@@ -350,7 +363,9 @@ public class VisionManager {
 		return new Corners(merged.get(3).point, merged.get(2).point, merged.get(0).point, merged.get(1).point);
 	}
 	
-	
+	/*
+	 * Write a BufferedImage to a given path. (Used for debugging mostly).
+	 */
 	private static void writeImageToFile(BufferedImage img, String path) throws IOException{
 		if (!SystemConfiguration.OPENCV_ENABLED){
 			File output = new File(path);
@@ -379,6 +394,9 @@ public class VisionManager {
 		writeImageToFile(rerenderImage(img, points, config), path);
 	}
 	
+	/*
+	 * Convert an IplImage to a BufferedImage
+	 */
 	private static BufferedImage IplImageToBufferedImage(IplImage image){
 		return image.getBufferedImage();
 	}
@@ -397,6 +415,9 @@ public class VisionManager {
 		return IplImage.createFrom(image);
 	}
 	
+	/*
+	 * Load the image at the given path
+	 */
 	public static BufferedImage loadImage(String path) throws IOException{
 		if (!SystemConfiguration.OPENCV_ENABLED){
 			File input = new File(path);
@@ -406,6 +427,9 @@ public class VisionManager {
 		}
 	}
 	
+	/*
+	 * Convert a corners object to the matrix form that OpenCV desires
+	 */
 	private static CvMat cornersToMat(Corners c){
 		CvMat points = cvCreateMat(4, 2, CV_64F);
 		points.put(0,0,c.upleft().x);
@@ -423,12 +447,18 @@ public class VisionManager {
 		return points;
 	}
 	
+	/*
+	 * CvPoint from x,y
+	 */
 	public static CvPoint makePoint(double x, double y){
 		CvPoint pt = new CvPoint();
 		pt.set((int)x, (int)y);
 		return pt;
 	}
 	
+	/*
+	 * Linear scaled image from a float array
+	 */
 	private static IplImage linearScaledImage(IplImage scaled){
 		final FloatBuffer scaledbuf = scaled.getByteBuffer().asFloatBuffer();
 		IplImage output = cvCreateImage(cvSize(scaled.width(), scaled.height()), IPL_DEPTH_8U, 1);
@@ -446,6 +476,9 @@ public class VisionManager {
     	return output;
 	}
 	
+	/*
+	 * Custom weights for r,g,b to grayscale.
+	 */
 	private static IplImage customGrayTransform(IplImage color, double r, double g, double b){
 		IplImage gray = cvCreateImage(cvSize(color.width(), color.height()), IPL_DEPTH_8U, 1);
 		
@@ -609,7 +642,7 @@ public class VisionManager {
 		
 		//debugging
 		//TODO: remove
-		
+		/*
 		warpage = linearScaledImage(warpage);
 		for(MergeZone pp: merged){
 			Point p = pp.point;
@@ -621,10 +654,13 @@ public class VisionManager {
 		cvSaveImage("gray.png", gray);
 		cvSaveImage("warpage.png", warpage);
 		cvSaveImage("integral.png", linearScaledImage(integral));
-		
+		*/
 		return merged;
 	}
 	
+	/*
+	 * Get a gray image weighted with the variance of the color channels.
+	 */
 	private static IplImage optimalGrayImage(IplImage color, int power){
 		final ByteBuffer colorbuf = color.getByteBuffer();
 		int width = color.width();
@@ -679,6 +715,9 @@ public class VisionManager {
 		return optimalGrayImage(color, 2);
 	}
 	
+	/*
+	 * Resize to be at most maxSide on the longest side
+	 */
 	private static IplImage resizeMaxSide(IplImage image, int maxSide){
     	int nw = 0;
     	int nh = 0;

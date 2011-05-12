@@ -2,7 +2,9 @@ package vision;
 
 import java.util.HashMap;
 
-
+/*
+ * An entry in a ConfigurationDictionary. Basically a variably typed object.
+ */
 
 public class ConfigurationValue {
 	
