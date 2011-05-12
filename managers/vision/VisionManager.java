@@ -161,7 +161,32 @@ public class VisionManager {
 	 * Binarize the image, that is move near-white to white and near-black to black.
 	 */
 	private static IplImage applyBinarization(IplImage img, ConfigurationValue binarize){
-		return null;
+		if (!(Boolean)binarize.value()){ return img;}
+		
+		IplImage hsl = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 3);
+		cvCvtColor(img, hsl, CV_RGB2HLS);
+		
+		final ByteBuffer hslbuf = hsl.getByteBuffer();
+		final ByteBuffer buf = img.getByteBuffer();
+		
+		int luma;
+		for(int y=0;y<img.height();y++){
+			for (int x=0;x<img.width();x++){
+				luma = hslbuf.get( y*img.width() + x + 2 )&0xff;
+				
+				if (luma > 50){
+					buf.put(y*img.width()*3 + x*3 + 0, (byte)255 );
+					buf.put(y*img.width()*3 + x*3 + 1, (byte)255 );
+					buf.put(y*img.width()*3 + x*3 + 2, (byte)255 );
+				}else{
+					buf.put(y*img.width()*3 + x*3 + 0, (byte)0 );
+					buf.put(y*img.width()*3 + x*3 + 1, (byte)0 );
+					buf.put(y*img.width()*3 + x*3 + 2, (byte)0 );
+				}
+			}
+		}
+		
+		return img;
 	}
 	
 	/*
@@ -836,8 +861,8 @@ public class VisionManager {
             	outputToFile(IplImageToBufferedImage(image), "output.png", corners, estimateConfigurationValues(IplImageToBufferedImage(image)));
         	}else if (true){
         		
-        		applyTemperatureCorrection(image, new ConfigurationValue(ConfigurationValue.ValueType.ColorTemperature, -50));
-        		//applyBinarization(image, new ConfigurationValue(ConfigurationValue.ValueType.Binarize, true));
+        		//applyTemperatureCorrection(image, new ConfigurationValue(ConfigurationValue.ValueType.ColorTemperature, -50));
+        		applyBinarization(image, new ConfigurationValue(ConfigurationValue.ValueType.Binarize, true));
         		
         		cvSaveImage("result.png", image);
         	}
