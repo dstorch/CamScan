@@ -14,7 +14,7 @@ public class ConfigurationValue {
 	public ValueType type;
 	
 	public static enum ValueType{
-		FlipHorizontal, FlipVertical, ColorTemperature, ContrastBoost, BilateralFilter;
+		FlipHorizontal, FlipVertical, ColorTemperature, ContrastBoost, BilateralFilter, Binarize;
 	}
 	
 	public ConfigurationValue(ValueType type, int value) throws InvalidTypingException{
@@ -32,7 +32,7 @@ public class ConfigurationValue {
 		this.type = type;
 	}
 	public ConfigurationValue(ValueType type, boolean value) throws InvalidTypingException{
-		if (type != ValueType.FlipHorizontal && type != ValueType.FlipVertical && type != ValueType.ContrastBoost && type != ValueType.BilateralFilter){
+		if (type != ValueType.FlipHorizontal && type != ValueType.FlipVertical && type != ValueType.ContrastBoost && type != ValueType.BilateralFilter && type != ValueType.Binarize){
 			throw new InvalidTypingException("Configuration type and value do not match");
 		}
 		this._bool = value;
@@ -47,13 +47,14 @@ public class ConfigurationValue {
 		names.put(ValueType.ColorTemperature, "colortemperature");
 		names.put(ValueType.ContrastBoost, "contrastboost");
 		names.put(ValueType.BilateralFilter, "bilateral");
+		names.put(ValueType.Binarize, "binarize");
 		return names.get(type);
 	}
 	
 	public Object value(){
 		if (this.type == ValueType.ColorTemperature){
 			return (Object)new Integer(this._int);
-		}else if (this.type == ValueType.FlipHorizontal || this.type == ValueType.FlipVertical || this.type == ValueType.ContrastBoost || this.type == ValueType.BilateralFilter){
+		}else if (this.type == ValueType.FlipHorizontal || this.type == ValueType.FlipVertical || this.type == ValueType.ContrastBoost || this.type == ValueType.BilateralFilter || this.type == ValueType.Binarize){
 			return (Object)new Boolean(this._bool);
 		}else if (false){
 			return (Object)new Double(this._dbl);

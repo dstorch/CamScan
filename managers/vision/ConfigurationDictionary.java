@@ -29,6 +29,7 @@ public class ConfigurationDictionary {
 		elementNames.put("FLIPH", ConfigurationValue.ValueType.FlipHorizontal);
 		elementNames.put("FLIPV", ConfigurationValue.ValueType.FlipVertical);
 		elementNames.put("BILATERAL", ConfigurationValue.ValueType.BilateralFilter);
+		elementNames.put("BINARIZED", ConfigurationValue.ValueType.Binarize);
 		
 		for(Object _key: elementNames.keySet()){
 			String key = (String)_key;
@@ -79,6 +80,7 @@ public class ConfigurationDictionary {
 		elementNames.put(ConfigurationValue.ValueType.FlipHorizontal, "FLIPH");
 		elementNames.put(ConfigurationValue.ValueType.FlipVertical, "FLIPV");
 		elementNames.put(ConfigurationValue.ValueType.BilateralFilter, "BILATERAL");
+		elementNames.put(ConfigurationValue.ValueType.Binarize, "BINARIZED");
 		
 		for(Object _key: this.getAllKeys()){
 			String key = (String)_key;
