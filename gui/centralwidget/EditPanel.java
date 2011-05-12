@@ -43,7 +43,7 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	 * The default radius of the ellipses representing
 	 * the corners of the page.
 	 */
-	private static int ELLIPSE_RADIUS = 10;
+	private static int ELLIPSE_RADIUS = 20;
 
 	/****************************************
 	 * 

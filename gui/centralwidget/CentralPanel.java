@@ -11,6 +11,7 @@ import search.SearchResults;
 
 import core.CoreManager;
 import core.Mode;
+import core.Page;
 import core.Parameters;
 
 import westwidget.WestPanel;

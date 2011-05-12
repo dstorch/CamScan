@@ -9,6 +9,7 @@ import javax.swing.JOptionPane;
 import core.Document;
 import core.Page;
 import core.Parameters;
+import core.SystemConfiguration;
 
 
 public class ExportThread extends Thread {
@@ -37,10 +38,10 @@ public class ExportThread extends Thread {
 	
 	        String docPath = _document.pathname();
 	        
-			System.out.println("python "+Parameters.EXPORT_PATH+" "+docPath+" "+_outfile);
+			System.out.println(SystemConfiguration.PYTHON_PATH+" "+Parameters.EXPORT_PATH+" "+docPath+" "+_outfile);
 			Process process;
 	
-			process = Runtime.getRuntime().exec("python "+Parameters.EXPORT_PATH+" "+docPath+" "+_outfile);		
+			process = Runtime.getRuntime().exec(SystemConfiguration.PYTHON_PATH+" "+Parameters.EXPORT_PATH+" "+docPath+" "+_outfile);		
 			reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			
 			String status = reader.readLine();

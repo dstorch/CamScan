@@ -4,11 +4,9 @@ import java.io.*;
 import java.awt.Point;
 import core.PageText;
 import core.Position;
+import core.SystemConfiguration;
 
 public class ocrManager {
-
-	// absolute path to the tesseract executable
-	public static String TESS_PATH = "C:" + File.separator + "Program Files (x86)" + File.separator + "Tesseract-OCR" + File.separator + "tesseract.exe";
 
 	// path to the python script for processing the tesseract output
 	private final static String EXTRACTBB_PATH = "managers" + File.separator + "ocr" + File.separator + "extractbb.py";
@@ -32,7 +30,7 @@ public class ocrManager {
 		if (outFile.exists()) outFile.delete();
 		
 		// run tesseract
-		String arguments = TESS_PATH+" "+imageFile+" "+OUT_PATH+File.separator+outname+" " + CONFIG_FILE;
+		String arguments = SystemConfiguration.TESS_PATH+" "+imageFile+" "+OUT_PATH+File.separator+outname+" " + CONFIG_FILE;
 		System.out.println(arguments);
 		Runtime.getRuntime().exec(arguments);
 		
@@ -40,7 +38,8 @@ public class ocrManager {
 		while (!outFile.canRead()) {}
 
 		// now run python script for extracting data
-		String command = "python "+EXTRACTBB_PATH+" "+OUT_PATH+File.separator+outname+".html";
+		String command = SystemConfiguration.PYTHON_PATH+" "+EXTRACTBB_PATH+" "
+						 +OUT_PATH+File.separator+outname+".html";
 		Process process = Runtime.getRuntime().exec(command);
 		
 		// use a reader to read text from the standard output stream of the processs
