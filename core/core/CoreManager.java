@@ -657,7 +657,7 @@ public class CoreManager {
 		}
 	}
 
-	/*
+	/**
 	 * Given a temperature (centered around 0, e.g. -50 to 50), adjust the image.
 	 */
 	public void changeTemperature(int temperature){
