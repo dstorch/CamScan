@@ -11,6 +11,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import core.Parameters;
 
@@ -64,6 +66,11 @@ public class ButtonPanel extends JPanel {
 	 */
 	private CentralPanel centralPanel;
 	
+	/**
+	 * The temperature slider;
+	 */
+	private JSlider temperatureSlider;
+	
 	/****************************************
 	 * 
 	 * Constructor(s)
@@ -103,9 +110,9 @@ public class ButtonPanel extends JPanel {
 		flipVertically.addActionListener(new FlipVerticallyListener());
 		this.controls.add(flipVertically);
 		
-		JLabel contrastLabel = new JLabel("Contrast: ", SwingConstants.CENTER);
-		this.add(contrastLabel);
-		this.controls.add(contrastLabel);
+		JLabel emptyLabel = new JLabel("");
+		this.add(emptyLabel);
+		this.controls.add(emptyLabel);
 		
 		this.contrastButton = new JButton("Boost Contrast");
 		this.add(this.contrastButton);
@@ -116,9 +123,10 @@ public class ButtonPanel extends JPanel {
 		this.add(temperatureLabel);
 		this.controls.add(temperatureLabel);
 		
-		JSlider temperatureSlider = new JSlider();
-		this.add(temperatureSlider);
-		this.controls.add(temperatureSlider);
+		this.temperatureSlider = new JSlider(JSlider.HORIZONTAL,-50, 50, 5);
+		this.temperatureSlider.addChangeListener(new TempListener());
+		this.add(this.temperatureSlider);
+		this.controls.add(this.temperatureSlider);
 	}
 	
 	/****************************************
@@ -225,17 +233,39 @@ public class ButtonPanel extends JPanel {
 		private boolean boostContrast = false;
 		
 		public void actionPerformed(ActionEvent arg0) {
-			boostContrast = !boostContrast;
 			
-			if (boostContrast)
+			this.boostContrast = !this.boostContrast;
+			
+			if (this.boostContrast) {
 				contrastButton.setText("Reduce Contrast");
-			else 
+			} else { 
 				contrastButton.setText("Boost Contrast");
-			
-			Parameters.getCoreManager().boostConstrast(boostContrast);
+			}	
+
+			Parameters.getCoreManager().boostConstrast();
 			Parameters.getCoreManager().getEditImageTransform();
 			centralPanel.updatePanels(false);
 		}
+	}
+	
+	/**
+	 * Implementation of a ChangeListener for the 
+	 * temperature slider.
+	 */
+	private class TempListener implements ChangeListener {
+
+		public void stateChanged(ChangeEvent arg0) {
+			TempChangeThread t = new TempChangeThread();
+			t.start();
+		}
+	}
+	
+	private class TempChangeThread extends Thread {
 		
+		public void run() {
+			Parameters.getCoreManager().changeTemperature(temperatureSlider.getValue());
+			Parameters.getCoreManager().getEditImageTransform();
+			centralPanel.updatePanels(false);
+		}
 	}
 }

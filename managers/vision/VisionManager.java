@@ -55,6 +55,9 @@ public class VisionManager {
 		return point;
 	}
 	
+	/*
+	 * Euclidean distance.
+	 */
 	private static double distance(Point a, Point b){
 		return Math.sqrt( (a.x-b.x)*(a.x-b.x) + (a.y-b.y)*(a.y-b.y) );
 	}
@@ -113,17 +116,9 @@ public class VisionManager {
 	 * Applies temperature correction to an image.
 	 */
 	private static IplImage applyTemperatureCorrection(IplImage img, ConfigurationValue temp){
-		int redshift = 0;
-		int blueshift = 0;
-		
 		int kelvin = (Integer)temp.value();
-		if (kelvin > 0){
-			redshift = -kelvin;
-			blueshift = kelvin;
-		}else{
-			redshift = kelvin;
-			blueshift = -kelvin;
-		}
+		int redshift = kelvin;
+		int blueshift = -kelvin;
 		
 		int blue;
 		int red;
@@ -133,7 +128,7 @@ public class VisionManager {
 			for(int y=0;y<img.height();y++){
 				
 				red = (buf.get(y*img.width()*3 + x*3 + 0)&0xff) + redshift;
-				blue = (buf.get(y*img.width()*3 + x*3 + 2)&0xff) + blueshift;				
+				blue = (buf.get(y*img.width()*3 + x*3 + 2)&0xff) + blueshift;			
 				
 				red = (red > 255)? 255:red;
 				blue = (blue > 255)? 255:blue;
@@ -149,7 +144,7 @@ public class VisionManager {
 	}
 	
 	/*
-	 * Flips an image.
+	 * Flips an image. Handles both vertical and horizontal flips (reads the relevant type from the ConfigurationValue)
 	 */
 	private static IplImage applyFlipCorrection(IplImage img, ConfigurationValue flip){
 		if (!(Boolean)flip.value()){return img;}
@@ -161,13 +156,48 @@ public class VisionManager {
 		return img;
 	}
 	
+	
+	/*
+	 * Binarize the image, that is move near-white to white and near-black to black.
+	 */
+	private static IplImage applyBinarization(IplImage img, ConfigurationValue binarize){
+		if (!(Boolean)binarize.value()){ return img;}
+		
+		IplImage hsl = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 3);
+		cvCvtColor(img, hsl, CV_RGB2HLS);
+		
+		final ByteBuffer hslbuf = hsl.getByteBuffer();
+		final ByteBuffer buf = img.getByteBuffer();
+		
+		int luma;
+		for(int y=0;y<img.height();y++){
+			for (int x=0;x<img.width();x++){
+				luma = hslbuf.get( y*img.width() + x + 2 )&0xff;
+				
+				if (luma > 50){
+					buf.put(y*img.width()*3 + x*3 + 0, (byte)255 );
+					buf.put(y*img.width()*3 + x*3 + 1, (byte)255 );
+					buf.put(y*img.width()*3 + x*3 + 2, (byte)255 );
+				}else{
+					buf.put(y*img.width()*3 + x*3 + 0, (byte)0 );
+					buf.put(y*img.width()*3 + x*3 + 1, (byte)0 );
+					buf.put(y*img.width()*3 + x*3 + 2, (byte)0 );
+				}
+			}
+		}
+		
+		return img;
+	}
+	
 	/*
 	 * Apply a contrast boost by equalizing the image in grayscale & reapplying that
 	 * relative difference in the luma channel. Also see alternative algorithm (faster,
 	 * but has chroma artifacts.)
 	 */
 	private static IplImage applyContrastBoost(IplImage img, ConfigurationValue boost){
-		if (!(Boolean)boost.value()){return img;}
+		System.out.println("Thinking of boosting the contrast...");
+		if (!(Boolean)boost.value()){System.out.println("Nah, nevermind."); return img;}
+		System.out.println("I'm doing it!");
 		
 		IplImage gray = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
     	cvCvtColor(img, gray, CV_RGB2GRAY);
@@ -222,6 +252,8 @@ public class VisionManager {
 	 */
 	private static IplImage _imageGlobalTransforms(IplImage img, ConfigurationDictionary config){
 		if (config == null){return img;}
+		
+		img = cvCloneImage(img);
 		
 		for(Object _name: config.getAllKeys()){
 			String name = (String)_name;
@@ -322,10 +354,17 @@ public class VisionManager {
 		return corners;
 	}
 	
+	/*
+	 * Angular distance for computing the ordering the of corners
+	 */
 	private static double angular_distance(double a1, double a2){
 		return Math.abs((a2+Math.PI)-(a1+Math.PI));
 	}
 	
+	/*
+	 * Find the top-left/top-right/bottom-left/bottom-right corners by going around from
+	 * the midpoint in a circle (starting west). The first one encountered is the top-left, then top-right, etc.
+	 */
 	private static Corners pointsToCorners(List<MergeZone> merged){
 		double mx = 0;
 		double my = 0;
@@ -350,7 +389,9 @@ public class VisionManager {
 		return new Corners(merged.get(3).point, merged.get(2).point, merged.get(0).point, merged.get(1).point);
 	}
 	
-	
+	/*
+	 * Write a BufferedImage to a given path. (Used for debugging mostly).
+	 */
 	private static void writeImageToFile(BufferedImage img, String path) throws IOException{
 		if (!SystemConfiguration.OPENCV_ENABLED){
 			File output = new File(path);
@@ -379,6 +420,9 @@ public class VisionManager {
 		writeImageToFile(rerenderImage(img, points, config), path);
 	}
 	
+	/*
+	 * Convert an IplImage to a BufferedImage
+	 */
 	private static BufferedImage IplImageToBufferedImage(IplImage image){
 		return image.getBufferedImage();
 	}
@@ -397,6 +441,9 @@ public class VisionManager {
 		return IplImage.createFrom(image);
 	}
 	
+	/*
+	 * Load the image at the given path
+	 */
 	public static BufferedImage loadImage(String path) throws IOException{
 		if (!SystemConfiguration.OPENCV_ENABLED){
 			File input = new File(path);
@@ -406,6 +453,9 @@ public class VisionManager {
 		}
 	}
 	
+	/*
+	 * Convert a corners object to the matrix form that OpenCV desires
+	 */
 	private static CvMat cornersToMat(Corners c){
 		CvMat points = cvCreateMat(4, 2, CV_64F);
 		points.put(0,0,c.upleft().x);
@@ -423,12 +473,18 @@ public class VisionManager {
 		return points;
 	}
 	
+	/*
+	 * CvPoint from x,y
+	 */
 	public static CvPoint makePoint(double x, double y){
 		CvPoint pt = new CvPoint();
 		pt.set((int)x, (int)y);
 		return pt;
 	}
 	
+	/*
+	 * Linear scaled image from a float array
+	 */
 	private static IplImage linearScaledImage(IplImage scaled){
 		final FloatBuffer scaledbuf = scaled.getByteBuffer().asFloatBuffer();
 		IplImage output = cvCreateImage(cvSize(scaled.width(), scaled.height()), IPL_DEPTH_8U, 1);
@@ -446,6 +502,9 @@ public class VisionManager {
     	return output;
 	}
 	
+	/*
+	 * Custom weights for r,g,b to grayscale.
+	 */
 	private static IplImage customGrayTransform(IplImage color, double r, double g, double b){
 		IplImage gray = cvCreateImage(cvSize(color.width(), color.height()), IPL_DEPTH_8U, 1);
 		
@@ -609,7 +668,7 @@ public class VisionManager {
 		
 		//debugging
 		//TODO: remove
-		
+		/*
 		warpage = linearScaledImage(warpage);
 		for(MergeZone pp: merged){
 			Point p = pp.point;
@@ -621,10 +680,13 @@ public class VisionManager {
 		cvSaveImage("gray.png", gray);
 		cvSaveImage("warpage.png", warpage);
 		cvSaveImage("integral.png", linearScaledImage(integral));
-		
+		*/
 		return merged;
 	}
 	
+	/*
+	 * Get a gray image weighted with the variance of the color channels.
+	 */
 	private static IplImage optimalGrayImage(IplImage color, int power){
 		final ByteBuffer colorbuf = color.getByteBuffer();
 		int width = color.width();
@@ -679,6 +741,9 @@ public class VisionManager {
 		return optimalGrayImage(color, 2);
 	}
 	
+	/*
+	 * Resize to be at most maxSide on the longest side
+	 */
 	private static IplImage resizeMaxSide(IplImage image, int maxSide){
     	int nw = 0;
     	int nh = 0;
@@ -696,7 +761,7 @@ public class VisionManager {
 	}
 	
 	@SuppressWarnings("unused")
-	public static void main(String[] args) throws IOException{
+	public static void main(String[] args) throws IOException, InvalidTypingException{
 		
 		if (!SystemConfiguration.OPENCV_ENABLED){
 			System.out.println("OpenCV disabled!");
@@ -704,14 +769,14 @@ public class VisionManager {
 		}
 		
 		System.out.println("Vision library stub launcher");
-		IplImage image = cvLoadImage("tests/images/IMG_1534.tif");
+		IplImage image = cvLoadImage("tests/images/IMG_1529.tif");
 		System.out.println("Loaded");
         if (image != null) {
         	
         	IplImage mini = resizeMaxSide(image, 200);
         	final ByteBuffer minibuf = mini.getByteBuffer();
         	
-        	if (true){
+        	if (false){
         		/*
         		 * Ideas:
         		 * -use angle invariance to do RANSAC on the points
@@ -796,6 +861,12 @@ public class VisionManager {
         	}else if (false){
         		Corners corners = new Corners(new Point(961, 531), new Point(2338, 182), new Point(1411, 2393), new Point(2874, 1986));        	
             	outputToFile(IplImageToBufferedImage(image), "output.png", corners, estimateConfigurationValues(IplImageToBufferedImage(image)));
+        	}else if (true){
+        		
+        		//applyTemperatureCorrection(image, new ConfigurationValue(ConfigurationValue.ValueType.ColorTemperature, -50));
+        		applyBinarization(image, new ConfigurationValue(ConfigurationValue.ValueType.Binarize, true));
+        		
+        		cvSaveImage("result.png", image);
         	}
 
         	

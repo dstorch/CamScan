@@ -901,7 +901,7 @@ public class CoreManager {
 	}
 
 	/**
-	 * Uses the VisionManager to implement the temperature slider.
+	 * Given a temperature (centered around 0, e.g. -50 to 50), adjust the image.
 	 * 
 	 * @param temperature
 	 */
@@ -913,7 +913,7 @@ public class CoreManager {
 		}
 	}
 
-	public void boostConstrast(boolean boost) {
+	public void boostConstrast() {
 		ConfigurationValue configVal = this.getWorkingPage().config().getKey(ConfigurationValue.ValueType.ContrastBoost);
 
 		try {
@@ -1017,6 +1017,7 @@ public class CoreManager {
 	public void getEditImageTransform() {
 		_processedImage = VisionManager.imageGlobalTransforms(_rawImage,
 				Parameters.getCoreManager().getWorkingPage().config());
+		this.updateProcessedImageWithRawDimensions();
 	}
 
 
