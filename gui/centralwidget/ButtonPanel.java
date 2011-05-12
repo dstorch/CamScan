@@ -129,19 +129,6 @@ public class ButtonPanel extends JPanel {
 		this.controls.add(this.temperatureSlider);
 	}
 	
-	/**
-	 * Implementation of a ChangeListener for the 
-	 * temperature slider.
-	 */
-	private class TempListener implements ChangeListener {
-
-		@Override
-		public void stateChanged(ChangeEvent arg0) {
-			Parameters.getCoreManager().changeTemperature(temperatureSlider.getValue());
-		}
-		
-	}
-	
 	/****************************************
 	 * 
 	 * Public Methods
@@ -256,17 +243,40 @@ public class ButtonPanel extends JPanel {
 		private boolean boostContrast = false;
 		
 		public void actionPerformed(ActionEvent arg0) {
-			boostContrast = !boostContrast;
 			
-			if (boostContrast)
+			this.boostContrast = !this.boostContrast;
+			
+			if (this.boostContrast) {
 				contrastButton.setText("Reduce Contrast");
-			else 
+			} else { 
 				contrastButton.setText("Boost Contrast");
-			
-			Parameters.getCoreManager().boostConstrast(boostContrast);
+			}	
+
+			Parameters.getCoreManager().boostConstrast();
 			Parameters.getCoreManager().getEditImageTransform();
 			centralPanel.updatePanels(false);
 		}
+	}
+	
+	/**
+	 * Implementation of a ChangeListener for the 
+	 * temperature slider.
+	 */
+	private class TempListener implements ChangeListener {
+
+		@Override
+		public void stateChanged(ChangeEvent arg0) {
+			TempChangeThread t = new TempChangeThread();
+			t.start();
+		}
+	}
+	
+	private class TempChangeThread extends Thread {
 		
+		public void run() {
+			Parameters.getCoreManager().changeTemperature(temperatureSlider.getValue());
+			Parameters.getCoreManager().getEditImageTransform();
+			centralPanel.updatePanels(false);
+		}
 	}
 }
