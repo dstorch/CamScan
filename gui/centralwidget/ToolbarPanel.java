@@ -116,7 +116,7 @@ public class ToolbarPanel extends JPanel {
 
 		// the view mode magnifying glass icon
 		c.gridx = 2;
-		c.insets = new Insets(0,150,0,0);
+		c.insets = new Insets(0,75,0,0);
 		JRadioButton viewIcon = new JRadioButton(new ImageIcon(Parameters.VIEW));
 		this.add(viewIcon, c);
 
@@ -145,7 +145,7 @@ public class ToolbarPanel extends JPanel {
 
 		// the down arrow button
 		c.gridx = 6;
-		c.insets = new Insets(0,150,0,0);
+		c.insets = new Insets(0,75,0,0);
 		this.nextPageUp = new JButton(new ImageIcon(Parameters.UP_ARROW));
 		this.nextPageUp.addActionListener(new NextPageUpListener());
 		this.nextPageUp.setToolTipText("Page up");

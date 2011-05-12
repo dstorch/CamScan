@@ -16,6 +16,9 @@ for line in infile :
 
 matches = regex.findall(fileString)
 
+regex2 = re.compile("[^A-Za-z0-9\-,.:;!? ]")
+
 for g1, g2, g3, g4, g5 in matches :
-	
+        g5 = re.sub(regex2, "", g5)
+        g2 = re.sub(regex2, "", g2)
 	sys.stdout.write(g5+" "+g2+"\n")
