@@ -5,6 +5,7 @@ import java.io.*;
 import core.Document;
 import core.Page;
 import core.Parameters;
+import core.SystemConfiguration;
 
 public class ExportManager implements Exporter {
 
@@ -27,7 +28,7 @@ public class ExportManager implements Exporter {
 		    try {
 		    	
 		    	// determine the name of the output file
-		    	String[] pathpieces = p.processed().split("\\\\");
+		    	String[] pathpieces = p.processed().split(SystemConfiguration.PATH_REGEX);
 		    	String outfile = outdirectory+File.separator+pathpieces[pathpieces.length - 1];
 		    	
 			    OutputStream out = new FileOutputStream(outfile);

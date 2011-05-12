@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.awt.Graphics;
 import java.awt.Point;
 import core.Corners;
+import core.SystemConfiguration;
+
 import javax.imageio.ImageIO;
 
 import com.googlecode.javacv.cpp.opencv_core.CvMat;
@@ -23,8 +25,6 @@ import static com.googlecode.javacv.cpp.opencv_calib3d.*;
 
 
 public class VisionManager {
-	
-	private static final boolean OPENCV_ENABLED = true;
 	
 	/*
 	 * Estimate good values for the configuration dictionary for a raw image.
@@ -90,7 +90,7 @@ public class VisionManager {
 	 * The result will be a flat, pretty page.
 	 */
 	public static BufferedImage rerenderImage(BufferedImage img, Corners corners, ConfigurationDictionary config){
-		if (!OPENCV_ENABLED){return img;}
+		if (!SystemConfiguration.OPENCV_ENABLED){return img;}
 		
 		IplImage image = BufferedImageToIplImage(img);
 		image = _imageGlobalTransforms(image, config);
@@ -250,7 +250,7 @@ public class VisionManager {
 	 * calling rerenderImage (as rerender does it interally.)
 	 */
 	public static BufferedImage imageGlobalTransforms(BufferedImage img, ConfigurationDictionary config){
-		if (!OPENCV_ENABLED){return img;}
+		if (!SystemConfiguration.OPENCV_ENABLED){return img;}
 		return IplImageToBufferedImage( _imageGlobalTransforms(BufferedImageToIplImage(img), config) );
 	}
 	
@@ -259,7 +259,7 @@ public class VisionManager {
 	 */
 	public static Corners findCorners(BufferedImage img){
 		Corners defaultCorners = new Corners(new Point(0,0), new Point(img.getWidth(),0), new Point(0,img.getHeight()), new Point(img.getWidth(),img.getHeight()));
-		if (!OPENCV_ENABLED){return defaultCorners;}
+		if (!SystemConfiguration.OPENCV_ENABLED){return defaultCorners;}
 		
 		IplImage image = BufferedImageToIplImage(img);
 		
@@ -352,7 +352,7 @@ public class VisionManager {
 	
 	
 	private static void writeImageToFile(BufferedImage img, String path) throws IOException{
-		if (!OPENCV_ENABLED){
+		if (!SystemConfiguration.OPENCV_ENABLED){
 			File output = new File(path);
 			ImageIO.write(img, "png", output);
 		}else{
@@ -364,7 +364,7 @@ public class VisionManager {
 	 * Write an image out to a path as a TIFF
 	 */
 	public static void writeTIFF(BufferedImage img, String path) throws IOException{
-		if (!OPENCV_ENABLED){
+		if (!SystemConfiguration.OPENCV_ENABLED){
 			File output = new File(path);
 			ImageIO.write(img, "tiff", output);
 		}else{
@@ -398,7 +398,7 @@ public class VisionManager {
 	}
 	
 	public static BufferedImage loadImage(String path) throws IOException{
-		if (!OPENCV_ENABLED){
+		if (!SystemConfiguration.OPENCV_ENABLED){
 			File input = new File(path);
 			return ImageIO.read(input);
 		}else{
@@ -698,7 +698,7 @@ public class VisionManager {
 	@SuppressWarnings("unused")
 	public static void main(String[] args) throws IOException{
 		
-		if (!OPENCV_ENABLED){
+		if (!SystemConfiguration.OPENCV_ENABLED){
 			System.out.println("OpenCV disabled!");
 			System.exit(1);
 		}

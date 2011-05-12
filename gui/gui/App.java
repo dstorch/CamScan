@@ -5,6 +5,8 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
 
@@ -73,7 +75,8 @@ public class App extends JFrame {
 		this.app = this;
 		Parameters.setApp(this.app);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-
+		this.addWindowListener(new CamscanWindowListener());
+	
 		
 		// Setup the menu bar
 		JMenuBar menuBar = new JMenuBar();
@@ -87,6 +90,10 @@ public class App extends JFrame {
 		menuBar.add(fileMenu);
 
 		// Setup the menu items for the file menu
+		JMenuItem settingsMenuItem = new JMenuItem("Settings");
+		settingsMenuItem.addActionListener(new SettingsListener());
+		fileMenu.add(settingsMenuItem);
+		
 		JMenuItem quitMenuItem = new JMenuItem("Quit");
 		quitMenuItem.addActionListener(new QuitListener());
 		fileMenu.add(quitMenuItem);
@@ -186,14 +193,49 @@ public class App extends JFrame {
 	 * The ActionListener class for the quit menu item.
 	 */
 	private class QuitListener implements ActionListener {
-		public void actionPerformed(ActionEvent arg0) {
+		public void actionPerformed(ActionEvent e) {
 			try {
 				Parameters.getCoreManager().shutdown();
-			} catch (IOException e) {
+			} catch (IOException exception) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
+				exception.printStackTrace();
 			}
 			System.exit(0); // Exit the program
+		}
+	}
+	
+	/**
+	 * The action listener which makes X-ing out the frame
+	 * identical to using File->Quit.
+	 */
+	private class CamscanWindowListener implements WindowListener {
+
+		public void windowClosing(WindowEvent e) {
+			try {
+				Parameters.getCoreManager().shutdown();
+			} catch (IOException exception) {
+				// TODO Auto-generated catch block
+				exception.printStackTrace();
+			}
+			System.exit(0); // Exit the program
+		}
+		
+		public void windowOpened(WindowEvent e) {}
+		public void windowClosed(WindowEvent e) {}
+		public void windowIconified(WindowEvent e) {}
+		public void windowDeiconified(WindowEvent e) {}
+		public void windowActivated(WindowEvent e) {}
+		public void windowDeactivated(WindowEvent e) {}
+		
+	}
+	
+	/**
+	 * The ActionListener class for opening the settings
+	 * dialog box.
+	 */
+	private class SettingsListener implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			SettingsDialog sd = new SettingsDialog(Parameters.getFrame());
 		}
 	}
 	

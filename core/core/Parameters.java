@@ -14,6 +14,7 @@ import gui.MainPanel;
 
 public class Parameters {
 
+	
 	/****************************************
 	 * 
 	 * Immutable Parameters
@@ -39,6 +40,12 @@ public class Parameters {
 	 * path of the python script to invoke for exportation
 	 */
 	public static final String SEARCHER_PATH = "managers" + File.separator + "search" + File.separator + "grepper.py";
+	
+	/**
+	 * Path of the Mac OS shell script which attempts to determine
+	 * installation locations.
+	 */
+	public static final String AUTOCONFIGURE_MAC = "core/core/autoConfigureMac.sh";
 	
 	/**
 	 * path of raw files

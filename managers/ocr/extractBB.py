@@ -17,4 +17,5 @@ for line in infile :
 matches = regex.findall(fileString)
 
 for g1, g2, g3, g4, g5 in matches :
+	
 	sys.stdout.write(g5+" "+g2+"\n")
