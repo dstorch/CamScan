@@ -704,7 +704,7 @@ public class VisionManager {
 		}
 		
 		System.out.println("Vision library stub launcher");
-		IplImage image = cvLoadImage("tests/images/IMG_1534.tif");
+		IplImage image = cvLoadImage("tests/images/IMG_1529.tif");
 		System.out.println("Loaded");
         if (image != null) {
         	
