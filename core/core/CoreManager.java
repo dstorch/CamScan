@@ -750,6 +750,7 @@ public class CoreManager {
 	public void getEditImageTransform() {
 		_processedImage = VisionManager.imageGlobalTransforms(_rawImage,
 				Parameters.getCoreManager().getWorkingPage().config());
+		this.updateProcessedImageWithRawDimensions();
 	}
 
 
