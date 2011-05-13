@@ -12,6 +12,7 @@ import javax.swing.JPanel;
  * @author Stelios
  *
  */
+@SuppressWarnings("serial")
 public class EastPanel extends JPanel {
 	
 	/****************************************

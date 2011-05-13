@@ -2,17 +2,12 @@ package westwidget;
 
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -20,15 +15,10 @@ import javax.swing.event.ListSelectionListener;
 import centralwidget.CentralPanel;
 
 import core.Document;
-import core.Mode;
-import core.Page;
 import core.Parameters;
 
 import eastwidget.PageExplorerPanel;
-import gui.ParamHolder;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import javax.swing.JOptionPane;
@@ -40,6 +30,7 @@ import javax.swing.JOptionPane;
  * @author Stelios
  *
  */
+@SuppressWarnings("serial")
 public class DocExplorerPanel extends JPanel {
 
     /****************************************
@@ -168,6 +159,8 @@ public class DocExplorerPanel extends JPanel {
         public void valueChanged(ListSelectionEvent e) {
             if (e.getValueIsAdjusting() == false) {
 
+            	System.out.println("value changed listener called");
+            	
                 // Get the current selection and set it as the working document.
                 String currDocName = (String) docList.getSelectedValue();
 

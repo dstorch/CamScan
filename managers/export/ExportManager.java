@@ -4,17 +4,38 @@ import java.io.*;
 
 import core.Document;
 import core.Page;
-import core.Parameters;
 import core.SystemConfiguration;
+
+/*******************************************************************
+ * ExportManager
+ *
+ * The class which implements the Exporter interface.
+ * Contains the implementations for exporting PDFs, exporting images,
+ * and exporting text.
+ * 
+ * @author dstorch
+ * 
+ *******************************************************************/
 
 public class ExportManager implements Exporter {
 
-	// have a thread do the exporting
+	/**
+	 * Launches a thread which exports to pdf.
+	 *
+	 * @param document - the Document to export
+	 * @param outdirectory - a String specifying the output location
+	 */
 	public void exportToPdf(Document document, String outfile) throws IOException {
 		ExportThread exportThread = new ExportThread(document, outfile);
 		exportThread.start();
 	}
 
+	/**
+	 * Exports the processed images corresponding to the given document.
+	 * 
+	 * @param document - the Document to export
+	 * @param outdirectory - a String specifying the output location
+	 */
 	public void exportImages(Document document, String outdirectory) throws IOException {
 
 		// produce the output directory, throwing an exception on failure
@@ -50,6 +71,12 @@ public class ExportManager implements Exporter {
 		
 	}
 
+	/**
+	 * Exports a document as its extracted OCR test.
+	 * 
+	 * @param document - the Document to export
+	 * @param outdirectory - a String specifying the output location
+	 */
 	public void exportText(Document document, String outfile) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(outfile));
 		try {

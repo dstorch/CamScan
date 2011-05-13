@@ -3,6 +3,17 @@ package core;
 import java.awt.Point;
 import org.dom4j.*;
 
+/*******************************************************************
+ * Corners
+ *
+ * A container for the four corners of a document. This object is
+ * set accordingly based on automatic corner finding, and after
+ * user adjustment in edit mode.
+ * 
+ * @author dstorch
+ * 
+ *******************************************************************/
+
 public class Corners {
 
 	private Point _upright;
@@ -25,6 +36,13 @@ public class Corners {
 		_downleft = downleft;
 	}
 	
+
+	/*******************************************************************
+	 * 
+	 * GETTERS
+	 * 
+	 *******************************************************************/
+	
 	public Point upright() {
 		return _upright;
 	}
@@ -37,6 +55,18 @@ public class Corners {
 	public Point downleft() {
 		return _downleft;
 	}
+	public int width(){
+		return _upright.x - _upleft.x;
+	}
+	public int height(){
+		return _downleft.y - _upleft.y;
+	}
+	
+	/*******************************************************************
+	 * 
+	 * SETTERS
+	 * 
+	 *******************************************************************/
 	
 	public void setUpRight(Point p) {
 		_upright = p;
@@ -54,13 +84,14 @@ public class Corners {
 		_downleft = p;
 	}
 	
-	public int width(){
-		return _upright.x - _upleft.x;
-	}
-	public int height(){
-		return _downleft.y - _upleft.y;
-	}
-	
+
+	/**
+	 * A helper to serialize. Adds a single point
+	 * to the CORNERS tag.
+	 * 
+	 * @param el - the element to which we will add a point
+	 * @param point - the Point object to add
+	 */
 	private void addPointAttribute(Element el, Point point) {
 		Integer x = new Integer(point.x);
 		Integer y = new Integer(point.y);
@@ -68,6 +99,13 @@ public class Corners {
 		el.addAttribute("y", y.toString());
 	}
 	
+	/**
+	 * Given the root element of an existing dom4j object,
+	 * adds this Corners object to the DOM.
+	 * 
+	 * @param root - the root dom4j element of an XML document
+	 * to write to disk
+	 */
 	public void serialize(Element root) {
 		Element corners = DocumentHelper.createElement("CORNERS");
 		root.add(corners);

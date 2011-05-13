@@ -10,6 +10,17 @@ import javax.swing.*;
 import core.Parameters;
 import core.SystemConfiguration;
 
+/************************************************
+ * SettingsDialog
+ * 
+ * This class extends JDialog, and implements a dialog
+ * box that pops up when the user selects File->Settings
+ * 
+ * @author dstorch
+ * 
+ ************************************************/
+
+@SuppressWarnings("serial")
 public class SettingsDialog extends JDialog {
 	
 	/************************************************

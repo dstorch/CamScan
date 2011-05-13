@@ -2,6 +2,15 @@ package search;
 
 import java.util.List;
 
+/*******************************************************************
+ * SearchResultsImpl
+ *
+ * The struct-like class which implements the SeachResults object.
+ * 
+ * @author dstorch
+ * 
+ *******************************************************************/
+
 public class SearchResultsImpl implements SearchResults {
 
 	private List<SearchHit> _inWorkingDoc;

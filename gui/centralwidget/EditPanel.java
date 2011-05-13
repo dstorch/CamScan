@@ -10,7 +10,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
@@ -31,6 +30,7 @@ import core.Parameters;
  * @author Stelios
  *
  */
+@SuppressWarnings("serial")
 public class EditPanel extends JPanel implements MouseMotionListener, MouseWheelListener, MouseListener {
 
 	/****************************************

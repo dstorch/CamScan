@@ -1,5 +1,16 @@
 package search;
 
+/*******************************************************************
+ * Term
+ *
+ * A "term" packages a word with its original position in the
+ * OCR text. This is necessary in order to reconstruct a snippet
+ * of text surrounding the matching search terms.
+ * 
+ * @author dstorch
+ * 
+ *******************************************************************/
+
 public class Term {
 	
 	public String word;

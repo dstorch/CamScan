@@ -3,10 +3,6 @@ package ocr;
 import java.io.IOException;
 
 import core.Page;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import javax.imageio.ImageIO;
-import vision.VisionManager;
 
 
 public class OCRThread extends Thread {

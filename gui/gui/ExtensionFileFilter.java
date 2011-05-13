@@ -4,6 +4,17 @@ import java.io.File;
 
 import javax.swing.filechooser.FileFilter;
 
+/************************************************
+ * ExtensionFileFilter
+ * 
+ * This file filter class is added to the file
+ * chooser. It makes sure that only image files
+ * can be selected from the dialog box.
+ * 
+ * @author dstorch
+ * 
+ ************************************************/
+
 public class ExtensionFileFilter extends FileFilter {
 	
 	private String[] _extensions;
@@ -12,6 +23,14 @@ public class ExtensionFileFilter extends FileFilter {
 		_extensions = extensions;
 	}
 
+	/**
+	 * Returns true if the file has a valid extension,
+	 * and returns false otherwise.
+	 * 
+	 * @param f - a file
+	 * @return true if it is valid for the user to select
+	 * the file, otherwise false
+	 */
 	@Override
 	public boolean accept(File f) {
 		String name = f.getAbsolutePath();
@@ -27,6 +46,10 @@ public class ExtensionFileFilter extends FileFilter {
 		return false;
 	}
 
+	/**
+	 * @return the String which will display the valid
+	 * file extensions to the user
+	 */
 	@Override
 	public String getDescription() {
 		

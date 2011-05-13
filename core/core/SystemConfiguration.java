@@ -1,12 +1,23 @@
 package core;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+
+/*******************************************************************
+ * SystemConfiguraion
+ *
+ * Keeps system-specific configuration, including the pathnames to
+ * CamScan dependencies. The static variables inside this class should
+ * be set on startup based on the contents of .camscan_startup.xml.
+ * If there is no .camscan_startup.xml found, then autoconfiguration
+ * is attempted.
+ * 
+ * @author dstorch
+ * 
+ *******************************************************************/
 
 public class SystemConfiguration {
 	

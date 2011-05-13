@@ -5,8 +5,6 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.Vector;
 
@@ -24,7 +22,6 @@ import javax.swing.event.ListSelectionListener;
 import search.SearchHit;
 import search.SearchResults;
 
-import core.Mode;
 import core.Page;
 import core.Parameters;
 
@@ -34,6 +31,7 @@ import core.Parameters;
  * @author Stelios
  *
  */
+@SuppressWarnings("serial")
 public class SearchResultsPanel extends JPanel implements ActionListener {
 	
 	/****************************************
