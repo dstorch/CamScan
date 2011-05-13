@@ -174,8 +174,6 @@ public class VisionManager {
 			for (int x=0;x<img.width();x++){
 				luma = graybuf.get( y*img.width() + x )&0xff;
 				
-				//System.out.println(luma);
-				
 				if (luma > 127){
 					buf.put(y*img.width()*3 + x*3 + 0, (byte)255 );
 					buf.put(y*img.width()*3 + x*3 + 1, (byte)255 );
