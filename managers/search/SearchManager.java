@@ -2,6 +2,9 @@ package search;
 
 import java.io.*;
 import java.util.*;
+
+import org.dom4j.DocumentException;
+
 import core.*;
 
 /*******************************************************************
@@ -130,10 +133,30 @@ public class SearchManager implements Searcher {
 
 	
 	
-	public void test(){
+	public void test() throws FileNotFoundException, DocumentException{
 		SearchResults results;
-		Document doc;
+		XMLReader r = new XMLReader();
+		Document doc = r.parseDocument("tests/search-tests/searchtest1");
+		String term = "death march";
 		
-		results = getSearchResults("query!", doc, new LinkedList<Document>());
+		results = getSearchResults(term, doc, new LinkedList<Document>());
+		System.out.println("Searched for: " + term);
+		for(SearchHit snip: results.inWorkingDoc()){
+			System.out.println(snip.snippet());
+		}
+		doc = r.parseDocument("tests/search-tests/searchtest2");
+		term = "prosecute";
+		results = getSearchResults(term, doc, new LinkedList<Document>());
+		System.out.println("Searched for: " + term);
+		for(SearchHit snip: results.inWorkingDoc()){
+			System.out.println(snip.snippet());
+		}
+		doc = r.parseDocument("tests/search-tests/searchtest3");
+		term = "pale as death";
+		results = getSearchResults(term, doc, new LinkedList<Document>());
+		System.out.println("Searched for: " + term);
+		for(SearchHit snip: results.inWorkingDoc()){
+			System.out.println(snip.snippet());
+		}
 	}
 }

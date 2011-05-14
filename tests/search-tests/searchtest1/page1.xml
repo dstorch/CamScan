@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<PAGE>
+  <IMG path="" processed=""/>
+  <CORNERS>
+    <UPRIGHT x="100" y="50"/>
+    <DOWNRIGHT x="100" y="200"/>
+    <UPLEFT x="50" y="50"/>
+    <DOWNLEFT x="50" y="200"/>
+  </CORNERS>
+  <TEXT>
+    <FULLTEXT>
+
+Finally, we may have scared some of you today. CS32 is not meant to be a death march, and it will not be a death march.  A note on Labs: Assuming that all students have read the lab handout before coming to lab, our target is to have at least 50% of the students (if not 100%) complete the lab by the end of the 2 hour lab block. Many of the labs can be completed in under 2 hours. 
+
+    </FULLTEXT>
+    <POSITIONS/>
+  </TEXT>
+  <CONFIG>
+    <COLORTEMP value="0"/>
+    <CONTRASTBOOST value="no"/>
+    <FLIPH value="no"/>
+    <FLIPV value="no"/>
+  </CONFIG>
+</PAGE>
