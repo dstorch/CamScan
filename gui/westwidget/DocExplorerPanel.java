@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -21,6 +23,7 @@ import eastwidget.PageExplorerPanel;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 /**
@@ -76,7 +79,7 @@ public class DocExplorerPanel extends JPanel {
 
         this.docList = new JList(this.getDocumentNames());
 
-        this.docList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        this.docList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         this.docList.getSelectionModel().addListSelectionListener(new SelectionListener());
         this.docList.setLayoutOrientation(JList.VERTICAL);
         this.docList.setSelectedIndex(0);
@@ -158,41 +161,50 @@ public class DocExplorerPanel extends JPanel {
 
         public void valueChanged(ListSelectionEvent e) {
             if (e.getValueIsAdjusting() == false) {
-            	
-                // Get the current selection and set it as the working document.
-                String currDocName = (String) docList.getSelectedValue();
+                ListSelectionModel lsm = (ListSelectionModel) e.getSource();
 
-                if (currDocName != null) {
+                int minIndex = lsm.getMinSelectionIndex();
+                int maxIndex = lsm.getMaxSelectionIndex();
 
-	                try {
-	                	System.out.println(currDocName);
-	                    Parameters.getCoreManager().setWorkingDocumentFromName(currDocName);
-	                } catch (IOException e1) {
-	                    e1.printStackTrace();
-	                }
-	
-	                // Update the page explorer panel with the pages of the
-	                // new working document.
-	                pageExpPanel.update();
-	
-	                // Get the very first page and display its image on the
-	                // central panel.
-	                centralPanel.updatePanels(false);
-	                
-                }   
+                if (lsm.isSelectionEmpty()) {
+                    System.out.println("Empty Selection");
+                } else if (minIndex == maxIndex) {
 
+                    // Get the current selection and set it as the working document.
+                    String currDocName = (String) docList.getSelectedValue();
+
+                    if (currDocName != null) {
+
+                        try {
+                            System.out.println(currDocName);
+                            Parameters.getCoreManager().setWorkingDocumentFromName(currDocName);
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+
+                        // Update the page explorer panel with the pages of the
+                        // new working document.
+                        pageExpPanel.update();
+
+                        // Get the very first page and display its image on the
+                        // central panel.
+                        centralPanel.updatePanels(false);
+
+
+                    }
+                }
             }
         }
     }
 
-    private class deleteListener implements KeyListener{
+    private class deleteListener implements KeyListener {
 
         public void keyPressed(java.awt.event.KeyEvent evt) {
 
             if (evt.getKeyCode() == 8) {
                 int index = docList.getSelectedIndex();
                 String docName = getDocumentNames().get(index);
-                int selected = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + docName+"?", "Delete Document", JOptionPane.OK_CANCEL_OPTION);
+                int selected = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete " + docName + "?", "Delete Document", JOptionPane.OK_CANCEL_OPTION);
                 if (selected == JOptionPane.OK_OPTION) {
 
                     try {
@@ -204,12 +216,40 @@ public class DocExplorerPanel extends JPanel {
                         JOptionPane.showMessageDialog(null, ex.getMessage(), "Delete Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
+            } else if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+                int minIndex = docList.getMinSelectionIndex();
+                int maxIndex = docList.getMaxSelectionIndex();
+
+                if (maxIndex > minIndex) {
+                    ArrayList<String> docs = new ArrayList<String>();
+                    for (int i = minIndex; i <= maxIndex; i++) {
+                        if (docList.isSelectedIndex(i)) {
+                            docs.add(getDocumentNames().get(i));
+                        }
+                    }
+
+                    int selected = JOptionPane.showConfirmDialog(null, "Are you sure you want to merge Documents?", "Merge Document", JOptionPane.OK_CANCEL_OPTION);
+                    if (selected == JOptionPane.OK_OPTION) {
+                        try {
+                            Parameters.getCoreManager().mergeDocuments(docs);
+                            update();
+                            centralPanel.updatePanels(false);
+                            centralPanel.getEastPanel().getPageExpPanel().update();
+                        } catch (IOException ex) {
+                            JOptionPane.showMessageDialog(null, ex.getMessage(), "Merge Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                }
+
             }
 
         }
 
-        public void keyTyped(KeyEvent ke) {}
-        public void keyReleased(KeyEvent ke) {}
+        public void keyTyped(KeyEvent ke) {
+        }
+
+        public void keyReleased(KeyEvent ke) {
+        }
     }
 
     private class MouseMotion implements MouseListener {
@@ -219,9 +259,9 @@ public class DocExplorerPanel extends JPanel {
                 int index = docList.locationToIndex(evt.getPoint());
                 String docName = getDocumentNames().get(index);
                 String input = JOptionPane.showInputDialog(null, "Enter new document name: ", "Rename Document", 1);
-                if(input != null){
+                if (input != null) {
                     try {
-                        Parameters.getCoreManager().renameDocument(docName, input);                       
+                        Parameters.getCoreManager().renameDocument(docName, input);
                         update();
                         setDocOrder(input);
                     } catch (IOException ex) {
@@ -231,29 +271,9 @@ public class DocExplorerPanel extends JPanel {
             }
         }
 
-        public void mousePressed(java.awt.event.MouseEvent evt) {
-            int index = docList.locationToIndex(evt.getPoint());
-            fromDrag = index;
-            //docList.setDragEnabled(true);
-            //docList.setValueIsAdjusting(true);
-        }
+        public void mousePressed(java.awt.event.MouseEvent evt) {}
 
-        public void mouseReleased(java.awt.event.MouseEvent evt) {
-            int index = docList.locationToIndex(evt.getPoint());
-            String doc1 = getDocumentNames().get(fromDrag);
-            String doc2 = getDocumentNames().get(index);
-            if (fromDrag != index) {
-                int selected = JOptionPane.showConfirmDialog(null, "Are you sure you want to merge "+ doc1 +" and "+doc2+"?", "Merge Documents", JOptionPane.OK_CANCEL_OPTION);
-                if (selected == JOptionPane.OK_OPTION) {
-                    try {
-                        Parameters.getCoreManager().mergeDocuments(doc1, doc2);
-                        update();
-                    } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(null, ex.getMessage(), "Merge Error", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-            }
-        }
+        public void mouseReleased(java.awt.event.MouseEvent evt) {}
 
         public void mouseEntered(MouseEvent me) {}
 

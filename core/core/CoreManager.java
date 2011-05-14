@@ -2,6 +2,8 @@ package core;
 
 import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.dom4j.*;
 import org.dom4j.io.*;
@@ -517,9 +519,25 @@ public class CoreManager {
 	 * 
 	 * @throws IOException
 	 */
-	public void reorderPage(Document d, Page p, int newOrder) throws IOException{
-		if(p.order()!=newOrder) d.reorderPage(p, newOrder);
+	public void reorderPage(Document d, ArrayList<String> newOrders) throws IOException{
+		d.reorderPage(newOrders);
 	}
+
+        /**
+         * Merges all documents in List by calling overloaded version that takes in only two Strings
+         *
+         * @param docs -- all the documents needed to merged together; the document
+         *          takes the name of the first String in the list
+         * @throws IOException
+         */
+        public void mergeDocuments(ArrayList<String> docs) throws IOException{
+            String docName = docs.get(0);
+
+            for(int i = 1; i<docs.size(); i++){
+                mergeDocuments(docName, docs.get(i));
+            }
+
+        }
 
 	/**
 	 * Implements combining the pages from two documents
@@ -532,7 +550,7 @@ public class CoreManager {
 	 * @param d2 - a string naming the second document to merge
 	 * @throws IOException
 	 */
-	public void mergeDocuments(String d1, String d2) throws IOException{
+	private void mergeDocuments(String d1, String d2) throws IOException{
 		Document toMerge1 = null;
 		Document toMerge2 = null;
 		for (Document d : _allDocuments) {
@@ -565,7 +583,8 @@ public class CoreManager {
 		for (Page p : d2.pages()) {
 			// extract name of file and append to path of document 1 to get new path
 			String[] s = p.metafile().split("\\\\");
-			String newMetaPath = docPath + s[s.length - 1];
+			//String newMetaPath = docPath + s[s.length - 1];
+                        String newMetaPath = docPath + p.name()+".xml";
 
 			File oldFile = new File(p.metafile());
 			File newFile = new File(newMetaPath);
@@ -586,10 +605,12 @@ public class CoreManager {
 		d1.serialize();
 
 		// delete directory of second Document
-		d2.delete();
+		d2.deleteOnlyDirectory();
 
 		// remove second Document from global list
 		_allDocuments.remove(d2);
+
+                writeStartupFile();
 
 	}
 
