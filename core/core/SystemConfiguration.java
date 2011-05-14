@@ -26,7 +26,7 @@ public class SystemConfiguration {
 	 * functionality. Useful for development, or when
 	 * working on a machine without openCV installed.
 	 */
-	public static boolean OPENCV_ENABLED = true;
+	public static boolean OPENCV_ENABLED = false;
 	
 	/**
 	 * Whether tesseract and OCR functionality is

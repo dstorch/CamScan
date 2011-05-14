@@ -193,7 +193,6 @@ public class Page implements Comparable{
 	 * @throws IOException
 	 */
 	public void initGuesses() throws IOException {
-		System.out.println("Raw file: "+raw());
 
 		// read a buffered image from the disk
 		BufferedImage buff = VisionManager.loadImage(raw());
@@ -214,9 +213,6 @@ public class Page implements Comparable{
 		// change the name of the metadata and processed files
 		String newMet = metafile().substring(0, (metafile().length()-(name().length()+4)))+newName+".xml";
 		String newPro = Parameters.PROCESSED_DIRECTORY+File.separator+newName+".tiff";
-
-		System.out.println("New Metafile " + newMet);
-		System.out.println("New Profile " + newPro);
 
 		File oldMeta = new File(metafile());
 		File newMeta = new File(newMet);

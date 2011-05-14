@@ -109,8 +109,6 @@ public class Document {
 
 		File oldDir = new File(oldPath);
 		File newDir = new File(newPath);
-		System.out.println("old directory: "+oldDir.getPath());
-		System.out.println("new directory: "+newDir.getPath());
 		if (!oldDir.renameTo(newDir)) throw new IOException("Could not rename document!");
 
 		// set instance variables
