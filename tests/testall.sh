@@ -34,17 +34,17 @@ if [ $VISION_ENABLED = "1" ]; then
 	../managers/vision/$VISION
 fi
 
-# 2. test search
+# 2. search unit tests
 if [ $SEARCH_ENABLED = "1" ]; then
 	../managers/search/$SEARCH
 fi
 
-# 3. test export
+# 3. export unit tests
 if [ $EXPORT_ENABLED = "1" ]; then
 	../managers/export/$EXPORT
 fi
 
-# 4. test ocr
+# 4. ocr unit tests
 if [ $OCR_ENABLED = "1" ]; then
 	../managers/ocr/$OCR
 fi
