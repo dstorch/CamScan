@@ -149,7 +149,7 @@ public class Document {
 	}
 
         /**
-         * Deletes documents directory -- used in merging
+         * Deletes doc directory but not Page files -- used in merging
          * @throws IOException
          */
         public void deleteOnlyDirectory() throws IOException{
@@ -240,24 +240,16 @@ public class Document {
 	 * @param newOrder - the new page number
 	 * @throws IOException
 	 */
-	public void reorderPage(Page p, int newOrder) throws IOException{
-		int oldOrder = p.order();
+	public void reorderPage(ArrayList<String> pageNames) throws IOException{
 
-		if(oldOrder<newOrder){ // moving a Page down
-			for (Page page : pages()) {
-				if((page.order()<=newOrder)&&(page.order()>oldOrder)){
-					page.setOrder(page.order() + 1);
+                for (int i = 1; i<=pages().size(); i++){
+                    String name = pageNames.get(i-1);
+                    for (Page page : pages()) {
+				if(page.name().equals(name)){
+					page.setOrder(i);
 				}
 			}
-		}else{ // moving a Page up
-			for (Page page : pages()) {
-				if((page.order()>=newOrder)&&(page.order()<oldOrder)){
-					page.setOrder(page.order() + 1);
-				}
-			}
-		}
-
-		p.setOrder(newOrder);
+                }
 
 		updateList();
 		serialize();

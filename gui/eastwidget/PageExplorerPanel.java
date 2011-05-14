@@ -21,6 +21,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 
 /**
@@ -52,6 +54,8 @@ public class PageExplorerPanel extends JPanel {
     private MainPanel mainPanel;
 
 
+     DefaultListModel model;
+
     /****************************************
      *
      * Constructor(s)
@@ -66,7 +70,13 @@ public class PageExplorerPanel extends JPanel {
         
         Parameters.setPageExplorerPanel(this);
 
-        this.pageList = new JList(this.getPageNames());
+        //this.pageList = new JList(this.getPageNames());
+
+        model = new DefaultListModel();
+        //this.pageList = new JList(model);
+        this.pageList = new ReorderableJList(model, this);
+        update();
+
 
         this.pageList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         this.pageList.getSelectionModel().addListSelectionListener(new SelectionListener());
@@ -89,8 +99,10 @@ public class PageExplorerPanel extends JPanel {
      * when the working document has changed.
      */
     public void update() {
-        this.pageList.setListData(this.getPageNames());
-        this.listScroller.revalidate();
+        model.removeAllElements();
+        getPageNames();
+        //this.pageList.setListData(this.getPageNames());
+        //this.listScroller.revalidate();
         this.pageList.setSelectedIndex(0);
     }
 
@@ -136,12 +148,33 @@ public class PageExplorerPanel extends JPanel {
         if (workingDoc != null) {
 
             for (Page page : workingDoc.pages()) {
-                //model.addElement(page.order()+": "+page.name());
+                model.addElement(page.order()+": "+page.name());
                 pages.add(page.order()+": "+page.name());
             }
         }
 
         return pages;
+    }
+
+    public void reOrderPages() throws IOException{
+        int first = pageList.getFirstVisibleIndex();
+        int last = pageList.getLastVisibleIndex();
+
+        ArrayList<String> orderedNames = new ArrayList<String>();
+        Document d = Parameters.getCoreManager().workingDocument();
+
+        for (int i = first; i<= last; i++){
+            String listString = model.getElementAt(i).toString();
+            String name = listString.substring(3, listString.length());
+            orderedNames.add(name);
+        }
+
+        Parameters.getCoreManager().reorderPage(d, orderedNames);
+
+        update();
+        mainPanel.updateCentralPanels(false);
+        Parameters.getDocExpPanel().update();
+
     }
 
 

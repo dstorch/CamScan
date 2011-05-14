@@ -519,8 +519,8 @@ public class CoreManager {
 	 * 
 	 * @throws IOException
 	 */
-	public void reorderPage(Document d, Page p, int newOrder) throws IOException{
-		if(p.order()!=newOrder) d.reorderPage(p, newOrder);
+	public void reorderPage(Document d, ArrayList<String> newOrders) throws IOException{
+		d.reorderPage(newOrders);
 	}
 
         /**
