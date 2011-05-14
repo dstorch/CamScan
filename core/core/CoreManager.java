@@ -621,7 +621,27 @@ public class CoreManager {
 		String name = sourceLocation.getName();
 		String directory = Parameters.DOC_DIRECTORY + File.separator + name;
 		File dirFile = new File(directory);
-		if (!dirFile.mkdir()) throw new IOException("Import aborted: problem making new document directory!");
+		
+		// handle the error case by displaying a warning, and then proceding to delete
+		if (!dirFile.mkdir()) {
+			
+			int result = JOptionPane.showConfirmDialog(Parameters.getFrame(),
+										  "You already have a document by that name. Do you want to overwrite?",
+										  "Import Document",
+										  JOptionPane.YES_NO_OPTION	);
+			
+			// if overwriting
+			if (result == JOptionPane.YES_OPTION) {
+				IOFunctions.deleteDir(dirFile);
+				dirFile.mkdir();
+			}
+			
+			// otherwise do nothing
+			else {
+				return null;
+			}
+		}
+		
 		String pathname = directory + File.separator + "doc.xml";
 		Document newDoc = new Document(name, pathname);
 
@@ -663,9 +683,27 @@ public class CoreManager {
 		String noExt = removeExtension(imageFile);
 		String directory = Parameters.DOC_DIRECTORY + File.separator + noExt;
 		File dirFile = new File(directory);
+		
+		// handle the error case by displaying a warning, and then proceding to delete
 		if (!dirFile.mkdir()) {
-			throw new IOException("Import aborted: problem making new document directory!");
+			
+			int result = JOptionPane.showConfirmDialog(Parameters.getFrame(),
+										  "You already have a document by that name. Do you want to overwrite?",
+										  "Import Document",
+										  JOptionPane.YES_NO_OPTION	);
+			
+			// if overwriting
+			if (result == JOptionPane.YES_OPTION) {
+				IOFunctions.deleteDir(dirFile);
+				dirFile.mkdir();
+			}
+			
+			// otherwise do nothing
+			else {
+				return null;
+			}
 		}
+		
 		String pathname = directory + File.separator + "doc.xml";
 		Document newDoc = new Document(noExt, pathname);
 

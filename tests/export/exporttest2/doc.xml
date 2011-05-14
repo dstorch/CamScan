@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<DOCUMENT name="PortWashington">
+  <PAGES>
+    <PAGE order="1" metafile="tests/export/exporttest2/PortWashington.xml" name="PortWashington"/>
+  </PAGES>
+</DOCUMENT>

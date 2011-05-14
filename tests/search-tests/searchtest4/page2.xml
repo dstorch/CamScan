@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<PAGE name="page2">
+  <IMG path="" processed=""/>
+  <CORNERS>
+    <UPRIGHT x="100" y="50"/>
+    <DOWNRIGHT x="100" y="200"/>
+    <UPLEFT x="50" y="50"/>
+    <DOWNLEFT x="50" y="200"/>
+  </CORNERS>
+  <TEXT>
+    <FULLTEXT>
+
+There is another page with a mention of Foodler.
+If all goes well, we should see a hit for this
+page as well.
+
+This text should not show up in the results.
+
+	</FULLTEXT>
+    <POSITIONS/>
+  </TEXT>
+  <CONFIG>
+    <COLORTEMP value="0"/>
+    <CONTRASTBOOST value="no"/>
+    <FLIPH value="no"/>
+    <FLIPV value="no"/>
+  </CONFIG>
+</PAGE>

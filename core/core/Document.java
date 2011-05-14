@@ -131,40 +131,13 @@ public class Document {
 	}
 
 	/**
-	 * Recursively deletes the contents of a directory.
-	 * Used for document deletion and renaming.
-	 * 
-	 * @param dir - the directory to delete
-	 * @return true if the deletion was successful,
-	 * and false otherwise
-	 */
-	public boolean deleteDir(File dir) {
-
-		// if directory, then recur on children
-		if (dir.isDirectory()) {
-			String[] children = dir.list();
-			for (int i=0; i<children.length; i++) {
-				boolean success = deleteDir(new File(dir, children[i]));
-
-				// short circuit if recursive deletion fails
-				if (!success) {
-					return false;
-				}
-			}
-		}
-
-		// The directory is now empty so delete it
-		return dir.delete();
-	}
-
-	/**
 	 * Deletes this page.
 	 * 
 	 * @throws IOException
 	 */
 	public void delete() throws IOException {
 		File docDirectory = new File(Parameters.DOC_DIRECTORY+File.separator+name());
-		if (!deleteDir(docDirectory)) throw new IOException("Problem deleting the document!");
+		if (!IOFunctions.deleteDir(docDirectory)) throw new IOException("Problem deleting the document!");
 
 
 		// delete all image files in raw directory (AND PROCESSED DIRECTORY?????)

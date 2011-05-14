@@ -12,7 +12,7 @@ import core.*;
  *
  * Implements the Searcher's public interface.
  * 
- * @author dstorch
+ * @author dstorch, sbirch
  * 
  *******************************************************************/
 
@@ -132,31 +132,63 @@ public class SearchManager implements Searcher {
 	}
 
 	
-	
-	public void test() throws FileNotFoundException, DocumentException{
-		SearchResults results;
-		XMLReader r = new XMLReader();
-		Document doc = r.parseDocument("tests/search-tests/searchtest1");
-		String term = "death march";
+	/**
+	 * Unit testing function. Called
+	 * from the shell script test_search.sh
+	 * 
+	 * @throws DocumentException
+	 * @throws IOException 
+	 */
+	public static void test() throws DocumentException, IOException{
 		
-		results = getSearchResults(term, doc, new LinkedList<Document>());
-		System.out.println("Searched for: " + term);
-		for(SearchHit snip: results.inWorkingDoc()){
-			System.out.println(snip.snippet());
+		Searcher searcher = Searcher.Factory.create();
+		List<SearchHit> results;
+		XMLReader r = new XMLReader();
+		
+		// set up the tests
+		String[] docList = {"searchtest1", "searchtest2", "searchtest3", "searchtest4"};
+		String[] queryList = {"death march", "prosecute", "pale as death", "foodler"};
+		
+		// print an opening message
+		System.out.println("SEARCH UNIT TESTS\n");
+		
+		// main testing loop
+		for (int i = 0; i < docList.length; i++) {
+			
+			String docName = "tests"+File.separator+"search-tests"+File.separator
+							+docList[i]+File.separator+"doc.xml";
+			Document doc = r.parseDocument(docName);
+			String query = queryList[i];
+			
+			// produce the set of query terms
+			HashSet<Term> querySet = new HashSet<Term>();
+			List<Term> queryNew = searcher.sanitize(query);
+			for (Term t : queryNew) {
+				querySet.add(t);
+			}
+			
+			
+			// search the document
+			results = doc.search(querySet, searcher);
+			
+			// print the results
+			System.out.println("Searched for: " + query);
+			for(SearchHit snip: results){
+				System.out.println(snip.snippet());
+			}
+			
+			// leave a newline between tests
+			System.out.print("\n");
 		}
-		doc = r.parseDocument("tests/search-tests/searchtest2");
-		term = "prosecute";
-		results = getSearchResults(term, doc, new LinkedList<Document>());
-		System.out.println("Searched for: " + term);
-		for(SearchHit snip: results.inWorkingDoc()){
-			System.out.println(snip.snippet());
-		}
-		doc = r.parseDocument("tests/search-tests/searchtest3");
-		term = "pale as death";
-		results = getSearchResults(term, doc, new LinkedList<Document>());
-		System.out.println("Searched for: " + term);
-		for(SearchHit snip: results.inWorkingDoc()){
-			System.out.println(snip.snippet());
-		}
+	}
+	
+	/**
+	 * Provides access to the testing function.
+	 * 
+	 * @throws DocumentException 
+	 * @throws IOException 
+	 */
+	public static void main(String[] args) throws DocumentException, IOException {
+		SearchManager.test();
 	}
 }

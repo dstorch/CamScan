@@ -158,8 +158,6 @@ public class DocExplorerPanel extends JPanel {
 
         public void valueChanged(ListSelectionEvent e) {
             if (e.getValueIsAdjusting() == false) {
-
-            	System.out.println("value changed listener called");
             	
                 // Get the current selection and set it as the working document.
                 String currDocName = (String) docList.getSelectedValue();

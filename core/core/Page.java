@@ -239,8 +239,19 @@ public class Page implements Comparable{
 	 * @throws IOException
 	 */
 	public void writeProcessedImage() throws IOException {
-		// write out image as a TIFF file
 		VisionManager.outputToFile(getRawImgFromDisk(), processed(), this.corners(), this.config());
+	}
+	
+	/**
+	 * Writes the processed image as a TIFF file. This is necessary
+	 * in order for the image to be compatible with Tesseract,
+	 * and is therefore used by the OCR manager.
+	 * 
+	 * @throws IOException
+	 */
+	public void writeProcessedImageTIFF() throws IOException {
+		BufferedImage rerendered = VisionManager.rerenderImage(getRawImgFromDisk(), this.corners(), this.config());
+		VisionManager.writeTIFF(rerendered, processed());
 	}
 
 	/**
@@ -312,9 +323,10 @@ public class Page implements Comparable{
 	 * @return a list of SearchHit objects within this page.
 	 */
 	public List<SearchHit> search(Set<Term> query, Searcher searcher) {
+		
 		LinkedList<SearchHit> hits = new LinkedList<SearchHit>();
 		String fullText = fullText();
-
+		
 		List<Term> fullTextTerms = searcher.sanitize(fullText);
 
 		// build the initial "grepping window"
@@ -368,7 +380,7 @@ public class Page implements Comparable{
 
 		// if you exit the loop and there is still a hit, then add it
 		if (resultInWindow) hits.add(lastHit);
-
+		
 		return hits;
 	}
 

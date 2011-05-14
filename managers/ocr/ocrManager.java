@@ -1,8 +1,10 @@
 package ocr;
 
 import java.io.*;
+import java.util.Date;
 import java.awt.Point;
 import core.PageText;
+import core.Parameters;
 import core.Position;
 import core.SystemConfiguration;
 
@@ -45,7 +47,13 @@ public class ocrManager {
 		Runtime.getRuntime().exec(arguments);
 
 		// block until the file is created
-		while (!outFile.canRead()) {}
+		Date timer = new Date();
+		long startStamp = timer.getTime();
+		while (!outFile.canRead()) {
+			long currentTime = timer.getTime();
+			if ((currentTime - startStamp) > Parameters.OCR_TIMEOUT)
+				return new PageText();
+		}
 
 		// now run python script for extracting data
 		String command = SystemConfiguration.PYTHON_PATH+" "+EXTRACTBB_PATH+" "

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<PAGE>
+<PAGE name="page1">
   <IMG path="" processed=""/>
   <CORNERS>
     <UPRIGHT x="100" y="50"/>
