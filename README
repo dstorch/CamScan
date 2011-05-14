@@ -125,6 +125,8 @@ The user interface and system integration were tested interactively on
 a set of standard test data. Our test data includes both images and test
 XML documents, located respectively in tests/xml/ and tests/images/.
 
+For more information on system tests, see tests/TESTING.txt.
+
 #############################################################################
 # 4. Additional resources
 #############################################################################

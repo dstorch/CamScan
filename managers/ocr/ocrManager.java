@@ -95,12 +95,16 @@ public class ocrManager {
 	 * Main method---useful for independently testing
 	 * the OCR module!
 	 * 
-	 * @param args
+	 * This main method is executed from the test_ocr.sh
+	 * shell script as part of the unit test suite.
+	 * 
+	 * @param args -
+	 * 		args[0] should be the path to tesseract
 	 * @throws IOException
 	 */
-
 	public static void main(String[] args) throws IOException{
-                System.out.println("Starting Test...");
+        
+		SystemConfiguration.TESS_PATH = args[0];
 
 		PageText pt = ocrManager.getPageText("../sample_page.tiff", "sample_page");
 		
