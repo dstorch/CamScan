@@ -4,8 +4,6 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
 
-import javax.imageio.ImageIO;
-
 import ocr.OCRThread;
 import ocr.ocrManager;
 import org.dom4j.*;
@@ -14,8 +12,26 @@ import search.*;
 import vision.ConfigurationDictionary;
 import vision.VisionManager;
 
+/*******************************************************************
+ * Page
+ *
+ * In addition to Document, the most important class implementing
+ * the Document model. An instance of this class keeps the metadata
+ * for every page in every document of the library.
+ * 
+ * @author dstorch, micalle
+ * 
+ *******************************************************************/
+
+@SuppressWarnings("rawtypes")
 public class Page implements Comparable{
 
+	/*******************************************************************
+	 * 
+	 * INSTANCE VARIABLES
+	 * 
+	 *******************************************************************/
+	
 	// used for searching the text of the page
 	private static final int GREP_WINDOW = 10;
 
@@ -43,8 +59,13 @@ public class Page implements Comparable{
 	// based on the current processed image
 	private boolean _ocrUpToDate;
 
+	/*******************************************************************
+	 * 
+	 * CONSTRUCTOR
+	 * 
+	 *******************************************************************/
+	
 	public Page(Document parent, int order, String name) {
-
 		_parentDoc = parent;
 		_order = order;
 		_name = name;
@@ -52,6 +73,12 @@ public class Page implements Comparable{
 		_corners = new Corners();
 		_text = new PageText();
 	}
+	
+	/*******************************************************************
+	 * 
+	 * GETTERS
+	 * 
+	 *******************************************************************/
 
 	public String name(){
 		return _name;
@@ -84,6 +111,13 @@ public class Page implements Comparable{
 	public Document getContainingDocument() {
 		return _parentDoc;
 	}
+	
+	/*******************************************************************
+	 * 
+	 * SETTERS
+	 * 
+	 *******************************************************************/
+	
 	public void setName(String name) {
 		_name = name;
 	}
@@ -120,27 +154,48 @@ public class Page implements Comparable{
 	public boolean getOcrUpToDate() {
 		return _ocrUpToDate;
 	}
+	
+	/*******************************************************************
+	 * 
+	 * PUBLIC METHODS
+	 * 
+	 *******************************************************************/
 
+	/**
+	 * This getter does not simply return a reference to an instance
+	 * variable, but does image IO. Namely, it loads an image
+	 * from disk.
+	 * 
+	 * @return the image as a BufferedImage
+	 * @throws IOException
+	 */
 	public BufferedImage getRawImgFromDisk() throws IOException {
-		System.out.println("Getting raw image from disk");
-		//return ImageIO.read(new File(raw()));
-		System.out.println("making raw image from disk");
 		return VisionManager.loadImage(raw());
 	}
 
+	/**
+	 * Loads the processed image from disk and returns a reference
+	 * to the resulting image object.
+	 * 
+	 * @return the BufferedImage object loaded from disk
+	 * @throws IOException
+	 */
 	public BufferedImage getProcessedImgFromDisk() throws IOException {
-		//return ImageIO.read(new File(processed()));
-		System.out.println("making raw image from disk");
 		return VisionManager.loadImage(processed());
 	}
 
 
-	// sets corners and config file for the initial guesses of an imported document
+	/**
+	 * Does corner finding and initializes the corners of the page
+	 * as the corners guessed by the VisionManager. Also estimates
+	 * initial configuration values for the appearance of the image.
+	 * 
+	 * @throws IOException
+	 */
 	public void initGuesses() throws IOException {
 		System.out.println("Raw file: "+raw());
 
 		// read a buffered image from the disk
-		//BufferedImage buff = ImageIO.read(new File(raw()));
 		BufferedImage buff = VisionManager.loadImage(raw());
 
 		// guess and set corners and configuration values of Page
@@ -148,6 +203,12 @@ public class Page implements Comparable{
 		setConfig(VisionManager.estimateConfigurationValues(buff));
 	}
 
+	/**
+	 * Renames this page.
+	 * 
+	 * @param newName - the new name, a String
+	 * @throws IOException
+	 */
 	public void rename(String newName) throws IOException {
 
 		// change the name of the metadata and processed files
@@ -174,14 +235,26 @@ public class Page implements Comparable{
                 _parentDoc.serialize();
 	}
 
-	// writes the current process image to workspace/processed
+	/**
+	 * Writes the processed image to the disk. Called whenever the
+	 * processed image has been changed, and the copy on disk needs
+	 * to be updated.
+	 * 
+	 * @throws IOException
+	 */
 	public void writeProcessedImage() throws IOException {
 		// write out image as a TIFF file
 		VisionManager.outputToFile(getRawImgFromDisk(), processed(), this.corners(), this.config());
 	}
 
+	/**
+	 * Performs OCR on this page object, and sets the result
+	 * as its PageText object.
+	 * 
+	 * @throws IOException
+	 */
 	public void setOcrResults() throws IOException {
-		String[] fields = metafile().split("\\\\");
+		String[] fields = metafile().split(SystemConfiguration.PATH_REGEX);
 		PageText text = ocrManager.getPageText(_processed, fields[fields.length-1]);
 		synchronized (this) {
 			_text = text;
@@ -189,12 +262,22 @@ public class Page implements Comparable{
 		}
 	}
 
+	/**
+	 * Launches a thread which calls setOcrResults in order
+	 * to update the OCR text.
+	 */
 	public void launchOcrThread() {
 		OCRThread t = new OCRThread(this);
 		t.start();
 	}
 
 
+	/**
+	 * Writes the instance variables of this Page to disk,
+	 * according to the CamScan XML spec.
+	 * 
+	 * @throws IOException
+	 */
 	public void serialize() throws IOException {
 		OutputFormat pretty = OutputFormat.createPrettyPrint();
 		XMLWriter filewriter = new XMLWriter(new FileWriter(metafile()), pretty);
@@ -223,6 +306,15 @@ public class Page implements Comparable{
 
 	}
 
+	/**
+	 * The function by which the searchs results within a page
+	 * are obtained. Called from the Document class's search
+	 * function.
+	 * 
+	 * @param query - a String, the search query
+	 * @param searcher - the Searcher object performing the search
+	 * @return a list of SearchHit objects within this page.
+	 */
 	public List<SearchHit> search(Set<Term> query, Searcher searcher) {
 		LinkedList<SearchHit> hits = new LinkedList<SearchHit>();
 		String fullText = fullText();
@@ -284,7 +376,63 @@ public class Page implements Comparable{
 		return hits;
 	}
 
+	
 
+
+	/**
+	 *  deletes image file in the workspace/raw directory
+	 */
+	public void deleteRawFile(){
+		File raw = new File(raw());
+		if(!raw.delete()) System.out.println("RAW file not deleted!!");
+	}
+
+	/**
+	 *  deletes image file in the workspace/processed directory
+	 */
+	public void deleteProcessedFile(){
+		File processed = new File(processed());
+		if(!processed.delete()) System.out.println("PROCESSED file not deleted!!");
+	}
+
+	/**
+	 * deletes metadata file
+	 */
+	public void deleteMetadataFile(){
+		File meta = new File(metafile());
+		System.out.println("Metafile: "+ metafile());
+		if(!meta.delete()) System.out.println("******METADTA file not deleted!!");
+	}
+
+
+	public int compareTo(Object t) {
+		if(order()< ((Page) t).order()) return -1;
+		else if (order() == ((Page) t).order()) return 0;
+		else return 1;
+	}
+
+	public boolean equals(Page p){
+		return (name() == p.name());
+	}
+	
+	/*******************************************************************
+	 * 
+	 * PRIVATE METHODS
+	 * 
+	 *******************************************************************/
+
+
+	/**
+	 * Given a set of terms matching the search query, extracts an appropriate
+	 * snippet of text, which the terms that matched the query approximately centered.
+	 * 
+	 * @param grepWindow - the set of terms that matched the query
+	 * @param fullText - the complete OCR text of the page
+	 * @param midpoint - an integer giving the term position of the term in the middle
+	 * 	of the "grep window"
+	 * 
+	 * @return a String giving a snippet of text that matched the search
+	 */
 	private String getSearchSnippet(Set<Term> grepWindow, String fullText, int midPosition) {
 
 		// collapse the full text into an array of strings
@@ -312,47 +460,5 @@ public class Page implements Comparable{
 
 		return snippet.trim();
 	}
-
-
-	// DEBUGGING METHOD ONLY
-	private void printWindowSet(Set<Term> windowSet) {
-		System.out.print("set: "+_metafile+" ");
-		for (Term t : windowSet) {
-			System.out.print("["+t.word+","+t.pos+"] ");
-		}
-		System.out.println("");
-	}
-
-
-	// deletes image file in the workspace/raw directory
-	public void deleteRawFile(){
-		File raw = new File(raw());
-		if(!raw.delete()) System.out.println("RAW file not deleted!!");
-	}
-
-	// deletes image file in the workspace/processed directory
-	public void deleteProcessedFile(){
-		File processed = new File(processed());
-		if(!processed.delete()) System.out.println("PROCESSED file not deleted!!");
-	}
-
-	// deletes metadata file
-	public void deleteMetadataFile(){
-		File meta = new File(metafile());
-		System.out.println("Metafile: "+ metafile());
-		if(!meta.delete()) System.out.println("******METADTA file not deleted!!");
-	}
-
-
-	public int compareTo(Object t) {
-		if(order()< ((Page) t).order()) return -1;
-		else if (order() == ((Page) t).order()) return 0;
-		else return 1;
-	}
-
-	public boolean equals(Page p){
-		return (name() == p.name());
-	}
-
 
 }

@@ -30,6 +30,7 @@ import core.Parameters;
  * @author Stelios
  *
  */
+@SuppressWarnings("serial")
 public class App extends JFrame {
 
 	/****************************************
@@ -235,6 +236,7 @@ public class App extends JFrame {
 	 */
 	private class SettingsListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
+			@SuppressWarnings("unused")
 			SettingsDialog sd = new SettingsDialog(Parameters.getFrame());
 		}
 	}

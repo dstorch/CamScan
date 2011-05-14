@@ -9,6 +9,12 @@ import java.util.Set;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 
+/*
+ * Manages the list of global transformations which are applied to an image,
+ * e.g. temperature, flippedness, etc.
+ * Designed to be flexible w/r/t new potential values.
+ */
+
 public class ConfigurationDictionary {
 	HashMap<String, ConfigurationValue> map;
 	public ConfigurationDictionary(){
@@ -23,6 +29,7 @@ public class ConfigurationDictionary {
 		elementNames.put("FLIPH", ConfigurationValue.ValueType.FlipHorizontal);
 		elementNames.put("FLIPV", ConfigurationValue.ValueType.FlipVertical);
 		elementNames.put("BILATERAL", ConfigurationValue.ValueType.BilateralFilter);
+		elementNames.put("BINARIZED", ConfigurationValue.ValueType.Binarize);
 		
 		for(Object _key: elementNames.keySet()){
 			String key = (String)_key;
@@ -73,6 +80,7 @@ public class ConfigurationDictionary {
 		elementNames.put(ConfigurationValue.ValueType.FlipHorizontal, "FLIPH");
 		elementNames.put(ConfigurationValue.ValueType.FlipVertical, "FLIPV");
 		elementNames.put(ConfigurationValue.ValueType.BilateralFilter, "BILATERAL");
+		elementNames.put(ConfigurationValue.ValueType.Binarize, "BINARIZED");
 		
 		for(Object _key: this.getAllKeys()){
 			String key = (String)_key;
@@ -91,6 +99,9 @@ public class ConfigurationDictionary {
 		
 	}
 	
+	/*
+	 * Why isn't this in the Java standard library? It's unclear.
+	 */
 	private String join(List<String> s, String seperator){
 		  if (s == null || seperator == null){return null;}
 		  if (s.size() == 0){return "";}

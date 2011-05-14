@@ -10,8 +10,9 @@ import java.awt.geom.Line2D;
 
 import core.Corners;
 
+@SuppressWarnings("serial")
 public class SplitMode extends EditPanel {
-	
+
 	private EditPanel editPanel;
 	
 	// the original corners

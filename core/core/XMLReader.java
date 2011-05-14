@@ -8,9 +8,29 @@ import org.dom4j.io.* ;
 
 import vision.ConfigurationDictionary;
 
+/*******************************************************************
+ * XMLReader
+ *
+ * Provides public functionality for parsing document and page XML
+ * and instantiating the corresponding objects.
+ * 
+ * @author dstorch
+ * 
+ *******************************************************************/
+
 @SuppressWarnings("rawtypes")
 public class XMLReader {
 
+	/**
+	 * Given a path to the XML file for a document, parses
+	 * the XML and returns the corresponding Document object.
+	 * 
+	 * @param path - path to the document to parse
+	 * @return the Document object corresponding to the parsed XML
+	 * 
+	 * @throws FileNotFoundException
+	 * @throws DocumentException
+	 */
 	public Document parseDocument(String path) throws FileNotFoundException, DocumentException {
 
 		Document d = new Document();
@@ -51,6 +71,19 @@ public class XMLReader {
 		return d;
 	}
 
+	/**
+	 * Given a path to page XML, parses the XML and
+	 * returns the corresponding Page object
+	 * 
+	 * @param path - a String indicating the Page XML file
+	 * @param order - the page number for this page
+	 * @param parent - the Document containing the page
+	 * @param name - the Name of the page
+	 * @return the Page object instantiated from the XML
+	 * 
+	 * @throws FileNotFoundException
+	 * @throws DocumentException
+	 */
 	public Page parsePage(String path, int order, Document parent, String name) throws FileNotFoundException, DocumentException {
 		Page p = new Page(parent, order, name);
 		p.setMetafile(path);
@@ -90,6 +123,13 @@ public class XMLReader {
 		return p;
 	}
 
+	/**
+	 * Instantiates and returns a Point from an XML tag
+	 * containing x and y attributes.
+	 * 
+	 * @param element - the dom4j element to extract the Point from
+	 * @return the resulting Point object
+	 */
 	private Point pointFromXML(Element element) {
 		String xstr = element.attribute("x").getStringValue();
 		String ystr = element.attribute("y").getStringValue();
@@ -98,7 +138,13 @@ public class XMLReader {
 		return new Point(x, y);
 	}
 
-
+	/**
+	 * Instantiates a Corners object based on the corresponding
+	 * dom4j element.
+	 * 
+	 * @param corners - the CORNERS dom4j tag
+	 * @return the corresponding Corners object
+	 */
 	private Corners parseCorners(Element corners) {
 
 		Point upright = null, upleft = null, downright = null, downleft = null;
@@ -127,6 +173,12 @@ public class XMLReader {
 	}
 
 
+	/**
+	 * Parses a text XML tag
+	 * 
+	 * @param textEl - the dom4j tag
+	 * @return the corresponding PageText object
+	 */
 	private PageText parseText(Element textEl) {
 		String fullText = "";
 		for (Iterator i = textEl.elementIterator("FULLTEXT"); i.hasNext();) {
@@ -150,6 +202,13 @@ public class XMLReader {
 		return pageText;
 	}
 
+	/**
+	 * Extracts a Position object from a corresponding
+	 * dom4j XML tag
+	 * 
+	 * @param position - the dom4j tag
+	 * @return the corresponing Position instance
+	 */
 	private Position parsePosition(Element position) {
 		String xminStr = position.attribute("xmin").getStringValue();
 		String yminStr = position.attribute("ymin").getStringValue();
@@ -169,6 +228,14 @@ public class XMLReader {
 		return new Position(min, max, word);
 	}
 
+	
+	/**
+	 * Parse and return the configuration dictionary
+	 * from the corresponding XML.
+	 * 
+	 * @param config - the dom4j element
+	 * @return the corresponding ConfigurationDictionary
+	 */
 	private ConfigurationDictionary parseConfig(Element config) {
 		return new ConfigurationDictionary(config);
 	}

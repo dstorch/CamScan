@@ -11,6 +11,15 @@ import core.Page;
 import core.Parameters;
 import core.SystemConfiguration;
 
+/*******************************************************************
+ * ExportThread
+ *
+ * This thread is launched when the user exports a PDF. It performs
+ * OCR and then builds a PDF containing an invisible OCR layer.
+ * 
+ * @author dstorch
+ * 
+ *******************************************************************/
 
 public class ExportThread extends Thread {
 
@@ -22,6 +31,11 @@ public class ExportThread extends Thread {
 		_outfile = outfile;
 	}
 	
+	/**
+	 *  The method which the thread executes. Invokes
+	 *  a python script which uses ReportLab to write
+	 *  the PDF.
+	 */
 	public void run() {
 		
 		BufferedReader reader = null;
@@ -56,6 +70,7 @@ public class ExportThread extends Thread {
 			
 			reader.close();
 		
+			System.out.println("export done");
 		}
 		
 		// show an error message if an IOException is thrown

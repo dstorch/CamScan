@@ -1,17 +1,11 @@
 package centralwidget;
 
 import java.awt.BorderLayout;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
-import java.io.IOException;
 
 import javax.swing.JPanel;
 
-import search.SearchResults;
-
 import core.CoreManager;
 import core.Mode;
-import core.Page;
 import core.Parameters;
 
 import westwidget.WestPanel;
@@ -25,6 +19,7 @@ import eastwidget.EastPanel;
  * @author Stelios
  *
  */
+@SuppressWarnings("serial")
 public class CentralPanel extends JPanel {
 
 	/****************************************
@@ -119,14 +114,6 @@ public class CentralPanel extends JPanel {
 		this.currentMode = Mode.VIEW;
 	}
 	
-	private class HorizontalScrollBarListener implements AdjustmentListener {
-
-		public void adjustmentValueChanged(AdjustmentEvent e) {
-			System.out.println(e.getValue());
-			
-		}
-		
-	}
 	
 	/**
 	 * Returns the view panel.

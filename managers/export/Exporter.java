@@ -4,6 +4,16 @@ import java.io.IOException;
 
 import core.Document;
 
+/*******************************************************************
+ * Exporter
+ *
+ * The interface by which the export functionality is accessed
+ * by the CoreManager.
+ * 
+ * @author dstorch
+ * 
+ *******************************************************************/
+
 public interface Exporter {
 	
 	public void exportToPdf(Document document, String outfile) throws IOException;

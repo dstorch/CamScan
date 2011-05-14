@@ -20,6 +20,7 @@ import core.Parameters;
  * @author Stelios
  *
  */
+@SuppressWarnings("serial")
 public class ViewPanel extends JPanel {
 
 	/****************************************

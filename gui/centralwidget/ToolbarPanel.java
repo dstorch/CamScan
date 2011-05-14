@@ -1,22 +1,17 @@
 package centralwidget;
 
-import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 
 import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-import core.Mode;
-import javax.swing.JRadioButton;
 import core.Parameters;
 
 /**
@@ -27,6 +22,7 @@ import core.Parameters;
  * @author Stelios
  *
  */
+@SuppressWarnings("serial")
 public class ToolbarPanel extends JPanel {
 
 	/****************************************
@@ -54,16 +50,6 @@ public class ToolbarPanel extends JPanel {
 	 * The zoom-out button.
 	 */
 	private JButton zoomOutButton;
-
-	/**
-	 * The back button
-	 */
-	private JButton backButton;
-
-	/**
-	 * The next button
-	 */
-	private JButton nextButton;
 
 	/**
 	 * The view radio button.
@@ -116,7 +102,7 @@ public class ToolbarPanel extends JPanel {
 
 		// the view mode magnifying glass icon
 		c.gridx = 2;
-		c.insets = new Insets(0,150,0,0);
+		c.insets = new Insets(0,75,0,0);
 		JRadioButton viewIcon = new JRadioButton(new ImageIcon(Parameters.VIEW));
 		this.add(viewIcon, c);
 
@@ -145,7 +131,7 @@ public class ToolbarPanel extends JPanel {
 
 		// the down arrow button
 		c.gridx = 6;
-		c.insets = new Insets(0,150,0,0);
+		c.insets = new Insets(0,75,0,0);
 		this.nextPageUp = new JButton(new ImageIcon(Parameters.UP_ARROW));
 		this.nextPageUp.addActionListener(new NextPageUpListener());
 		this.nextPageUp.setToolTipText("Page up");
@@ -202,8 +188,6 @@ public class ToolbarPanel extends JPanel {
 		 * Handles the switch of radio buttons.
 		 */
 		public void actionPerformed(ActionEvent e) {
-			Mode lastMode = centralPanel.getCurrentMode();
-
 			if (e.getActionCommand().equals("VIEW")) {
 				centralPanel.switchToViewPanel();
 				Parameters.setIsInEditMode(false);

@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import javax.vecmath.Vector2d;
 import core.Corners;
 
+/*
+ * Represents a set of potential corners and related logic to evaluate how "good" they are.
+ */
+
 public class PotentialCorners implements Comparable {
 	public Corners corners;
 	public double score;

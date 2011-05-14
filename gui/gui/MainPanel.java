@@ -2,7 +2,6 @@ package gui;
 
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.io.IOException;
 
 import javax.swing.JPanel;
@@ -24,6 +23,7 @@ import eastwidget.EastPanel;
  * @author Stelios Anagnostopoulos (sanagnos)
  *
  */
+@SuppressWarnings("serial")
 public class MainPanel extends JPanel {
 	
 	/****************************************

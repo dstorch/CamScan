@@ -5,6 +5,7 @@ import java.awt.Point;
 
 /*
  * Because Java doesn't have tuples.
+ * Keeps track of a set of values for a potential cluster: position, weight, number of underlying variables...
  */
 public class MergeZone implements Comparable{
 	public int count;

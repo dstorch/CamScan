@@ -18,14 +18,18 @@ import javax.swing.event.ListSelectionListener;
 import core.Document;
 import core.Page;
 import core.Parameters;
+import java.awt.Rectangle;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 //import javax.swing.DropMode;
+import javax.swing.DefaultListModel;
+import javax.swing.DropMode;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -60,6 +64,7 @@ public class PageExplorerPanel extends JPanel {
 
     private int indexFrom;
     private int indexTo;
+    DefaultListModel model;
 
     /****************************************
      *
@@ -75,7 +80,12 @@ public class PageExplorerPanel extends JPanel {
         
         Parameters.setPageExplorerPanel(this);
 
-        this.pageList = new JList(this.getPageNames());
+        model = new DefaultListModel();
+
+        //this.pageList = new JList(this.getPageNames());
+
+        this.pageList = new JList(model);
+        update();
 
         this.pageList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         this.pageList.getSelectionModel().addListSelectionListener(new SelectionListener());
@@ -83,12 +93,11 @@ public class PageExplorerPanel extends JPanel {
         this.pageList.addKeyListener(new deleteListener());
         this.pageList.addMouseListener(new MouseMotion());
 
-        // for DnD
-//        this.pageList.setDropMode(DropMode.INSERT);
-//        this.pageList.setDragEnabled(true);
-//        this.pageList.setTransferHandler(new TH());
-//        this.pageList.setVisibleRowCount(-1); 
-
+        // added for DnD
+        this.pageList.setTransferHandler(new ToTransferHandler());
+        this.pageList.setDropMode(DropMode.INSERT);
+        this.pageList.setDragEnabled(true);
+        this.pageList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         this.listScroller = new JScrollPane(this.pageList);
         this.listScroller.setPreferredSize(new Dimension(150, 600));
@@ -105,8 +114,10 @@ public class PageExplorerPanel extends JPanel {
      * when the working document has changed.
      */
     public void update() {
-        this.pageList.setListData(this.getPageNames());
-        this.listScroller.revalidate();
+        //this.pageList.setListData(this.getPageNames());
+        model.removeAllElements();
+        getPageNames();
+//        this.listScroller.revalidate();
         this.pageList.setSelectedIndex(0);
     }
 
@@ -152,7 +163,7 @@ public class PageExplorerPanel extends JPanel {
         if (workingDoc != null) {
 
             for (Page page : workingDoc.pages()) {
-                //model.addElement(Integer.toString(page.order()));
+                model.addElement(page.order()+": "+page.name());
                 pages.add(page.order()+": "+page.name());
             }
         }
@@ -256,108 +267,95 @@ public class PageExplorerPanel extends JPanel {
         public void mouseExited(MouseEvent me) {}
     }
 
-    /**
-     * Class to support drag and dropping for reordering pages
-     *
-     */
-    protected class TH extends TransferHandler {
 
-        public boolean canImport(TransferHandler.TransferSupport info) {
-            // we only import Strings
-            if (!info.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                return false;
-            }
+   /**
+    * For reordering Pages
+    */
 
-            JList.DropLocation dl = (JList.DropLocation) info.getDropLocation();
-            if (dl.getIndex() == -1) {
-                System.out.println("INDEX = -1");
-                return false;
-            }
-            System.out.println("Can Import!");
-            return true;
+    class ToTransferHandler extends TransferHandler {
+        int action = TransferHandler.MOVE;
+
+        public int getSourceActions(JComponent comp) {
+            return TransferHandler.MOVE;
         }
 
-        public boolean importData(TransferHandler.TransferSupport info) {
-            if (!info.isDrop()) {
-                return false;
+        private int index = 0;
+
+        public Transferable createTransferable(JComponent comp) {
+            index = pageList.getSelectedIndex();
+            indexFrom = index+1;
+            System.err.println("****INDEX From: "+indexFrom);
+            if (index < 0 || index >= model.getSize()) {
+                return null;
             }
 
-            // Check for String flavor
-            if (!info.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-                return false;
-            }
+            return new StringSelection((String)pageList.getSelectedValue());
+        }
 
-            System.out.println("Creating transferable");
-
-            JList.DropLocation dl = (JList.DropLocation) info.getDropLocation();;
-            int index = dl.getIndex();
-            
+        public void exportDone(JComponent comp, Transferable trans, int action) {
+            //model.removeElementAt(index);
             Document d = Parameters.getCoreManager().workingDocument();
-            indexTo = index;
-            String value2 = (String) pageList.getModel().getElementAt(dl.getIndex());
-            indexFrom = Integer.parseInt(value2);
-            Page p = Parameters.getCoreManager().getPageFromOrder(d, indexFrom+1);
-            boolean insert = dl.isInsert();
-            // Get the current string under the drop.
-            String value = (String) pageList.getModel().getElementAt(index);//listModel.getElementAt(index);
+            Page p = Parameters.getCoreManager().getPageFromOrder(d, indexFrom);
+            try {
+                Parameters.getCoreManager().reorderPage(d, p, indexTo);
+            } catch (IOException ex) {
+                Logger.getLogger(PageExplorerPanel.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            update();
+        }
 
-            // Get the string that is being dropped.
-            Transferable t = info.getTransferable();
+        public boolean canImport(TransferHandler.TransferSupport support) {
+            // for the demo, we'll only support drops (not clipboard paste)
+            if (!support.isDrop()) {
+                return false;
+            }
+
+            // we only import Strings
+            if (!support.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                return false;
+            }
+
+            boolean actionSupported = (action & support.getSourceDropActions()) == action;
+            if (actionSupported) {
+                support.setDropAction(action);
+                return true;
+            }
+
+            return false;
+        }
+
+        public boolean importData(TransferHandler.TransferSupport support) {
+            // if we can't handle the import, say so
+            if (!canImport(support)) {
+                return false;
+            }
+
+            // fetch the drop location
+            JList.DropLocation dl = (JList.DropLocation)support.getDropLocation();
+
+            int index = dl.getIndex();
+            indexTo = index;
+            System.err.println("****INDEX To: "+indexTo);
+            // fetch the data and bail if this fails
             String data;
             try {
-                data = (String) t.getTransferData(DataFlavor.stringFlavor);
-            } catch (Exception e) {
-                System.out.println("In exception!");
+                data = (String)support.getTransferable().getTransferData(DataFlavor.stringFlavor);
+            } catch (UnsupportedFlavorException e) {
+                return false;
+            } catch (java.io.IOException e) {
                 return false;
             }
-            
-            System.out.println("Created transferable");
 
-            // Perform the actual import (rearrange List of Pages).
-            if (insert) {
-                try {
-                    System.out.println("Insert");
-                    Parameters.getCoreManager().reorderPage(d, p, indexTo + 1);
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(null, ex.getMessage(), "Reordering Error", JOptionPane.ERROR_MESSAGE);
-                }
-            } else {
-                System.out.println("Not insert");
-                //Parameters.getCoreManager().reorderPage(d, p, Integer.parseInt(value2));
-            }
+            JList list = (JList)support.getComponent();
+            DefaultListModel model = (DefaultListModel)list.getModel();
+            model.insertElementAt(data, index);
+
+            Rectangle rect = list.getCellBounds(index, index);
+            list.scrollRectToVisible(rect);
+            list.setSelectedIndex(index);
+            list.requestFocusInWindow();
+
             return true;
-        }
-
-        public int getSourceActions(JComponent c) {
-            return MOVE;
-        }
-
-        protected Transferable createTransferable(JComponent c) {
-            JList list = (JList) c;
-            Object[] values = list.getSelectedValues();
-
-            System.out.println("in transferable: "+list.getSelectedIndex());
-            indexTo = list.getSelectedIndex();
-            StringBuffer buff = new StringBuffer();
-
-            for (int i = 0; i < values.length; i++) {
-                Object val = values[i];
-                buff.append(val == null ? "" : val.toString());
-                if (i != values.length - 1) {
-                    buff.append("\n");
-                }
-            }
-            System.out.println(buff.toString());
-            return new StringSelection("Transferable: "+buff.toString());
-        }
-
-        @Override
-        protected void exportDone(JComponent c, Transferable t, int action) {
-            if (action == MOVE) {
-                System.out.println("*****MOVE****");
-                System.out.println("FROM: "+indexFrom+", TO: "+indexTo);
-                update();
-            }
         }
     }
 
