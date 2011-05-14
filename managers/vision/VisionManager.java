@@ -770,22 +770,22 @@ public class VisionManager {
 			System.out.println("Couldn't load an image! (Fatal).");
 		}
 		
-		IplImage image = cvLoadImage("tests/images/IMG_1529.tif");
+		IplImage timage = cvLoadImage("tests/images/IMG_1529.tif");
 		
 		try{
-			applyFlipCorrection(image, new ConfigurationValue(ConfigurationValue.ValueType.Binarize, true));
-			applyTemperatureCorrection(image, new ConfigurationValue(ConfigurationValue.ValueType.ColorTemperature, 25));
-			applyContrastBoost(image, new ConfigurationValue(ConfigurationValue.ValueType.ContrastBoost, true));
-			applyBinarization(image, new ConfigurationValue(ConfigurationValue.ValueType.Binarize, true));
+			applyFlipCorrection(timage, new ConfigurationValue(ConfigurationValue.ValueType.Binarize, true));
+			applyTemperatureCorrection(timage, new ConfigurationValue(ConfigurationValue.ValueType.ColorTemperature, 25));
+			applyContrastBoost(timage, new ConfigurationValue(ConfigurationValue.ValueType.ContrastBoost, true));
+			applyBinarization(timage, new ConfigurationValue(ConfigurationValue.ValueType.Binarize, true));
 			System.out.println("Global transform tests passed!");
 		}catch(Exception e){
 			System.out.println("Couldn't do global transforms");
 		}
 		
-		image = cvLoadImage("tests/images/IMG_1529.tif");
+		timage = cvLoadImage("tests/images/IMG_1529.tif");
 		
 		try{
-			findCorners(IplImageToBufferedImage(image));
+			findCorners(IplImageToBufferedImage(timage));
 			System.out.println("Found corners!");
 		}catch(Exception e){
 			System.out.println("Couldn't perform corner finding.");

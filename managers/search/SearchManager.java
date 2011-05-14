@@ -128,4 +128,12 @@ public class SearchManager implements Searcher {
 		return stemmed;
 	}
 
+	
+	
+	public void test(){
+		SearchResults results;
+		Document doc;
+		
+		results = getSearchResults("query!", doc, new LinkedList<Document>());
+	}
 }
