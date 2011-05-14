@@ -156,7 +156,7 @@ public class PageExplorerPanel extends JPanel {
         return pages;
     }
 
-    public void reOrderPages() throws IOException{
+    public void reOrderPages(int highlightIndex) throws IOException{
         int first = pageList.getFirstVisibleIndex();
         int last = pageList.getLastVisibleIndex();
 
@@ -170,10 +170,12 @@ public class PageExplorerPanel extends JPanel {
         }
 
         Parameters.getCoreManager().reorderPage(d, orderedNames);
-
+        // update all panels
         update();
         mainPanel.updateCentralPanels(false);
         Parameters.getDocExpPanel().update();
+        // keep page dragged highlighted
+        setPageOrder(highlightIndex);
 
     }
 
