@@ -762,6 +762,37 @@ public class VisionManager {
 	
 	@SuppressWarnings("unused")
 	public static void main(String[] args) throws IOException, InvalidTypingException{
+		//Tests!
+		
+		try{
+			cvLoadImage("tests/images/IMG_1529.tif");
+		}catch (Exception e){
+			System.out.println("Couldn't load an image! (Fatal).");
+		}
+		
+		IplImage image = cvLoadImage("tests/images/IMG_1529.tif");
+		
+		try{
+			applyFlipCorrection(image, new ConfigurationValue(ConfigurationValue.ValueType.Binarize, true));
+			applyTemperatureCorrection(image, new ConfigurationValue(ConfigurationValue.ValueType.ColorTemperature, 25));
+			applyContrastBoost(image, new ConfigurationValue(ConfigurationValue.ValueType.ContrastBoost, true));
+			applyBinarization(image, new ConfigurationValue(ConfigurationValue.ValueType.Binarize, true));
+			System.out.println("Global transform tests passed!");
+		}catch(Exception e){
+			System.out.println("Couldn't do global transforms");
+		}
+		
+		image = cvLoadImage("tests/images/IMG_1529.tif");
+		
+		try{
+			findCorners(IplImageToBufferedImage(image));
+			System.out.println("Found corners!");
+		}catch(Exception e){
+			System.out.println("Couldn't perform corner finding.");
+		}
+		
+		
+		if (1==1){return;} //Silly Java.
 		
 		if (!SystemConfiguration.OPENCV_ENABLED){
 			System.out.println("OpenCV disabled!");
@@ -777,13 +808,13 @@ public class VisionManager {
         	final ByteBuffer minibuf = mini.getByteBuffer();
         	
         	if (false){
-        		/*
-        		 * Ideas:
-        		 * -use angle invariance to do RANSAC on the points
-        		 * -clustering + morphological ops to segment image for best corners
-        		 * -absolute value of harris detector for warpage? (doesn't seem to work)
-        		 * -absolute value of harris detector for integral neighborhood eval.? (doesn't seem to improve)
-        		 */
+        		
+        		 //* Ideas:
+        		 //* -use angle invariance to do RANSAC on the points
+        		 //* -clustering + morphological ops to segment image for best corners
+        		 //* -absolute value of harris detector for warpage? (doesn't seem to work)
+        		 //* -absolute value of harris detector for integral neighborhood eval.? (doesn't seem to improve)
+        		 
         		
         		long start = System.nanoTime();
         		int width = mini.width();
