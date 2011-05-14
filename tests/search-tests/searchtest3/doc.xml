@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<DOCUMENT name="searchtest3">
+  <PAGES>
+    <PAGE order="0" metafile="tests/search-tests/searchtest3/page1.xml" name="page1"/>
+  </PAGES>
+</DOCUMENT>

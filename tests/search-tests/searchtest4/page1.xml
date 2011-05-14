@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<PAGE name="page1">
+  <IMG path="" processed=""/>
+  <CORNERS>
+    <UPRIGHT x="100" y="50"/>
+    <DOWNRIGHT x="100" y="200"/>
+    <UPLEFT x="50" y="50"/>
+    <DOWNLEFT x="50" y="200"/>
+  </CORNERS>
+  <TEXT>
+    <FULLTEXT>
+
+
+Foodler is holding a one-night contest w/ $100 prize, more details from JJ:
+
+Foodler has a problem on holidays.  We know that many restaurants
+change their hours (or close completely), but getting that information
+from thousands of restaurants is difficult.
+
+Today, we fax them a form to fill out with changes, and just close
+down any restaurant that doesn't fill it out.  Of course, this is
+error-prone.  Some restaurants don't get around to filling it out, so
+we close them down in order to be conservative.  Further, it's labor
+intensive, because our workers need to read and enter the new data
+from blurry, handwritten faxes.
+
+We'd like two tools to help us use the phone system to solve this
+problem accurately, and with less labor. Twilio.com offers free developer 
+testing accounts.
+
+
+TOOL #1: Are you open?
+
+This tool would be invoked a few minutes after a restaurant is
+supposed to be open.  It would call the restaurant, identify itself,
+and ask them to enter a code if they are open.  This just confirms
+that a human is there, and they are actually open.  A command-line
+tool like this:
+
+ ./are-you-open 617-555-2121 367 0
+
+ would fit the bill.  It would ask the person to enter 367 if they are
+ open, or 0 if they are closed. Print
+
+ "NO ANSWER" if there's no answer after, say, 8 rings.
+ "BUSY" if there is a busy signal
+ "OPEN" if the human types 367
+ "CLOSED" if the human types 0
+ "UNKNOWN" if the phone is answered, but no response is detected.
+ "ERROR" for anything else - probably a twilio timeout or error.
+
+ You can assume that we would do any retry logic, based on these
+ responses.  No need for the tool to retry BUSY numbers, for example.
+
+ TOOL #2: Are you closing?
+
+ We would use this tool in lead up to a holiday.  It would call a
+ number, identify itself, and find out the intended hours of the
+ restaurant for the holiday in question.
+
+ ./are-you-closing 617-555-2121 "Thanksgiving, November 25th"
+
+ "NO ANSWER" if there's no answer after, say, 8 rings.
+ "BUSY" if there is a busy signal
+ "OPEN" if they confirm normal operating hours.
+ "CLOSED" if they indicate they are closed entirely
+ if the indicate different hours
+ "UNKNOWN" if the phone is answered, but no response is detected.
+ "ERROR" for anything else - probably a Twilio timeout or error.
+
+ This tool requires you come up with the simplest way to enter hours
+ that you can come up with.  The most common responses are normal
+ hours, or closed, so you should probably just ask that first.  Then
+ you might ask whether the are closing early. If yes, have them enter a
+ time.  Then, opening late?  (I think Twilio can do voice synthesis of
+ the text name of the holiday, otherwise assume we'll create an audio
+ file.)
+
+ We'll pay $100 for the best ./are-you-closing tool.  ($100 for the
+ best ./are-you-open, if nobody gets ./are-you-closing done.)  The rule
+ is: We get your code, and so do you.  We can do anything we want with
+ it, as if we wrote it ourselves, but you lose no rights.  You can go do
+ what you want with it too.
+
+ Any stand-alone script/program is fine.  This is supposed to be a
+ small hack project, so deadline is Friday at midnight.  Email code to
+ jannotti@gmail.com. Although I can't be there, I should be able to
+ answer questions by email during the night.
+
+	</FULLTEXT>
+    <POSITIONS/>
+  </TEXT>
+  <CONFIG>
+    <COLORTEMP value="0"/>
+    <CONTRASTBOOST value="no"/>
+    <FLIPH value="no"/>
+    <FLIPV value="no"/>
+  </CONFIG>
+</PAGE>

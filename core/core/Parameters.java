@@ -87,6 +87,11 @@ public class Parameters {
 	public static final String[] txtExtensions = {".txt", ".text"};
 	public static final String[] pdfExtensions = {".pdf"};
 	
+	/**
+	 * Amount of seconds to wait before timing out OCR
+	 */
+	public static final int OCR_TIMEOUT = 40;
+	
 	/****************************************
 	 * 
 	 * Mutable Parameters

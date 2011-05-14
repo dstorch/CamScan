@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<DOCUMENT name="exporttest1">
+  <PAGES>
+    <PAGE order="1" metafile="tests/export/exporttest1/mexican_war_text.xml" name="mexican_war_text"/>
+    <PAGE order="2" metafile="tests/export/exporttest1/sample2.xml" name="sample2"/>
+    <PAGE order="3" metafile="tests/export/exporttest1/sample_page.xml" name="sample_page"/>
+  </PAGES>
+</DOCUMENT>

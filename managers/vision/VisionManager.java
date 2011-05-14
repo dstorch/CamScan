@@ -165,18 +165,18 @@ public class VisionManager {
 	private static IplImage applyBinarization(IplImage img, ConfigurationValue binarize){
 		if (!(Boolean)binarize.value()){ return img;}
 		
-		IplImage hsl = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 3);
-		cvCvtColor(img, hsl, CV_RGB2HLS);
+		IplImage gray = cvCreateImage(cvSize(img.width(), img.height()), IPL_DEPTH_8U, 1);
+    	cvCvtColor(img, gray, CV_RGB2GRAY);
 		
-		final ByteBuffer hslbuf = hsl.getByteBuffer();
+		final ByteBuffer graybuf = gray.getByteBuffer();
 		final ByteBuffer buf = img.getByteBuffer();
 		
 		int luma;
 		for(int y=0;y<img.height();y++){
 			for (int x=0;x<img.width();x++){
-				luma = hslbuf.get( y*img.width() + x + 2 )&0xff;
+				luma = graybuf.get( y*img.width() + x )&0xff;
 				
-				if (luma > 50){
+				if (luma > 127){
 					buf.put(y*img.width()*3 + x*3 + 0, (byte)255 );
 					buf.put(y*img.width()*3 + x*3 + 1, (byte)255 );
 					buf.put(y*img.width()*3 + x*3 + 2, (byte)255 );
@@ -764,6 +764,37 @@ public class VisionManager {
 	
 	@SuppressWarnings("unused")
 	public static void main(String[] args) throws IOException, InvalidTypingException{
+		//Tests!
+		
+		try{
+			cvLoadImage("tests/images/IMG_1529.tif");
+		}catch (Exception e){
+			System.out.println("Couldn't load an image! (Fatal).");
+		}
+		
+		IplImage timage = cvLoadImage("tests/images/IMG_1529.tif");
+		
+		try{
+			applyFlipCorrection(timage, new ConfigurationValue(ConfigurationValue.ValueType.Binarize, true));
+			applyTemperatureCorrection(timage, new ConfigurationValue(ConfigurationValue.ValueType.ColorTemperature, 25));
+			applyContrastBoost(timage, new ConfigurationValue(ConfigurationValue.ValueType.ContrastBoost, true));
+			applyBinarization(timage, new ConfigurationValue(ConfigurationValue.ValueType.Binarize, true));
+			System.out.println("Global transform tests passed!");
+		}catch(Exception e){
+			System.out.println("Couldn't do global transforms");
+		}
+		
+		timage = cvLoadImage("tests/images/IMG_1529.tif");
+		
+		try{
+			findCorners(IplImageToBufferedImage(timage));
+			System.out.println("Found corners!");
+		}catch(Exception e){
+			System.out.println("Couldn't perform corner finding.");
+		}
+		
+		
+		if (1==1){return;} //Silly Java.
 		
 		if (!SystemConfiguration.OPENCV_ENABLED){
 			System.out.println("OpenCV disabled!");
@@ -779,13 +810,13 @@ public class VisionManager {
         	final ByteBuffer minibuf = mini.getByteBuffer();
         	
         	if (false){
-        		/*
-        		 * Ideas:
-        		 * -use angle invariance to do RANSAC on the points
-        		 * -clustering + morphological ops to segment image for best corners
-        		 * -absolute value of harris detector for warpage? (doesn't seem to work)
-        		 * -absolute value of harris detector for integral neighborhood eval.? (doesn't seem to improve)
-        		 */
+        		
+        		 //* Ideas:
+        		 //* -use angle invariance to do RANSAC on the points
+        		 //* -clustering + morphological ops to segment image for best corners
+        		 //* -absolute value of harris detector for warpage? (doesn't seem to work)
+        		 //* -absolute value of harris detector for integral neighborhood eval.? (doesn't seem to improve)
+        		 
         		
         		long start = System.nanoTime();
         		int width = mini.width();

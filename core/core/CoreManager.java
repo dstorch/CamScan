@@ -163,7 +163,6 @@ public class CoreManager {
 	 * @throws IOException 
 	 */
 	public void setWorkingDocumentFromName(String docName) throws IOException {
-		System.out.println("Doc Name: "+docName);
 		Document doc = getDocFromName(docName);
 		_workingDocument = doc;
 		setWorkingPageAndImage(doc.pages().first());
@@ -460,7 +459,6 @@ public class CoreManager {
 					setWorkingDocument(first);
 					setWorkingPageAndImage(first.pages().first());
 				}else{ // there are no Documents
-					System.out.println("IN ELSE!!!");
 					_workingDocument = null;
 					_workingPage = null;
 					_rawImage = null;
@@ -644,7 +642,27 @@ public class CoreManager {
 		String name = sourceLocation.getName();
 		String directory = Parameters.DOC_DIRECTORY + File.separator + name;
 		File dirFile = new File(directory);
-		if (!dirFile.mkdir()) throw new IOException("Import aborted: problem making new document directory!");
+		
+		// handle the error case by displaying a warning, and then proceding to delete
+		if (!dirFile.mkdir()) {
+			
+			int result = JOptionPane.showConfirmDialog(Parameters.getFrame(),
+										  "You already have a document by that name. Do you want to overwrite?",
+										  "Import Document",
+										  JOptionPane.YES_NO_OPTION	);
+			
+			// if overwriting
+			if (result == JOptionPane.YES_OPTION) {
+				IOFunctions.deleteDir(dirFile);
+				dirFile.mkdir();
+			}
+			
+			// otherwise do nothing
+			else {
+				return null;
+			}
+		}
+		
 		String pathname = directory + File.separator + "doc.xml";
 		Document newDoc = new Document(name, pathname);
 
@@ -686,9 +704,27 @@ public class CoreManager {
 		String noExt = removeExtension(imageFile);
 		String directory = Parameters.DOC_DIRECTORY + File.separator + noExt;
 		File dirFile = new File(directory);
+		
+		// handle the error case by displaying a warning, and then proceding to delete
 		if (!dirFile.mkdir()) {
-			throw new IOException("Import aborted: problem making new document directory!");
+			
+			int result = JOptionPane.showConfirmDialog(Parameters.getFrame(),
+										  "You already have a document by that name. Do you want to overwrite?",
+										  "Import Document",
+										  JOptionPane.YES_NO_OPTION	);
+			
+			// if overwriting
+			if (result == JOptionPane.YES_OPTION) {
+				IOFunctions.deleteDir(dirFile);
+				dirFile.mkdir();
+			}
+			
+			// otherwise do nothing
+			else {
+				return null;
+			}
 		}
+		
 		String pathname = directory + File.separator + "doc.xml";
 		Document newDoc = new Document(noExt, pathname);
 
@@ -930,7 +966,9 @@ public class CoreManager {
 		try {
 			Parameters.getCoreManager().getWorkingPage().config().setKey(new ConfigurationValue(ConfigurationValue.ValueType.ColorTemperature, temperature));
 		} catch (InvalidTypingException e) {
-			System.out.println("ConfigurationValue threw an InvalidTypingException! Won't be able to change the temperature.");
+			JOptionPane.showMessageDialog(Parameters.getFrame(),
+					"ConfigurationValue threw an InvalidTypingException! Won't be able to change the temperature.",
+					"Startup Warning", JOptionPane.WARNING_MESSAGE);
 		}
 	}
 
@@ -1027,7 +1065,6 @@ public class CoreManager {
 	 * @see removeExtension()
 	 */
 	private String getExtension(String file) {
-		System.out.println(file);
 		String[] pieces = file.split("[.]");
 		return pieces[pieces.length-1];
 	}

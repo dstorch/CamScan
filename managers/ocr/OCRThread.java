@@ -14,15 +14,14 @@ public class OCRThread extends Thread {
 	}
 	
 	public void run() {
+		System.out.println("running OCR");
 		try {
-			System.out.println("writing processed image");
-			_page.writeProcessedImage();
-			System.out.println("doing OCR");
+			//_page.writeProcessedImageTIFF();
 			_page.setOcrResults();
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 		}
-		System.out.println("OCR thread exiting");
+		System.out.println("OCR exited");
 	}
 
 

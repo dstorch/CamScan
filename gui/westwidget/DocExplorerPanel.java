@@ -161,7 +161,6 @@ public class DocExplorerPanel extends JPanel {
 
         public void valueChanged(ListSelectionEvent e) {
             if (e.getValueIsAdjusting() == false) {
-
                 ListSelectionModel lsm = (ListSelectionModel) e.getSource();
 
                 int minIndex = lsm.getMinSelectionIndex();

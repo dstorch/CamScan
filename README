@@ -5,12 +5,13 @@
 # Contents:
 #   1. Project set-up
 #   2. Design overview
-#   3. Additional resources
+#   3. Testing
+#   4. Additional resources
 #
 # Authors and Contact:
 #  1. Michelle Micallef
 #     mmicalle@cs.brown.edu
-#	  michelle_micallef@brown.edu
+#     michelle_micallef@brown.edu
 #  2. David Storch
 #     dstorch@cs.brown.edu
 #     david_storch@brown.edu
@@ -71,7 +72,8 @@ in workspace/docs in a series of XML files.
 
 f) tests
 ===
-Contains test data used in development of CamScan.
+Contains test data used in development of CamScan. See Section 3 of this
+readme for more on testing.
 
 
 #############################################################################
@@ -106,8 +108,29 @@ The PDF export functionality is written almost entirely in Python. We are
 using ReportLab, a convenient PDF drawing library for Python.
 
 #############################################################################
-# 3. Additional resources
+# 3. Testing
 #############################################################################
 
+a) Unit tests
+===
+The modules have been separately unit tested. The tests can be executed
+simultaneously by invoking the "testall" shell script. This script can
+be found in the tests/ subdirectory of the project folder. This script
+just calls a series of unit testing scripts. See the commenting inside
+testall.sh for details.
+
+b) System tests
+===
+The user interface and system integration were tested interactively on
+a set of standard test data. Our test data includes both images and test
+XML documents, located respectively in tests/xml/ and tests/images/.
+
+For more information on system tests, see tests/TESTING.txt.
+
+#############################################################################
+# 4. Additional resources
+#############################################################################
+
+For instructions on how to use CamScan, see our user guide!
 
 

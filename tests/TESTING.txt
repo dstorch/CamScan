@@ -1,0 +1,20 @@
+==CamScan Testing==
+
+We split our testing at the module level, with each subcomponent responsible 
+with ensuring its own internal consistency and especially correct results as 
+returned to the caller for public methods. To this end most of the feature 
+modules have automated unit tests. Some (such as the GUI) have to be tested 
+manually; these tests are outlined below. In addition to the module level 
+testing we've assembled a corpus of test data for integration testing which 
+comprises documents and raw images for processing. This corpus can be found 
+in the tests directory.
+
+==Manual Testing==
+We have a sample test document in /tests/xml which was created by hand 
+according to the spec (since we couldn't trust the output of our program to 
+conform either!). Similar tests were performed for the output (e.g. the save 
+of a loaded document is equivalent to the original). Under the images folder 
+we have a variety of images from different documents, environments, and taken 
+under different lighting conditions. These were primarily collected to test 
+the algorithms in the vision library (corner finding, etc.), but double as 
+document creation tests.

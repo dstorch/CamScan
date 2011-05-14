@@ -476,7 +476,7 @@ public class EditPanel extends JPanel implements MouseMotionListener, MouseWheel
 	 */
 	protected boolean isWithinCornerEllipse(Ellipse2D ellipse, double mX, double mY) {
 
-		int limit = (int) (75 * this.scaleFactor);
+		int limit = (int) (40 * this.scaleFactor);
 		return (ellipse.getCenterX() - limit <= mX && mX <= ellipse.getCenterX() + limit &&
 				ellipse.getCenterY() - limit <= mY && mY <= ellipse.getCenterY() + limit);
 	}
