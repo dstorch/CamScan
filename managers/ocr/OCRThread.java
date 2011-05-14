@@ -16,7 +16,7 @@ public class OCRThread extends Thread {
 	public void run() {
 		System.out.println("running OCR");
 		try {
-			//_page.writeProcessedImageTIFF();
+			_page.writeProcessedImageTIFF();
 			_page.setOcrResults();
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
